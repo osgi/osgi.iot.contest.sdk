@@ -5,7 +5,7 @@
 SAN RAMON, Calif. – Aug. 27, 2015 – OSGi app developers are invited to participate in an IoT playground competition at the OSGi Community Event 2015, Nov. 3-5. The contest will demonstrate how OSGi was made for the Internet of Things as participants control a model LEGO® train track that runs multiple trains simultaneously at the event.
 The train and track playground will illustrate the OSGi advantage of being able to reliably share code from the cloud all the way down to the smallest devices in an IoT environment.
 
-The OSGi Community Event 2015 is co-located with EclipseCon Europe 2015, in Ludwigsburg, Germany. Registered attendees have access to both conference programs, including the OSGi IoT demo.
+The OSGi Community Event 2015 is co-located with [EclipseCon Europe 2015][eclipsecon], in Ludwigsburg, Germany. Registered attendees have access to both conference programs, including the OSGi IoT demo.
 
 The IoT playground will use OSGi technology from the cloud to the lowest levels of sensors and actuators in the train and track playground. Developers will be able to assign tasks to the trains and see how the trains navigate the tracks.
 
@@ -31,3 +31,4 @@ Alisa Pfeil
 Inventures for OSGi Alliance apfeil@inventures.com +1.775.720.5071 www.osgi.org
 
 [twitter]: https://twitter.com/OSGiAlliance?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor
+[eclipsecon]: https://www.eclipsecon.org/europe2015/
