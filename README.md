@@ -22,9 +22,11 @@ The SDK will be available Oct. 1 at [https://github.com/osgi/osgi.iot.contest.sd
 
 The OSGi Alliance is a worldwide consortium of technology innovators that advances a proven and mature process to enable the componentization of applications into well-defined software modules, and ensure interoperability of applications and services over a broad variety of devices. The Alliance provides specifications, reference implementations, test suites and certification to foster a valuable cross-industry ecosystem. OSGi technology is shipping in millions of units worldwide, and is deployed by Fortune Global 500 companies in enterprise, desktop, smart home/energy and telematics markets. Member companies collaborate within an egalitarian, equitable and transparent environment and promote adoption of OSGi technology through business benefits, user experiences and forums. For more information on the non-profit technology corporation, visit [http://www.osgi.org](http://www.osgi.org).
 
----------
+-----
+
 OSGi is a trademark or registered trademark of the OSGi Alliance in the United States, other countries, or both. Java and all Java based trademarks and logos are trademarks of the Oracle Corporation in the United States, other countries, or both. All other product or service names are the property of their respective owners.
----------
+
+-----
 
 ### Media Contact:
 Alisa Pfeil
