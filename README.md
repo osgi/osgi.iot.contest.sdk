@@ -14,7 +14,7 @@ An application manages the overall track from the cloud and provides a user inte
 The demonstration is underpinned by OSGi enRoute, available in September, which provides an easy-to-use tool chain for OSGi that provides the best-known practices with a true service-oriented architecture.
 The OSGi Alliance will provide a software development kit for the playground that includes a train emulator of the track and train. Participants can provide software that controls a train or the overall track. The winners of the competition will be selected and announced on the final day of the conference.
 
-The SDK will be available Oct. 1 at [https://github.com/osgi/osgi.iot.contest.sdk[(https://github.com/osgi/osgi.iot.contest.sdk). Follow [@OSGiAlliance][twitter] on Twitter for updates and reminders.
+The SDK will be available Oct. 1 at [https://github.com/osgi/osgi.iot.contest.sdk](https://github.com/osgi/osgi.iot.contest.sdk). Follow [@OSGiAlliance][twitter] on Twitter for updates and reminders.
 
 ￼Register to attend the OSGi Community Event and EclipseCon Europe. Early bird rates are available through Sept. 30.
 
