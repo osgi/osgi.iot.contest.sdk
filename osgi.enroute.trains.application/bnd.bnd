@@ -1,0 +1,28 @@
+#
+# OSGI ENROUTE TRAINS APPLICATION APPLICATION
+#
+
+Bundle-Version: 			1.0.0.${tstamp}
+EnRoute-Application: 		osgi.enroute.trains
+Bundle-Description: \
+	A viewer on the OSGi enRoute Trains Community Event Demonstration. This viewer \
+	shows the track in all its events in gory detail.
+Private-Package:  \
+	osgi.enroute.trains.application
+
+Conditional-Package: aQute.lib*
+
+-includeresource: \
+	{readme.md}, \
+	{configuration=configuration}, \
+	{static=static}, \
+	web=web
+
+-buildpath: \
+	osgi.enroute.base.api,\
+	osgi.enroute.trains.api;version=latest,\
+	biz.aQute.bndlib;packages=*,\
+	osgi.enroute.trains.util;version=latest
+	
+-testpath: \
+	osgi.enroute.junit.wrapper

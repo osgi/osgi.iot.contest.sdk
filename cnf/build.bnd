@@ -1,0 +1,5 @@
+#
+# This file is left open for you to define your macros
+#
+Bundle-Vendor: 				OSGi Alliance 
+Bundle-Copyright: 			OSGi Alliance All Rights Reserved ${tstamp;YYYY}

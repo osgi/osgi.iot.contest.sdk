@@ -1,0 +1,10 @@
+# Name       Type              Speed    Controller   To
+
+  A00      : STRAIGHT      : 1      : -1         : X01
+  X01      : SWITCH        : 1      : -1         : B00, C00
+  B00      : STRAIGHT      : 1      : -1         : X02
+  X02      : SWITCH        : 1      : -1         : A00
+  
+  C00      : STRAIGHT      : 1      : -1         : C01
+  C01      : STRAIGHT      : 1      : -1         : X02!
+  

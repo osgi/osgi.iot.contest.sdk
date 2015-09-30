@@ -1,0 +1,184 @@
+<section ng-cloak>
+	<style>
+		.rails {
+			stroke:				black;
+			stroke-width:		8;
+			fill:				none;
+		}
+		.arrow {
+			stroke:				white;
+			stroke-width:		4;
+			fill:				none;
+		}
+		
+		.GREEN {
+			fill: lightgreen;
+			stroke: black;
+		}
+		.RED {
+			fill: red;
+			stroke: black;
+		}
+		.YELLOW {
+			fill: orange;
+			stroke: black;
+		}
+		
+		.arrived {
+			background-color: #EEF5F7;
+			border-radius: 2px;
+		}
+	</style>	
+	
+	{{
+		w=15;
+		h=90;
+		w2=w/2;
+		h2=h/2;
+		railsw=10;
+		indent=20;
+		;""
+	}}
+	<svg style="height:350px;width:100%"]">
+		<g ng:attr:transform="translate({{indent}},0)">
+			<path ng:attr:d="M 0 120 q -10 0 -10 -10 l 0 {{-h}} q 0 -10 10 -10 l 660 0 q 10 0 10 10 l 0 {{h}} q 0 10 -10 10 l -50 0" class=rails>
+			</path>
+			<g ng-repeat="p in track" class={{p.segment.id}}>
+				{{
+					x = p.x * w;
+					y = p.y * h + h;
+					l = p.width * w;
+				;""
+				}}
+				<g ng-switch=p.symbol ng:attr:transform="translate({{x}},{{y+30}})">
+					<path ng:attr:d="M 0 0 l{{l}} 0" class=rails></path>
+					
+					
+					<g ng-switch-when=SWITCH>
+						<path ng:attr:d="M 0 0 q 10 0 10 10 l 0 {{h-20}} q 0 10 10 10 l {{2*w-20}} 0" class=rails fill=none></path>
+						<path d="M 15 -5 l 5 5 l -5 5" class=arrow ng-show=!p.alt></path>
+						<path d="M 5 10 l 5 5 l 5 -5" class=arrow ng-show=p.alt></path>
+						<title>Switch {{p.segment.id}}</title>
+					</g>
+					<g ng-switch-when=MERGE>
+						<path ng:attr:d="M 0 {{h}} q 10 0 10 -10 l 0 {{-h+20}} q 0 -10 10 -10" class=rails></path>
+						<path d="M 0 -5 l 5 5 l -5 5" class=arrow ng-show=!p.alt></path>
+						<path d="M 5 15 l 5 -5 l 5 5" class=arrow ng-show=p.alt></path>
+						<title>Switch {{p.segment.id}}</title>
+					</g>
+				</g>
+			</g>
+			<g ng-repeat="p in track" class={{p.segment.id}}>
+				{{
+					x = p.x * w;
+					y = p.y * h + h;
+					l = p.width * w;
+				;""
+				}}
+				
+				<g ng-switch=p.symbol ng:attr:transform="translate({{x}},{{y+30}})">
+					<g ng-switch-when=SIGNAL>
+						<circle cx=-2 cy=12 r=5  style="stroke:black;stroke-width:1px;" class={{p.color}}></circle>
+						<title>Signal {{p.segment.id}}</title>
+					</g>
+					<g ng-switch-when=LOCATOR>
+						<path d="M 0 -18 l 0 17 m 0 -10 l 6 -6 m -6 6 l -6 -6" stroke-width=1 stroke=black></path>
+						<g ng-repeat="(train,seg) in trains.locations" >
+							<text text-anchor=middle x=0 y=-20 fill="black" ng-show=seg==p.segment.id style="font-size:0.9em;fill:darkred;">{{train}}</text>
+						</g>
+						<title>Locator {{p.segment.id}}</title>
+					</g>
+					
+					<g ng-show=p.title>
+						<circle cx=10 cy=0 r=9 fill=white stroke=black stroke-width=2></circle>
+						<text text-anchor=middle x=10 y=4 fill="black" style="font-size:0.7em" ng-show=p.title>{{p.title}}</text>
+					</g>
+					
+				</g>
+			</g>
+			<g ng-repeat="p in track" class={{p.segment.id}}>
+				{{
+					x = p.x * w;
+					y = p.y * h + h;
+					l = p.width * w;
+				;""
+				}}
+				<g ng-switch=p.symbol ng:attr:transform="translate({{x}},{{y+30}})">
+					<g ng-repeat="t in trains.rfids" ng-show="t.segment==p.segment.id">
+						<path d="M -6 0 l 8 -8 l 8 8 l -8 8 l -8 -8"  style="stroke:black;stroke-width:2px;fill:lightblue"></path>
+						<title>Train {{t.train}}</title>
+					</g>
+				</g>
+			</g>
+		</g>
+	</svg>
+	<div class=row>
+		<div class="col-lg-12">
+			<h2>Trains</h2>
+			<table class="table table-small">
+				<colgroup>
+					<col style="width:20%">
+					<col style="width:20%">
+					<col style="width:20%">
+					<col style="width:20%">
+				</colgroup>
+				<tbody>
+					<tr ng-repeat='t in trains.rfids' class="{{t.assignment.startsWith(t.segment)?'arrived':'chase'}}">
+						<td>{{t.train}}</td>
+						<td>{{t.segment}}</td>
+						<td>{{t.speed}}</td>
+						<td>
+							<select ng-model=t.assignment  ng-change=assign(t.train,t.assignment)>
+								<option  ng-repeat="o in trains.destinations track by $index" value={{o}}>{{o}}</option>
+							</select>
+						</td>
+					</tr>
+				</tbody>			
+			</table>
+		</div>		
+	</div>	
+	<div class=row>
+		<div class="col-lg-12">
+			<h2>Events</h2>
+			<table class="table table-small">
+				<colgroup>
+					<col style="">
+					<col style="">
+					<col style="">
+					<col style="">
+					<col style="">
+					<col style="">
+					<col style="">
+					<col style="">
+					<col style="">
+				</colgroup>
+				<thead>
+					<tr>
+						<th>Type</th>
+						<th>Message</th>
+						<th>Segment</th>
+						<th>Train</th>
+						<th>Alt</th>
+						<th>Blocked</th>
+						<th>Assign</th>
+						<th>Signal</th>
+						<th>Speed</th>
+					</tr>
+				</thead>
+				<tbody style="font-size:smaller">
+					<tr ng-repeat='e in trains.events.slice().reverse()'>
+						<td>{{e.type}}</td>
+						<td>{{e.message}}</td>
+						<td>{{e.segment}}</td>
+						<td>{{e.train}}</td>
+						<td>{{e.alternate}}</td>
+						<td>{{e.blocked}}</td>
+						<td>{{e.assignment}}</td>
+						<td>{{e.signal}}</td>
+						<td>{{e.speed}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section>

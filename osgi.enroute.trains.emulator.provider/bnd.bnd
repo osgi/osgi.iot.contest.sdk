@@ -1,0 +1,37 @@
+#
+# OSGI ENROUTE TRAINS REALWORLD PROVIDER BUNDLE 
+#
+
+
+Bundle-Version:					1.0.0.${tstamp}
+Bundle-Description: 				\
+	This project emulates the TrainController & SegmentControllers
+
+Export-Package: \
+	osgi.enroute.trains.controller.api,\
+	osgi.enroute.trains.train.api
+	
+Private-Package:  \
+	osgi.enroute.trains.emulator.provider
+
+Provide-Capability: \
+	osgi.service; objectClass=osgi.enroute.trains.train.api.TrainController;effective:=active, \
+	osgi.service; objectClass=osgi.enroute.trains.train.api.SignalSegmentController;effective:=active, \
+	osgi.service; objectClass=osgi.enroute.trains.train.api.SwitchSegmentController;effective:=active
+	
+-buildpath: \
+	osgi.enroute.base.api;version=1.0,\
+	osgi.enroute.trains.api;version=latest,\
+	osgi.enroute.trains.util;version=latest
+	
+-testpath: \
+	osgi.enroute.junit.wrapper;version=4.12
+
+-includeresource: {readme.md}
+
+
+-runrequires:  \
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.realworld.provider)'
+	
+-runbundles: \
+	${error;Resolve first}
