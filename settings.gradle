@@ -73,8 +73,8 @@ if (projectNames.remove('')) {
 projectNames.each { projectName ->
   include projectName
   def project = getBndProject(workspace, projectName)
-  project?.getDependson()*.getName().each {
-    include it
+  project?.dependson.each {
+    include it.name
   }
 }
 
@@ -91,10 +91,10 @@ def getBndProject(Workspace workspace, String projectName) {
 
   project.getInfo(workspace, "${rootDir} :")
   def errorCount = 0
-  project.getWarnings().each {
+  project.warnings.each {
     println "Warning: ${it}"
   }
-  project.getErrors().each {
+  project.errors.each {
     println "Error  : ${it}"
     errorCount++
   }
