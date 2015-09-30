@@ -1,8 +1,8 @@
 <h1><img src="http://enroute.osgi.org/img/enroute-logo-64.png" witdh=40px style="float:left;margin: 0 1em 1em 0;width:40px">
-OSGi enRoute Archetype</h1>
+OSGi enRoute IoT Contest 2015</h1>
 
-This repository represents a template workspace for bndtools, it is the easiest way to get started with OSGi enRoute. The workspace is useful in an IDE (bndtools or Intellij) and has support for [continuous integration][2] with [gradle][3]. If you want to get started with enRoute, then follow the steps in the [quick-start guide][1].
+This is the repository for the OSGi IoT 2015 Contest. It contains the SDK for this contest: controlling a train or a track layout.
 
-[1]: http://enroute.osgi.org/quick-start.html
-[2]: http://enroute.osgi.org/tutorial_base/800-ci.html
-[3]: https://www.gradle.org/
+To find out more details about this contest go to the [home page][iotcontest].
+
+[iotcontest]: http://enroute.osgi.org/book/650-trains.html
