@@ -3,3 +3,13 @@
 #
 Bundle-Vendor: 				OSGi Alliance 
 Bundle-Copyright: 			OSGi Alliance All Rights Reserved ${tstamp;YYYY}
+
+-plugin.paremus.rsa = \
+	aQute.bnd.deployer.repository.FixedIndexedRepo; \
+	        name		=       Paremus RSA; \
+	        locations	=       https://repository.paremus.com/gossip/index.xml
+
+-plugin.paremus.slf4j = \
+	aQute.bnd.deployer.repository.FixedIndexedRepo; \
+	        name		=       Paremus RSA Deps; \
+	        locations	=       https://repository.paremus.com/gossip-slf4j/index.xml
