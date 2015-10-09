@@ -1,108 +1,132 @@
 [
-	{
-	    "service.pid":"osgi.enroute.trains.emulator",
-	    "name.rfids":[ "DemoTrain:rfid1234" ],
-	    "rfid.probability": 500,
-	    "play.speed":0.5
-	},
-	{
-	    "service.pid":"osgi.enroute.trains.train.manager",
-	    "name": "DemoTrain",
-	    "rfid": "rfid1234",
-	    "target.TrainController" : "train.rfid=rfid1234"
-	},	
-	{
-	    "service.pid":"osgi.enroute.trains.track.manager",
-	    "name": "main",
-	    "segments": [
-	        "A00        : CURVED     : 1      : -1     : A01",
-	        "A01        : CURVED     : 1      : -1     : A02",
-	        "A02        : CURVED     : 1      : -1     : A03",
-	        "A03        : CURVED     : 1      : -1     : A04",
-	        "A04        : STRAIGHT   : 1      : -1     : A05",
-	        "A05        : STRAIGHT   : 1      : -1     : A06",
-	        "A06        : STRAIGHT   : 1      : -1     : A07",
-	        "A07        : STRAIGHT   : 1      : -1     : A07_L",
-	        "A07_L      : LOCATOR    : 0      : 1      : A08",
-	        "A08        : STRAIGHT   : 1      : -1     : A09",
-	        "A09        : STRAIGHT   : 1      : -1     : A10",
-	        "A10        : STRAIGHT   : 1      : -1     : A11",
-	        "A11        : STRAIGHT   : 1      : -1     : A12",
-	        "A12        : STRAIGHT   : 1      : -1     : A13",
-	        "A13        : CURVED     : 1      : -1     : A14",
-	        "A14        : CURVED     : 1      : -1     : A15",
-	        "A15        : CURVED     : 1      : -1     : A16_L",
-	        "A16_L      : LOCATOR    : 0      : 2      : A16",
-	        "A16        : CURVED     : 1      : -1     : A16_S",
-	        "A16_S      : SIGNAL     : 0      : 3      : X01",	        
-	        
-	        "X01        : SWITCH     : 1      : 4      : B00,C00",
-	        
-	        "B00        : CURVED     : 1      : -1     : B01",
-	        "B01        : CURVED     : 1      : -1     : B02",
-	        "B02        : CURVED     : 1      : -1     : B03",
-	        "B03        : CURVED     : 1      : -1     : B04",
-	        "B04        : STRAIGHT   : 1      : -1     : B05",
-	        "B05        : STRAIGHT   : 1      : -1     : B06",
-	        "B06        : STRAIGHT   : 1      : -1     : B07",
-	        "B07        : STRAIGHT   : 1      : -1     : B07_L",
-	        "B07_L      : LOCATOR    : 0      : 5      : B08",
-	        "B08        : STRAIGHT   : 1      : -1     : B09",
-	        "B09        : STRAIGHT   : 1      : -1     : B10",
-	        "B10        : STRAIGHT   : 1      : -1     : B11",
-	        "B11        : STRAIGHT   : 1      : -1     : B12",
-	        "B12        : STRAIGHT   : 1      : -1     : B13",
-	        "B13        : CURVED     : 1      : -1     : B14",
-	        "B14        : CURVED     : 1      : -1     : B15",
-	        "B15        : CURVED     : 1      : -1     : B16_L",
-	        "B16_L      : LOCATOR    : 1      : 6      : B16",
-	        "B16        : CURVED     : 1      : -1     : B16_S",
-	        "B16_S      : SIGNAL     : 1      : 7      : X04",
-	        
-	        "C00        : CURVED     : 1      : -1     : C01",
-	        "C01        : CURVED     : 1      : -1     : C02",
-	        "C02        : CURVED     : 1      : -1     : C03",
-	        "C03        : CURVED     : 1      : -1     : C04",
-	        "C04        : CURVED     : 1      : -1     : C05_L",
-	      	"C05_L      : LOCATOR    : 0      : 8      : C05",
-	        "C05        : CURVED     : 1      : -1     : C05_S",
-	        "C05_S      : SIGNAL     : 0      : 9      : X02",
+${if;false; ---------- TRAINS DEMO CONFIG. ------------ }
+    {
+        "service.pid":"osgi.enroute.trains.emulator",
+        "name.rfids":[ "DemoTrain:rfid1234" ],
+        "rfid.probability": 500,
+        "play.speed":0.5
+    },
+    {
+        "service.pid":"osgi.enroute.trains.train.manager",
+        "name": "DemoTrain",
+        "rfid": "rfid1234",
+        "target.TrainController" : "train.channel=1"
+    },
+    {
+        "service.pid":"osgi.enroute.trains.track.manager",
+        "name": "main",
+        "segments": [
+            "A00        : CURVED     : 1      : -1     : A01",
+            "A01        : CURVED     : 1      : -1     : A02",
+            "A02        : CURVED     : 1      : -1     : A03",
+            "A03        : CURVED     : 1      : -1     : A04",
+            "A04        : STRAIGHT   : 1      : -1     : A05",
+            "A05        : STRAIGHT   : 1      : -1     : A06",
+            "A06        : STRAIGHT   : 1      : -1     : A07",
+            "A07        : STRAIGHT   : 1      : -1     : A07_L",
+            "A07_L      : LOCATOR    : 0      : 1      : A08",
+            "A08        : STRAIGHT   : 1      : -1     : A09",
+            "A09        : STRAIGHT   : 1      : -1     : A10",
+            "A10        : STRAIGHT   : 1      : -1     : A11",
+            "A11        : STRAIGHT   : 1      : -1     : A12",
+            "A12        : STRAIGHT   : 1      : -1     : A13",
+            "A13        : CURVED     : 1      : -1     : A14",
+            "A14        : CURVED     : 1      : -1     : A15",
+            "A15        : CURVED     : 1      : -1     : A16_L",
+            "A16_L      : LOCATOR    : 0      : 2      : A16",
+            "A16        : CURVED     : 1      : -1     : A16_S",
+            "A16_S      : SIGNAL     : 0      : 3      : X01",
 
-	        "X02        : SWITCH     : 1      : 10     : E00,D00",
-	        
-	        "E00        : STRAIGHT   : 1      : -1     : E01",
-	        "E01        : STRAIGHT   : 1      : -1     : E02",
-	        "E02        : STRAIGHT   : 1      : -1     : E03",
-	        "E03        : STRAIGHT   : 1      : -1     : E04",
-	        "E04        : STRAIGHT   : 1      : -1     : E05",
-	        "E05        : STRAIGHT   : 1      : -1     : E06_L",
-	       	"E06_L      : LOCATOR    : 0      : 11      : E06",
-	        "E06        : STRAIGHT   : 1      : -1     : E06_S",
-	        "E06_S      : SIGNAL     : 0      : 12      : X03",
-	        
-	        "D01        : STRAIGHT   : 1      : -1     : D02",
-	        "D00        : CURVED     : 1      : -1     : D01",
-	        "D02        : STRAIGHT   : 1      : -1     : D03",
-	        "D03        : STRAIGHT   : 1      : -1     : D04",
-	        "D04        : STRAIGHT   : 1      : -1     : D05",
-	        "D05        : STRAIGHT   : 1      : -1     : D06",
-	        "D06        : STRAIGHT   : 1      : -1     : D07_L",
-	        "D07_L      : LOCATOR    : 0      : 13      : D07",
-	        "D07        : CURVED     : 1      : -1     : D07_S",
-	        "D07_S      : SIGNAL     : 0      : 4      : X03!",
+            "X01        : SWITCH     : 1      : 4      : B00,C00",
 
-	        "X03        : SWITCH     : 1      : 14     : F00",
-	        
-	        "F00        : CURVED     : 1      : -1     : F01",
-	        "F01        : CURVED     : 1      : -1     : F02",
-	        "F02        : CURVED     : 1      : -1     : F03",
-	        "F03        : CURVED     : 1      : -1     : F04",
-	        "F04        : CURVED     : 1      : -1     : F05_L",
-	        "F05_L      : LOCATOR    : 0      : 15      : F05",
-	       	"F05        : CURVED     : 1      : -1     : F05_S",
-	        "F05_S      : SIGNAL     : 0      : 16     : X04!",
-	        
-	        "X04        : SWITCH     : 1      : 17     : A00"
-	    ]
-	}
+            "B00        : CURVED     : 1      : -1     : B01",
+            "B01        : CURVED     : 1      : -1     : B02",
+            "B02        : CURVED     : 1      : -1     : B03",
+            "B03        : CURVED     : 1      : -1     : B04",
+            "B04        : STRAIGHT   : 1      : -1     : B05",
+            "B05        : STRAIGHT   : 1      : -1     : B06",
+            "B06        : STRAIGHT   : 1      : -1     : B07",
+            "B07        : STRAIGHT   : 1      : -1     : B07_L",
+            "B07_L      : LOCATOR    : 0      : 5      : B08",
+            "B08        : STRAIGHT   : 1      : -1     : B09",
+            "B09        : STRAIGHT   : 1      : -1     : B10",
+            "B10        : STRAIGHT   : 1      : -1     : B11",
+            "B11        : STRAIGHT   : 1      : -1     : B12",
+            "B12        : STRAIGHT   : 1      : -1     : B13",
+            "B13        : CURVED     : 1      : -1     : B14",
+            "B14        : CURVED     : 1      : -1     : B15",
+            "B15        : CURVED     : 1      : -1     : B16_L",
+            "B16_L      : LOCATOR    : 1      : 6      : B16",
+            "B16        : CURVED     : 1      : -1     : B16_S",
+            "B16_S      : SIGNAL     : 1      : 7      : X04",
+
+            "C00        : CURVED     : 1      : -1     : C01",
+            "C01        : CURVED     : 1      : -1     : C02",
+            "C02        : CURVED     : 1      : -1     : C03",
+            "C03        : CURVED     : 1      : -1     : C04",
+            "C04        : CURVED     : 1      : -1     : C05_L",
+            "C05_L      : LOCATOR    : 0      : 8      : C05",
+            "C05        : CURVED     : 1      : -1     : C05_S",
+            "C05_S      : SIGNAL     : 0      : 9      : X02",
+
+            "X02        : SWITCH     : 1      : 10     : E00,D00",
+
+            "E00        : STRAIGHT   : 1      : -1     : E01",
+            "E01        : STRAIGHT   : 1      : -1     : E02",
+            "E02        : STRAIGHT   : 1      : -1     : E03",
+            "E03        : STRAIGHT   : 1      : -1     : E04",
+            "E04        : STRAIGHT   : 1      : -1     : E05",
+            "E05        : STRAIGHT   : 1      : -1     : E06_L",
+            "E06_L      : LOCATOR    : 0      : 11      : E06",
+            "E06        : STRAIGHT   : 1      : -1     : E06_S",
+            "E06_S      : SIGNAL     : 0      : 12      : X03",
+
+            "D01        : STRAIGHT   : 1      : -1     : D02",
+            "D00        : CURVED     : 1      : -1     : D01",
+            "D02        : STRAIGHT   : 1      : -1     : D03",
+            "D03        : STRAIGHT   : 1      : -1     : D04",
+            "D04        : STRAIGHT   : 1      : -1     : D05",
+            "D05        : STRAIGHT   : 1      : -1     : D06",
+            "D06        : STRAIGHT   : 1      : -1     : D07_L",
+            "D07_L      : LOCATOR    : 0      : 13      : D07",
+            "D07        : CURVED     : 1      : -1     : D07_S",
+            "D07_S      : SIGNAL     : 0      : 14      : X03!",
+
+            "X03        : SWITCH     : 1      : 15     : F00",
+
+            "F00        : CURVED     : 1      : -1     : F01",
+            "F01        : CURVED     : 1      : -1     : F02",
+            "F02        : CURVED     : 1      : -1     : F03",
+            "F03        : CURVED     : 1      : -1     : F04",
+            "F04        : CURVED     : 1      : -1     : F05_L",
+            "F05_L      : LOCATOR    : 0      : 16      : F05",
+            "F05        : CURVED     : 1      : -1     : F05_S",
+            "F05_S      : SIGNAL     : 0      : 17     : X04!",
+
+            "X04        : SWITCH     : 1      : 18     : A00"
+        ]
+    },
+
+${if;false; ---------- PAREMUS RSA CONFIG. ------------ }
+    {
+        "service.pid": "com.paremus.net.encode"
+    },
+    {
+        "service.pid": "com.paremus.dosgi.net",
+        "allow.insecure.transports": true,
+        "server.bind.address": "${com.paremus.bind}"
+    },
+    {
+        "service.pid": "com.paremus.dosgi.discovery.gossip",
+        "infra": "${com.paremus.bootstrap}",
+        "root.cluster": "${com.paremus.cluster}"
+    },
+    {
+        "service.pid": "com.paremus.gossip",
+        "service.factoryPid": "com.paremus.gossip",
+        "infra": "${com.paremus.bootstrap}",
+        "cluster.name": "${com.paremus.cluster}",
+        "initial.peers": "${com.paremus.peers}"
+    }
+
 ]
