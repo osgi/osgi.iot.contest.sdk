@@ -4,6 +4,11 @@ package osgi.enroute.trains.train.api;
  * A Train Controller interfaces to the Lego IR interface.
  */
 public interface TrainController {
+    /**
+     * Service property identifying RC channel for this controller
+     */
+    String CONTROLLER_CHANNEL = "train.channel";
+
 	/**
 	 * Control the motor. Positive is forward, negative is reverse, 0 is stop.
 	 * 

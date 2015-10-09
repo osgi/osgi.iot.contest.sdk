@@ -1,0 +1,24 @@
+[
+${if;false; ---------- PAREMUS RSA CONFIG. ------------ }
+    {
+	    "service.pid": "com.paremus.net.encode"
+	},	
+	{
+	    "service.pid": "com.paremus.dosgi.net",
+	    "allow.insecure.transports": true,
+        "server.bind.address": "${com.paremus.bind}"
+	},	
+	{
+	    "service.pid": "com.paremus.dosgi.discovery.gossip",
+	    "infra": "${com.paremus.bootstrap}",
+	    "root.cluster": "${com.paremus.cluster}"
+	},
+	{
+	    "service.pid": "com.paremus.gossip",
+	    "service.factoryPid": "com.paremus.gossip",
+	    "infra": "${com.paremus.bootstrap}",
+        "cluster.name": "${com.paremus.cluster}",
+        "initial.peers": "${com.paremus.peers}"
+	}
+	
+]

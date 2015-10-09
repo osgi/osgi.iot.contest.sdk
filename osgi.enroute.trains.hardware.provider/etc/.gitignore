@@ -1,0 +1,3 @@
+# don't commit the hardware config
+osgi.enroute.trains.hardware.provider.config
+license.ini

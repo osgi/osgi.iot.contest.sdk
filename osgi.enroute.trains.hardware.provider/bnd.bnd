@@ -1,0 +1,35 @@
+#
+# OSGI ENROUTE TRAINS HARDWARE PROVIDER BUNDLE 
+#
+
+
+Bundle-Version:					1.0.0.${tstamp}
+Bundle-Description: \
+	This is OSGI ENROUTE TRAINS Hardware Provider project.\
+	It controls the real hardware running on a Raspberry Pi.\
+	It exports SegmentController and TrainController services for each all configured hardware.
+
+Private-Package:  \
+	osgi.enroute.trains.hardware.provider
+
+Export-Package: \
+	osgi.enroute.trains.cloud.api,\
+	osgi.enroute.trains.controller.api,\
+	osgi.enroute.trains.train.api
+	
+-metatypeannotations: *
+
+-includeresource: \
+	{configuration=configuration},\
+    {readme.md}
+	
+-buildpath: \
+	osgi.enroute.base.api;version=1.0,\
+	biz.aQute.bndlib;packages=*,\
+	org.apache.felix.configadmin,\
+	osgi.enroute.trains.api;version=latest
+
+-testpath: \
+	osgi.enroute.junit.wrapper
+
+#
