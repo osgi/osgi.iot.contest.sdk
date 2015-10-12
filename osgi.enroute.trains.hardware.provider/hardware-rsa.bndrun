@@ -27,19 +27,18 @@ myIP: ${system;sh myIP.sh}
 -runsystempackages:		sun.misc
 -runfw:					org.eclipse.osgi
 
--runrequires: \
-	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.hardware.provider)'
+-runrequires: osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.hardware.provider)'
 	
 rsa-bundles:\
-	com.paremus.gossip;version='(1,2]',\
-	com.paremus.dosgi.discovery.gossip;version='(1,2]',\
-	com.paremus.dosgi.net;version='(1,2]',\
-	com.paremus.dosgi.topology.scoped;version='(1,2]',\
-	com.paremus.dosgi.discovery.gossip;version='(1,2]',\
-	com.paremus.deployment.framework.provider;version='(1,2]',\
-	com.paremus.net;version='(1,2]',\
-	slf4j.api;version='[1.7.4,1.7.5)',\
-	slf4j.simple;version='[1.7.4,1.7.5)',\
+	com.paremus.gossip;version='[1,2)',\
+	com.paremus.dosgi.discovery.gossip;version='[1,2)',\
+	com.paremus.dosgi.net;version='[1,2)',\
+	com.paremus.dosgi.topology.scoped;version='[1,2)',\
+	com.paremus.dosgi.discovery.gossip;version='[1,2)',\
+	com.paremus.deployment.framework.provider;version='[1,2)',\
+	com.paremus.net;version='[1,2)',\
+	osgi.enroute.logger.simple.provider;version='[1.1.1,1.2)'
+
 
 -runbundles: \
 	org.apache.felix.configadmin;version='[1.8.6,1.8.7)',\

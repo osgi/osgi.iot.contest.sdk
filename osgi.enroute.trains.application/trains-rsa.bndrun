@@ -21,15 +21,15 @@ myIP: ${system;sh myIP.sh}
 -runfw:					org.eclipse.osgi
 
 rsa-bundles:\
-	com.paremus.gossip;version='(1,2]',\
-	com.paremus.dosgi.discovery.gossip;version='(1,2]',\
-	com.paremus.dosgi.net;version='(1,2]',\
-	com.paremus.dosgi.topology.scoped;version='(1,2]',\
-	com.paremus.dosgi.discovery.gossip;version='(1,2]',\
-	com.paremus.deployment.framework.provider;version='(1,2]',\
-	com.paremus.net;version='(1,2]',\
-	slf4j.api;version='[1.7.4,1.7.5)',\
-	slf4j.simple;version='[1.7.4,1.7.5)'
+	com.paremus.gossip;version='[1,2)',\
+	com.paremus.dosgi.discovery.gossip;version='[1,2)',\
+	com.paremus.dosgi.net;version='[1,2)',\
+	com.paremus.dosgi.topology.scoped;version='[1,2)',\
+	com.paremus.dosgi.discovery.gossip;version='[1,2)',\
+	com.paremus.deployment.framework.provider;version='[1,2)',\
+	com.paremus.net;version='[1,2)',\
+	osgi.enroute.logger.simple.provider;version='[1.1.1,1.2)'
+	
 
 -runbundles: \
 	com.springsource.org.json;version='[1.0.0,1.0.1)',\
