@@ -8,4 +8,3 @@ Bundle-Copyright: 			OSGi Alliance All Rights Reserved ${tstamp;YYYY}
 	aQute.bnd.deployer.repository.FixedIndexedRepo; \
 	        name		=       Paremus RSA; \
 	        locations	=       https://repository.paremus.com/gossip/index.xml
-
