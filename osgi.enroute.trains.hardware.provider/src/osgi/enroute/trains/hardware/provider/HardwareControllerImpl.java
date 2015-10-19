@@ -95,6 +95,7 @@ public class HardwareControllerImpl {
             BiFunction<Integer, String, S> factory) {
         Hashtable<String, Object> dict = new Hashtable<>();
         dict.put(Constants.SERVICE_EXPORTED_INTERFACES, "*");
+        dict.put(SegmentController.CONTROLLER_ID, 0);
 
         for (int index = 0; index < segments.length; index++) {
             String segment = segments[index];

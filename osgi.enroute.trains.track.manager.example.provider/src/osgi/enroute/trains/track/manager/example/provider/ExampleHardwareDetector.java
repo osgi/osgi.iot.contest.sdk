@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -24,16 +23,13 @@ import osgi.enroute.trains.controller.api.SwitchSegmentController;
 @Component(immediate = true)
 public class ExampleHardwareDetector {
 
-    private Map<Integer, String> id2name = new ConcurrentHashMap<>();
+    private Map<Integer, String> id2name = null;
     private Map<String, SignalSegmentController> signals = new ConcurrentHashMap<>();
     private Map<String, SwitchSegmentController> switches = new ConcurrentHashMap<>();
     private Map<String, RFIDSegmentController> locators = new ConcurrentHashMap<>();
 
     @Reference
-    private TrackInfo ti;
-
-    @Activate
-    void activate() {
+    void setTrackInfo(TrackInfo ti) {
         try {
             id2name = ti.getSegments().values().stream().filter(s -> s.controller >= 0)
                     .collect(Collectors.toMap(s -> s.controller, s -> s.id + ":" + s.type));
@@ -96,16 +92,19 @@ public class ExampleHardwareDetector {
 
     private String getSegmentName(Map<String, Object> config, Segment.Type type) {
         String name = (String) config.get(SegmentController.CONTROLLER_SEGMENT);
-        String id = (String) config.get(SegmentController.CONTROLLER_ID);
+        Integer id = (Integer) config.get(SegmentController.CONTROLLER_ID);
 
-        if (name != null) {
+        if (id2name == null) {
+            warn("Can't check %s(name=%s, id=%s) - TrackInfo not available", type, name, id);
+        }
+        else if (name != null) {
             if (!id2name.values().contains(name + ":" + type)) {
                 warn("unexpected %s(name=%s)", type, name);
                 name = null;
             }
         }
         else if (id != null) {
-            name = id2name.get(Integer.parseInt(id));
+            name = id2name.get(id);
             if (name == null) {
                 warn("unexpected %s(id=%s)", type, id);
             }
