@@ -27,14 +27,20 @@ myIP: ${system;sh myIP.sh}
 -runsystempackages:		sun.misc
 -runfw:					org.eclipse.osgi
 
--runrequires: osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.hardware.provider)'
+# currently fails to resolve:
+#	missing requirement objectClass=com.paremus.net.encode.ClusterInformation
+-runrequires:\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.hardware.provider)',\
+	osgi.identity;filter:='(osgi.identity=com.paremus.gossip)',\
+	osgi.identity;filter:='(osgi.identity=com.paremus.dosgi.net)',\
+	osgi.identity;filter:='(osgi.identity=com.paremus.dosgi.topology.scoped)',\
+	osgi.identity;filter:='(osgi.identity=com.paremus.dosgi.discovery.gossip)'
 	
 rsa-bundles:\
 	com.paremus.gossip;version='[1,2)',\
 	com.paremus.dosgi.discovery.gossip;version='[1,2)',\
 	com.paremus.dosgi.net;version='[1,2)',\
 	com.paremus.dosgi.topology.scoped;version='[1,2)',\
-	com.paremus.dosgi.discovery.gossip;version='[1,2)',\
 	com.paremus.deployment.framework.provider;version='[1,2)',\
 	com.paremus.net;version='[1,2)'
 
