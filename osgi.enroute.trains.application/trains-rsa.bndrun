@@ -12,6 +12,7 @@
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.train.manager.example.provider)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.emulator.provider)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.track.controller.provider)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.hardware.commands)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.shell)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.command)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.webconsole)'
@@ -52,6 +53,7 @@
 	osgi.enroute.stackexchange.pagedown.webresource;version='[1.1.1,1.1.2)',\
 	osgi.enroute.trains.application;version=snapshot,\
 	osgi.enroute.trains.emulator.provider;version=snapshot,\
+	osgi.enroute.trains.hardware.commands;version=snapshot,\
 	osgi.enroute.trains.track.controller.provider;version=snapshot,\
 	osgi.enroute.trains.track.manager.example.provider;version=snapshot,\
 	osgi.enroute.trains.train.manager.example.provider;version=snapshot,\
