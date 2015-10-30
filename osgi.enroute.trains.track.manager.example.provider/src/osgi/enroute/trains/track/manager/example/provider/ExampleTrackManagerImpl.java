@@ -79,24 +79,25 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain,T
 	private Closeable ticker;
 
 	@Activate
-	public void activate(TrackConfiguration config) throws Exception{
+	public void activate(TrackConfiguration config) throws Exception {
 		tracks = new Tracks<Object>(config.segments(), new TrackManagerFactory(this));
 	}
-	
+
 	@Deactivate
-	void deactivate( ) throws IOException {
-		ticker.close();
+	void deactivate() throws IOException {
+		if (ticker != null)
+			ticker.close();
 		quit = true;
-		
-		synchronized(observations) {
+
+		synchronized (observations) {
 			observations.notifyAll();
 		}
-		
+
 	}
-	
+
 	private void setSignal(String segmentId, Color color) {
 		Command c = new Command();
-		c.type=Command.Type.SIGNAL;
+		c.type = Command.Type.SIGNAL;
 		c.segment = segmentId;
 		c.signal = color;
 		command(c);

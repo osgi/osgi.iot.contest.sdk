@@ -1,5 +1,4 @@
 [
-${if;false; ---------- TRAINS DEMO CONFIG. ------------ }
     {
         "service.pid":"osgi.enroute.trains.emulator",
         "name.rfids":[ "DemoTrain:rfid1234" ],
@@ -10,7 +9,7 @@ ${if;false; ---------- TRAINS DEMO CONFIG. ------------ }
         "service.pid":"osgi.enroute.trains.train.manager",
         "name": "DemoTrain",
         "rfid": "rfid1234",
-        "target.TrainController" : "train.channel=1"
+        "TrainController.target" : "train.channel=1"
     },
     {
         "service.pid":"osgi.enroute.trains.track.manager",
@@ -107,7 +106,6 @@ ${if;false; ---------- TRAINS DEMO CONFIG. ------------ }
         ]
     },
 
-${if;false; ---------- PAREMUS RSA CONFIG. ------------ }
     {
         "service.pid": "com.paremus.net.encode"
     },
