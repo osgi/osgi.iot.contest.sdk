@@ -19,8 +19,8 @@ import osgi.enroute.trains.train.api.TrainController;
 /**
  * 
  */
-@Component(immediate = true, property = { Debug.COMMAND_SCOPE + "=tc", //
-		Debug.COMMAND_FUNCTION + "=tc", //
+@Component(immediate = true, property = { Debug.COMMAND_SCOPE + "=trns", //
+		Debug.COMMAND_FUNCTION + "=trns", //
 		Debug.COMMAND_FUNCTION + "=trains", //
 		Debug.COMMAND_FUNCTION + "=signals", //
 		Debug.COMMAND_FUNCTION + "=switches", //
@@ -69,12 +69,12 @@ public class Command {
 		trains.get(train).light(on);
 	}
 
-	public String color(int controller, Color color) {
+	public String color(int controller, String color) {
 		SignalSegmentController c = signals.get(controller);
 		if (c == null)
 			return "No such controller";
 		else
-			c.signal(color);
+			c.signal(Color.valueOf(color));
 		return null;
 	}
 
@@ -84,6 +84,23 @@ public class Command {
 			return null;
 		else
 			return c.getSignal();
+	}
+
+	public String swtch(int controller, boolean alt) {
+		SwitchSegmentController c = switches.get(controller);
+		if (c == null)
+			return "No such controller";
+		else
+			c.swtch(alt);;
+		return null;
+	}
+
+	public boolean swtch(int controller) {
+		SwitchSegmentController c = switches.get(controller);
+		if (c == null)
+			return false;
+		else
+			return c.getSwitch();
 	}
 
 	public Collection<SignalSegmentController> signals() {
@@ -96,5 +113,20 @@ public class Command {
 	
 	public Collection<TrainController> trains() {
 		return trains.values();
+	}
+	
+	public String trns() {
+		return "" //
+				+ "trns                              help\n"
+				+ "signals                           show the signals and their state\n"
+				+ "trains                            show the trains\n"
+				+ "color <controller> <Color>        set the color of a signal\n"
+				+ "color <controller>                get the color of a signal\n"
+				+ "swtch <controller> <alt>          set the switch status\n"
+				+ "swtch <controller>                get the switch status\n"
+				+ "move <name> <speed %>             set the speed of the train\n"
+				+ "light <name> <on>                 set the light on or off\n"
+				+ "switches                          show the switches status\n"
+				;
 	}
 }

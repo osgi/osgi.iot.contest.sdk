@@ -2,6 +2,7 @@ package osgi.enroute.trains.hw.provider;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
@@ -14,8 +15,8 @@ import com.pi4j.io.gpio.RaspiPin;
 
 import osgi.enroute.trains.controller.api.SwitchSegmentController;
 
-@Designate(ocd=SwitchSegmentImpl.Config.class)
-@Component(name = "osgi.enroute.trains.hw.switch", property="service.exported.interfaces=*")
+@Designate(ocd=SwitchSegmentImpl.Config.class, factory=true)
+@Component(name = "osgi.enroute.trains.hw.switch", property="service.exported.interfaces=*", configurationPolicy=ConfigurationPolicy.REQUIRE)
 public class SwitchSegmentImpl implements SwitchSegmentController {
 	private GpioPinDigitalOutput alt;
 

@@ -2,6 +2,7 @@ package osgi.enroute.trains.hw.provider;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
@@ -15,10 +16,10 @@ import osgi.enroute.trains.train.api.TrainController;
 /**
  * 
  */
-@Designate(ocd = Config.class)
+@Designate(ocd = Config.class, factory=true)
 @Component(name = "osgi.enroute.trains.hw.train", immediate = true, property = { Debug.COMMAND_SCOPE + "=tc",
 		Debug.COMMAND_FUNCTION + "=tc", Debug.COMMAND_FUNCTION + "=move", Debug.COMMAND_FUNCTION + "=light",
-		"service.exported.interfaces=*" })
+		"service.exported.interfaces=*" }, configurationPolicy=ConfigurationPolicy.REQUIRE)
 public class TrainControllerImpl extends LegoRC implements TrainController {
 
 	@ObjectClassDefinition
