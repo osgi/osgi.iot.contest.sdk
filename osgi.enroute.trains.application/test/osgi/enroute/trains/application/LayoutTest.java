@@ -1,9 +1,6 @@
 package osgi.enroute.trains.application;
 
-import aQute.lib.io.IO;
 import junit.framework.TestCase;
-import osgi.enroute.trains.application.LayoutAdapter.Layout;
-import osgi.enroute.trains.track.util.Tracks;
 
 public class LayoutTest extends TestCase {
 
