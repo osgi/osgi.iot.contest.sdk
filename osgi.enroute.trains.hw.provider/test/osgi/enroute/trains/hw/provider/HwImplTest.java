@@ -15,4 +15,7 @@ public class HwImplTest extends TestCase {
 	 * 
 	 * 
 	 */
+	public void testMe() {
+		
+	}
 }
