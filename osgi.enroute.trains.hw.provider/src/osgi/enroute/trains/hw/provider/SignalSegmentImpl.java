@@ -56,7 +56,8 @@ public class SignalSegmentImpl implements SignalSegmentController {
 			break;
 		case YELLOW:
 			green.setState(false);
-			red.pulse(1);
+//			red.pulse(1);
+			red.blink(500);
 			break;
 		default:
 		case RED:

@@ -47,6 +47,7 @@ public class LegoRC extends ICAdapter<LegoPowerFunctions, Wave> implements
 	final static int SINGLE_OUTPUT_MODE_B = 0b0000_0101_0000_0000;
 	final static int TOGGLE = 0b1000_0000_0000_0000;
 
+	boolean toggle = false;
 	int channel;
 	int values[] = new int[2];
 	Lock lock = new ReentrantLock();
@@ -82,7 +83,11 @@ public class LegoRC extends ICAdapter<LegoPowerFunctions, Wave> implements
 	// Calculate and insert LRC check bits
 	// Send 16 bit word with start and stop
 	private void sendword(int data) throws Exception {
-		data |= TOGGLE;
+		if (toggle) {
+            data |= TOGGLE;
+		}
+		toggle = !toggle;
+
 		// Calculate check LRC bits
 		int check = 0xf ^ (data >> 12) ^ (data >> 8) ^ (data >> 4);
 
@@ -155,7 +160,7 @@ public class LegoRC extends ICAdapter<LegoPowerFunctions, Wave> implements
 		value = Math.max(-1, value);
 		value = Math.min(1, value);
 		int vint = (int) Math.round(value * 7) & 0xF;
-
+		
 		lock.lock();
 		try {
 			values[index] = vint;
