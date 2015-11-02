@@ -10,21 +10,22 @@
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",
 		"controller":3,
 		"segment":"A16_S",
-		"green":"GPIO 8",
-		"red":"GPIO 9"
+		"green":"GPIO 24",
+		"red":"GPIO 25"
 	},{
 		"service.pid":"C05_S-9",
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",
 		"controller":9,
 		"segment":"C05_S",
-		"green":"GPIO 7",
-		"red":"GPIO 2"
+		"green":"GPIO 3",
+		"red":"GPIO 21"
 	},{
 		"service.pid":"X01-4",
 		"service.factoryPid":"osgi.enroute.trains.hw.switch",
 		"controller":4,
 		"segment":"X04",
-		"swtch":"GPIO 2"
+		"fwd":"GPIO 8",
+		"rev":"GPIO 9"
 	}
 	
 ]
