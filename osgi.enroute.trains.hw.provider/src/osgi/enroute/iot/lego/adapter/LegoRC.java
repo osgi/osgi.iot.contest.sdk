@@ -164,7 +164,7 @@ public class LegoRC extends ICAdapter<LegoPowerFunctions, Wave> implements
 		lock.lock();
 		try {
 			values[index] = vint;
-			int data = ADDRESS | channel | singleOutputMode | (vint << 4);
+			int data = ADDRESS | (channel << 12) | singleOutputMode | (vint << 4);
 			sendword(data);
 		} finally {
 			lock.unlock();
