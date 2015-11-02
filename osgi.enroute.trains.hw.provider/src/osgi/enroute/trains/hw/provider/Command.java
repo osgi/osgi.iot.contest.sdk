@@ -22,11 +22,10 @@ import osgi.enroute.trains.train.api.TrainController;
 @Component(immediate = true, property = { Debug.COMMAND_SCOPE + "=trns", //
 		Debug.COMMAND_FUNCTION + "=trns", //
 		Debug.COMMAND_FUNCTION + "=trains", //
-		Debug.COMMAND_FUNCTION + "=signals", //
-		Debug.COMMAND_FUNCTION + "=switches", //
 		Debug.COMMAND_FUNCTION + "=move", //
 		Debug.COMMAND_FUNCTION + "=light", //
-		Debug.COMMAND_FUNCTION + "=color",//
+		Debug.COMMAND_FUNCTION + "=signal", //
+		Debug.COMMAND_FUNCTION + "=switch", //
 }, service=Command.class)
 public class Command {
 	final Map<String, TrainController> trains = new ConcurrentHashMap<>();
@@ -61,6 +60,7 @@ public class Command {
 	void removeSwitch(SwitchSegmentController s) {
 		switches.values().remove(s);
 	}
+
 	public void move(String train, int directionAndSpeed) {
 		trains.get(train).move(directionAndSpeed);
 	}
@@ -69,16 +69,16 @@ public class Command {
 		trains.get(train).light(on);
 	}
 
-	public String color(int controller, String color) {
+	public String signal(int controller, String color) {
 		SignalSegmentController c = signals.get(controller);
 		if (c == null)
 			return "No such controller";
 		else
-			c.signal(Color.valueOf(color));
+			c.signal(Color.valueOf(color.toUpperCase()));
 		return null;
 	}
 
-	public Color color(int controller) {
+	public Color signal(int controller) {
 		SignalSegmentController c = signals.get(controller);
 		if (c == null)
 			return null;
@@ -86,7 +86,7 @@ public class Command {
 			return c.getSignal();
 	}
 
-	public String swtch(int controller, boolean alt) {
+	public String _switch(int controller, boolean alt) {
 		SwitchSegmentController c = switches.get(controller);
 		if (c == null)
 			return "No such controller";
@@ -95,7 +95,7 @@ public class Command {
 		return null;
 	}
 
-	public boolean swtch(int controller) {
+	public boolean _switch(int controller) {
 		SwitchSegmentController c = switches.get(controller);
 		if (c == null)
 			return false;
@@ -103,11 +103,11 @@ public class Command {
 			return c.getSwitch();
 	}
 
-	public Collection<SignalSegmentController> signals() {
+	public Collection<SignalSegmentController> signal() {
 		return signals.values();
 	}
 
-	public Collection<SwitchSegmentController> switches() {
+	public Collection<SwitchSegmentController> _switch() {
 		return switches.values();
 	}
 	
@@ -118,15 +118,15 @@ public class Command {
 	public String trns() {
 		return "" //
 				+ "trns                              help\n"
-				+ "signals                           show the signals and their state\n"
+				+ "signal                            show the signals and their state\n"
+				+ "signal <controller> <Color>       set the color of a signal\n"
+				+ "signal <controller>               get the color of a signal\n"
+				+ "switch                            show the switches status\n"
+				+ "switch <controller> <alt>         set the switch status\n"
+				+ "switch <controller>               get the switch status\n"
 				+ "trains                            show the trains\n"
-				+ "color <controller> <Color>        set the color of a signal\n"
-				+ "color <controller>                get the color of a signal\n"
-				+ "swtch <controller> <alt>          set the switch status\n"
-				+ "swtch <controller>                get the switch status\n"
 				+ "move <name> <speed %>             set the speed of the train\n"
 				+ "light <name> <on>                 set the light on or off\n"
-				+ "switches                          show the switches status\n"
 				;
 	}
 }

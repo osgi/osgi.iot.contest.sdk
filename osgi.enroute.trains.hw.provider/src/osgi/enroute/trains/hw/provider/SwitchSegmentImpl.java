@@ -18,7 +18,11 @@ import osgi.enroute.trains.controller.api.SwitchSegmentController;
 @Designate(ocd=SwitchSegmentImpl.Config.class, factory=true)
 @Component(name = "osgi.enroute.trains.hw.switch", property="service.exported.interfaces=*", configurationPolicy=ConfigurationPolicy.REQUIRE)
 public class SwitchSegmentImpl implements SwitchSegmentController {
-	private GpioPinDigitalOutput alt;
+
+	private GpioPinDigitalOutput fwd;
+	private GpioPinDigitalOutput rev;
+	private int duration = 3000;
+	private boolean state;
 
 	@Reference
 	private GpioController gpio;
@@ -31,14 +35,21 @@ public class SwitchSegmentImpl implements SwitchSegmentController {
 
 		String segment();
 		
-		String swtch();
+		String fwd();
+
+		String rev();
+		
+		int duration() default 3000;
 	}
 
 	@Activate
 	void activate(Config config) {
 		this.config = config;
-		alt = setup(config.swtch());
-		swtch(false);;
+		fwd = setup(config.fwd());
+		rev = setup(config.rev());
+		duration = config.duration();
+		state = true;
+		swtch(false);
 	}
 
 
@@ -59,19 +70,29 @@ public class SwitchSegmentImpl implements SwitchSegmentController {
 
 	@Override
 	public String toString() {
-		return "Switch[alt="+getSwitch() + ", pin=" + alt.toString() + ", cntl="+config.controller() + ", seg="+config.segment() + "]";
+		return "Switch[alt="+getSwitch() + ", fwd=" + fwd.toString() + ", rev=" + rev.toString() + ", cntl="+config.controller() + ", seg="+config.segment() + "]";
 	}
 
 
 	@Override
-	public void swtch(boolean alternative) {
-		alt.setState(alternative);
+	public void swtch(boolean alt) {
+		if (state == alt) {
+			System.out.printf("switch is already in %s state\n", alt ? "ALT" : "NORMAL");
+			return;
+		}
+		if (alt) {
+			rev.pulse(duration);
+		}
+		else {
+            fwd.pulse(duration);
+		}
+		state = alt;
 	}
 
 
 	@Override
 	public boolean getSwitch() {
-		return alt.getState().isHigh();
+		return state;
 	}
 
 }
