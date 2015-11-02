@@ -26,6 +26,12 @@
 		"segment":"X04",
 		"fwd":"GPIO 8",
 		"rev":"GPIO 9"
+	},{
+		"service.pid":"A07_L-1",
+		"service.factoryPid":"osgi.enroute.trains.hw.rfid",
+		"controller":1,
+		"segment":"A07_L",
+		"channel":0
 	}
 	
 ]

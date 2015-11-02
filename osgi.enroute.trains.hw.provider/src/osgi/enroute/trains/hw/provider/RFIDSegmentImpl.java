@@ -1,37 +1,56 @@
 package osgi.enroute.trains.hw.provider;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
+
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.osgi.util.promise.Deferred;
 import org.osgi.util.promise.Promise;
 
+import osgi.enroute.debug.api.Debug;
 import osgi.enroute.trains.controller.api.RFIDSegmentController;
 
-@Designate(ocd=RFIDSegmentImpl.Config.class, factory=true)
-@Component(name = "osgi.enroute.trains.hw.rfid", property="service.exported.interfaces=*", configurationPolicy=ConfigurationPolicy.REQUIRE)
-public class RFIDSegmentImpl implements RFIDSegmentController {
+@Designate(ocd = RFIDSegmentImpl.Config.class, factory = true)
+@Component(name = "osgi.enroute.trains.hw.rfid", property = { "service.exported.interfaces=*", //
+		Debug.COMMAND_SCOPE + "=rfid", //
+		Debug.COMMAND_FUNCTION + "=lastrfid" }, //
+		configurationPolicy = ConfigurationPolicy.REQUIRE)
+public class RFIDSegmentImpl implements RFIDSegmentController, Runnable {
 
-	private Config config;
+	private String command;
+	private Process mfrc522;
 
 	private String lastRFID = null;
 	private Deferred<String> nextRFID = new Deferred<String>();
-	
-	
+
 	@ObjectClassDefinition
 	@interface Config {
 		int controller();
-		
-		// TODO also specify which hardware pins/port RFID reader to read out in config
+
+		String segment();
+
+		int channel();
 	}
 
 	@Activate
 	void activate(Config config) {
-		this.config = config;
-		
-		// TODO initialize reading out the RFID reader - call trigger each time RFID is detected
+		command = "mfrc522-read " + config.channel();
+		new Thread(this).start();
+	}
+
+	@Deactivate
+	void deactivate() {
+		if (mfrc522 != null) {
+			mfrc522.destroy();
+		}
 	}
 
 	@Override
@@ -44,11 +63,44 @@ public class RFIDSegmentImpl implements RFIDSegmentController {
 		return nextRFID.getPromise();
 	}
 
-	// This method is called when an RFID tag detected 
-	private synchronized void trigger(String rfid){
+	// This method is called when an RFID tag detected
+	private synchronized void trigger(String rfid) {
 		Deferred<String> toResolve = nextRFID;
 		nextRFID = new Deferred<String>();
 		toResolve.resolve(rfid);
 		this.lastRFID = rfid;
+	}
+
+	public void run() {
+		try {
+			mfrc522 = Runtime.getRuntime().exec(command);
+			System.out.println("Started RFID reader");
+			InputStream in = mfrc522.getInputStream();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+			// Card read UID: 180,60,30,87
+			final String UID = "Card read UID: ";
+			String line;
+			while ((line = reader.readLine()) != null) {
+				if (line.startsWith(UID)) {
+					System.out.println(line);
+					int uid = 0;
+					for (String u : line.substring(UID.length()).split(",")) {
+						uid = (uid << 8) | Integer.parseInt(u);
+					}
+
+					String tag = Integer.toHexString(uid);
+					System.out.println(tag);
+					trigger(tag);
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("mfrc522read failed! " + e);
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	public String lastrfid() {
+		return lastRFID;
 	}
 }
