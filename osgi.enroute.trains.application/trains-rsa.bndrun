@@ -5,6 +5,12 @@
 -include: ~remote-osgi.bndrun
 -resolve.effective: active;skip:="osgi.service"
 
+-runpath: biz.aQute.remote.launcher
+-runremote: master; \
+	host=192.168.99.1; \
+	jdb=1044; \
+	shell=-1
+
 #-include: ~osgi.enroute.trains.bndrun
 -runrequires.app: \
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.application)',\

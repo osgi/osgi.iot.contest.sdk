@@ -19,7 +19,7 @@ import osgi.enroute.debug.api.Debug;
 import osgi.enroute.trains.controller.api.RFIDSegmentController;
 
 @Designate(ocd = RFIDSegmentImpl.Config.class, factory = true)
-@Component(name = "osgi.enroute.trains.hw.rfid", property = { "service.exported.interfaces=*", //
+@Component(name = "osgi.enroute.trains.hw.rfid", immediate = true, property = { "service.exported.interfaces=*", //
 		Debug.COMMAND_SCOPE + "=rfid", //
 		Debug.COMMAND_FUNCTION + "=lastrfid" }, //
 		configurationPolicy = ConfigurationPolicy.REQUIRE)
@@ -50,6 +50,7 @@ public class RFIDSegmentImpl implements RFIDSegmentController, Runnable {
 	void deactivate() {
 		if (mfrc522 != null) {
 			mfrc522.destroy();
+			mfrc522 = null;
 		}
 	}
 
@@ -74,7 +75,7 @@ public class RFIDSegmentImpl implements RFIDSegmentController, Runnable {
 	public void run() {
 		try {
 			mfrc522 = Runtime.getRuntime().exec(command);
-			System.out.println("Started RFID reader");
+			System.out.println("Started RFID reader: " + command);
 			InputStream in = mfrc522.getInputStream();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
@@ -97,6 +98,9 @@ public class RFIDSegmentImpl implements RFIDSegmentController, Runnable {
 		} catch (IOException e) {
 			System.err.println("mfrc522read failed! " + e);
 			throw new UncheckedIOException(e);
+		}
+		finally {
+			System.out.println("RFID reader thread finished");
 		}
 	}
 

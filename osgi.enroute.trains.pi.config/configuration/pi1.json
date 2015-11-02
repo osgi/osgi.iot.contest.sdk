@@ -6,6 +6,12 @@
 		"train.rfid":"rfid1111",
 		"train.name":"T1111"
 	},{
+        "service.pid":"rfid2222",
+        "service.factoryPid": "osgi.enroute.trains.hw.train",
+        "channel":"CH2",
+		"train.rfid":"rfid2222",
+		"train.name":"T2222"
+	},{
 		"service.pid":"A16_S-3",
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",
 		"controller":3,
@@ -23,15 +29,22 @@
 		"service.pid":"X01-4",
 		"service.factoryPid":"osgi.enroute.trains.hw.switch",
 		"controller":4,
-		"segment":"X04",
+		"segment":"X01",
 		"fwd":"GPIO 8",
 		"rev":"GPIO 9"
+	},{
+		"service.pid":"X02-10",
+		"service.factoryPid":"osgi.enroute.trains.hw.switch",
+		"controller":10,
+		"segment":"X02",
+		"fwd":"GPIO 7",
+		"rev":"GPIO 2"
 	},{
 		"service.pid":"A07_L-1",
 		"service.factoryPid":"osgi.enroute.trains.hw.rfid",
 		"controller":1,
 		"segment":"A07_L",
-		"channel":0
+		"channel":1
 	}
 	
 ]

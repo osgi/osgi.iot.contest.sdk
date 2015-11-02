@@ -1,6 +1,0 @@
-
-# 
-# Configuration for the 12 Raspberry PI (holds RFID 1 & 2)
-#
-
--includeresource: configuration/configuration.json = configuration/cnf12.json

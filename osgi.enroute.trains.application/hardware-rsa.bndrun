@@ -8,12 +8,20 @@
 -resolve.effective: active;skip:="osgi.service"
 
 -runrequires.hardware: \
-	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.hardware.provider)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.hw.provider)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.pi.config.pi1)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.configurer.simple.provider)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.shell)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.command)',\
-	osgi.identity;filter:='(osgi.identity=org.apache.felix.webconsole)'
+	osgi.identity;filter:='(osgi.identity=org.apache.felix.webconsole)',\
+    osgi.identity;filter:='(osgi.identity=osgi.enroute.webconsole.xray.provider)'
 
--runvm.httpPort: -Dorg.osgi.service.http.port=8081
+-runpath: biz.aQute.remote.launcher
+
+-runremote: pi; \
+	host=192.168.99.2; \
+	jdb=1044; \
+	shell=-1
 
 # peerIP is the IP address of the server running trains-rsa.bndrun
 #	you need to change it for your environment, before starting hardware.bndrun
@@ -47,6 +55,14 @@ rsa.bootstrap: false
 	org.eclipse.equinox.metatype;version='[1.4.100,1.4.101)',\
 	org.osgi.service.event;version='[1.3.1,1.3.2)',\
 	org.osgi.service.metatype;version='[1.3.0,1.3.1)',\
+	osgi.enroute.bostock.d3.webresource;version='[3.5.6,3.5.7)',\
 	osgi.enroute.configurer.simple.provider;version='[1.2.2,1.2.3)',\
+	osgi.enroute.dto.bndlib.provider;version='[1.0.0,1.0.1)',\
+	osgi.enroute.iot.circuit.provider;version='[2.0.1,2.0.2)',\
+	osgi.enroute.iot.pi.provider;version='[1.0.2,1.0.3)',\
 	osgi.enroute.logger.simple.provider;version='[1.2.1,1.2.2)',\
-	osgi.enroute.trains.hardware.provider;version=snapshot
+	osgi.enroute.scheduler.simple.provider;version='[1.1.1,1.1.2)',\
+	osgi.enroute.trains.hw.provider;version=snapshot,\
+	osgi.enroute.trains.pi.config.pi1;version=snapshot,\
+	osgi.enroute.web.simple.provider;version='[1.3.3,1.3.4)',\
+	osgi.enroute.webconsole.xray.provider;version='[2.0.0,2.0.1)'

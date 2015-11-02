@@ -33,4 +33,7 @@ Conditional-Package: aQute.lib*
 	
 -runbundles: \
 	${error;Resolve first}
-Export-Package: osgi.enroute.trains.train.api
+Export-Package: \
+	osgi.enroute.trains.train.api,\
+	osgi.enroute.trains.controller.api,\
+	osgi.enroute.trains.cloud.api

@@ -17,7 +17,7 @@ rsa.bootstrap: true
 	com.paremus.cluster=IOT_DEMO,\
 	com.paremus.bootstrap=${rsa.bootstrap},\
 	com.paremus.bind=${myIP},\
-	com.paremus.peers=${myIP}
+	com.paremus.peers=192.168.99.1
 	
 -runsystempackages:		sun.misc
 
