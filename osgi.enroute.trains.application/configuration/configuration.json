@@ -9,7 +9,7 @@
         "service.pid":"osgi.enroute.trains.train.manager",
         "name": "DemoTrain",
         "rfid": "rfid1234",
-        "TrainController.target" : "train.channel=1"
+        "target.TrainController" : "train.channel=1"
     },
     {
         "service.pid":"osgi.enroute.trains.track.manager",
