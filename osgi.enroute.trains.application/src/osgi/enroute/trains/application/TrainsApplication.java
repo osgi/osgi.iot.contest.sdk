@@ -3,11 +3,14 @@ package osgi.enroute.trains.application;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 import osgi.enroute.configurer.api.RequireConfigurerExtender;
 import osgi.enroute.eventadminserversentevents.capabilities.RequireEventAdminServerSentEventsWebResource;
@@ -18,8 +21,10 @@ import osgi.enroute.stackexchange.pagedown.capabilities.RequirePagedownWebResour
 import osgi.enroute.trains.application.LayoutAdapter.Layout;
 import osgi.enroute.trains.cloud.api.Segment;
 import osgi.enroute.trains.cloud.api.TrackForCommand;
+import osgi.enroute.trains.cloud.api.TrackForSegment;
 import osgi.enroute.trains.track.util.Tracks;
 import osgi.enroute.trains.track.util.Tracks.SegmentHandler;
+import osgi.enroute.trains.train.api.TrainController;
 import osgi.enroute.twitter.bootstrap.capabilities.RequireBootstrapWebResource;
 import osgi.enroute.webserver.capabilities.RequireWebServerExtender;
 
@@ -32,10 +37,12 @@ import osgi.enroute.webserver.capabilities.RequireWebServerExtender;
 @RequirePagedownWebResource(resource="enmarkdown.js")
 @Component(name = "osgi.enroute.trains", property = JSONRPC.ENDPOINT + "=trains")
 public class TrainsApplication implements JSONRPC {
-
+	final Map<String,String> name2rfid = new ConcurrentHashMap<>();
+	
 	@Reference
 	private TrackForCommand ti;
-
+	@Reference
+	private TrackForSegment ts;
 	
 	private Tracks<Layout> track;
 	private Map<String,SegmentPosition> positions;
@@ -76,6 +83,9 @@ public class TrainsApplication implements JSONRPC {
 		return positions;
 	}
 	
+	public void setPosition( String train, String segment) {
+		ts.locatedTrainAt(name2rfid.get(train), segment);
+	}
 
 	private void security() {
 		// TODO Auto-generated method stub
@@ -84,8 +94,16 @@ public class TrainsApplication implements JSONRPC {
 
 	@Override
 	public Object getDescriptor() throws Exception {
-		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Reference(cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC)
+	void addTrain(TrainController tm, Map<String,Object> map) {
+		name2rfid.put( (String)map.get("train.name"), (String)map.get("train.rfid"));
+	}
+	
+	void removeTrain(TrainController tm) {
+		
 	}
 
 }

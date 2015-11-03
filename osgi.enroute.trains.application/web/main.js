@@ -128,6 +128,11 @@
 
 	var mainProvider = function($scope) {
 		$scope.assign = trains.ep.assign;
+		$scope.rfid= function(segment,train) {
+			console.log(segment + " " + train);
+			trains.ep.setPosition( train, segment);
+
+		}
 	}
 
 })();

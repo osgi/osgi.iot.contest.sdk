@@ -82,6 +82,25 @@
 						<title>Signal {{p.segment.id}}</title>
 					</g>
 					<g ng-switch-when=LOCATOR>
+						<g ng:attr:transform="translate(0,{{$index*-20 - 45}})" ng-repeat='t in trains.rfids' >
+							<rect
+								x=-30 
+								y = -8
+								width=60
+								height=12
+								fill=lightgrey
+							/> 
+							<text 
+								
+								text-anchor=middle 
+								x=0 
+								y=0
+								fill="white" 
+								ng-click="rfid(p.segment.id,t.train)"
+								style="font-size:0.5em">
+								{{t.train}}
+							</text>
+						</g>
 						<path d="M 0 -18 l 0 17 m 0 -10 l 6 -6 m -6 6 l -6 -6" stroke-width=1 stroke=black></path>
 						<g ng-repeat="(train,seg) in trains.locations" >
 							<text text-anchor=middle x=0 y=-20 fill="black" ng-show=seg==p.segment.id style="font-size:0.9em;fill:darkred;">{{train}}</text>
