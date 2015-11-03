@@ -12,6 +12,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 
 import osgi.enroute.debug.api.Debug;
 import osgi.enroute.trains.cloud.api.Color;
+import osgi.enroute.trains.controller.api.SegmentController;
 import osgi.enroute.trains.controller.api.SignalSegmentController;
 import osgi.enroute.trains.controller.api.SwitchSegmentController;
 import osgi.enroute.trains.train.api.TrainController;
@@ -43,7 +44,7 @@ public class Command {
 
 	@Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
 	void addSignal(SignalSegmentController t, ServiceReference<?> ref) {
-		signals.put((Integer) ref.getProperty("controller"), t);
+		signals.put((Integer) ref.getProperty(SegmentController.CONTROLLER_ID), t);
 	}
 
 	void removeSignal(SignalSegmentController s) {
@@ -54,7 +55,7 @@ public class Command {
 	
 	@Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
 	void addSwitch(SwitchSegmentController t, ServiceReference<?> ref) {
-		switches.put((Integer) ref.getProperty("controller"), t);
+		switches.put((Integer) ref.getProperty(SegmentController.CONTROLLER_ID), t);
 	}
 
 	void removeSwitch(SwitchSegmentController s) {

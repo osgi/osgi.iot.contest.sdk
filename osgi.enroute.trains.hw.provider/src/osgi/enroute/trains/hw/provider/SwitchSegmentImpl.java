@@ -31,7 +31,7 @@ public class SwitchSegmentImpl implements SwitchSegmentController {
 
 	@ObjectClassDefinition
 	@interface Config {
-		int controller();
+		int controller_id();
 
 		String segment();
 		
@@ -70,7 +70,7 @@ public class SwitchSegmentImpl implements SwitchSegmentController {
 
 	@Override
 	public String toString() {
-		return "Switch[alt="+getSwitch() + ", fwd=" + fwd.toString() + ", rev=" + rev.toString() + ", cntl="+config.controller() + ", seg="+config.segment() + "]";
+		return "Switch[alt="+getSwitch() + ", fwd=" + fwd.toString() + ", rev=" + rev.toString() + ", cntl="+config.controller_id() + ", seg="+config.segment() + "]";
 	}
 
 

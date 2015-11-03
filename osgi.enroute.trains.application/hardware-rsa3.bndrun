@@ -1,33 +1,35 @@
 #
-# OSGI ENROUTE TRAINS APPLICATION RUN SPECIFICATION
+# OSGI ENROUTE TRAINS HARDWARE RUN SPECIFICATION
 #
-	
--runtrace: true
+
+# Launch hardware.provider on remote system using Paremus RSA provider
+
+-include: ~../osgi.enroute.trains.application/remote-osgi.bndrun
+-resolve.effective: active;skip:="osgi.service"
+
+-runrequires.hardware: \
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.hw.provider)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.pi.config.pi3)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.configurer.simple.provider)',\
+	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.shell)',\
+	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.command)',\
+	osgi.identity;filter:='(osgi.identity=org.apache.felix.webconsole)',\
+    osgi.identity;filter:='(osgi.identity=osgi.enroute.webconsole.xray.provider)'
+
 -runpath: biz.aQute.remote.launcher
--runremote: master; \
-	host=192.168.99.1; \
+
+-runremote: pi3; \
+	host=192.168.99.4; \
 	jdb=1044; \
 	shell=-1
 
-#-include: ~osgi.enroute.trains.bndrun
--runrequires.app: \
-	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.application)',\
-	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.track.manager.example.provider)',\
-	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.train.manager.example.provider)',\
-	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.track.controller.provider)'
-
--runrequires.xtra: \
-	osgi.identity;filter:='(osgi.identity=osgi.enroute.bostock.d3.webresource)',\
-	osgi.identity;filter:='(osgi.identity=osgi.enroute.executor.simple.provider)',\
-	osgi.identity;filter:='(osgi.identity=osgi.promise)'
-	
--runrequires.trains: \
-	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.shell)',\
-	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.command)',\
-	osgi.identity;filter:='(osgi.identity=org.apache.felix.webconsole)'
+# peerIP is the IP address of the server running trains-rsa.bndrun
+#	you need to change it for your environment, before starting hardware.bndrun
+#	setting it to ${myIP} allows testing both hardware-rsa.bndrun and trains-rsa.bndrun on the same machine
+peerIP: ${myIP}
+rsa.bootstrap: false
 
 #
-
 -runbundles: \
 	com.paremus.deployment.framework.provider;version='[1.0.0,1.0.1)',\
 	com.paremus.dosgi.discovery.gossip;version='[1.0.0,1.0.1)',\
@@ -56,18 +58,11 @@
 	osgi.enroute.bostock.d3.webresource;version='[3.5.6,3.5.7)',\
 	osgi.enroute.configurer.simple.provider;version='[1.2.2,1.2.3)',\
 	osgi.enroute.dto.bndlib.provider;version='[1.0.0,1.0.1)',\
-	osgi.enroute.easse.simple.adapter;version='[1.3.2,1.3.3)',\
-	osgi.enroute.executor.simple.provider;version='[1.0.0,1.0.1)',\
-	osgi.enroute.google.angular.webresource;version='[1.4.4,1.4.5)',\
-	osgi.enroute.jsonrpc.simple.provider;version='[1.1.3,1.1.4)',\
+	osgi.enroute.iot.circuit.provider;version='[2.0.1,2.0.2)',\
+	osgi.enroute.iot.pi.provider;version='[1.1.0,1.1.1)',\
 	osgi.enroute.logger.simple.provider;version='[1.2.1,1.2.2)',\
 	osgi.enroute.scheduler.simple.provider;version='[1.1.1,1.1.2)',\
-	osgi.enroute.stackexchange.pagedown.webresource;version='[1.1.1,1.1.2)',\
-	osgi.enroute.trains.application;version=snapshot,\
-	osgi.enroute.trains.track.controller.provider;version=snapshot,\
-	osgi.enroute.trains.track.manager.example.provider;version=snapshot,\
-	osgi.enroute.trains.train.manager.example.provider;version=snapshot,\
-	osgi.enroute.trains.util;version=snapshot,\
-	osgi.enroute.twitter.bootstrap.webresource;version='[3.3.5,3.3.6)',\
+	osgi.enroute.trains.hw.provider;version=snapshot,\
+	osgi.enroute.trains.pi.config.pi3;version=snapshot,\
 	osgi.enroute.web.simple.provider;version='[1.3.3,1.3.4)',\
-	osgi.promise;version='[6.0.0,6.0.1)'
+	osgi.enroute.webconsole.xray.provider;version='[2.0.0,2.0.1)'

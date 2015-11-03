@@ -26,3 +26,6 @@ Conditional-Package: aQute.lib*
 	
 -testpath: \
 	osgi.enroute.junit.wrapper
+Export-Package: \
+	osgi.enroute.trains.train.api,\
+	osgi.enroute.trains.controller.api

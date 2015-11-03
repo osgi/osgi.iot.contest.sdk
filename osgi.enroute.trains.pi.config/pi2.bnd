@@ -1,0 +1,6 @@
+
+# 
+# Configuration for the P1 Raspberry PI 
+#
+
+-includeresource: {configuration/configuration.json = configuration/pi2.json}

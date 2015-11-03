@@ -3,4 +3,4 @@
 # Configuration for the P1 Raspberry PI 
 #
 
--includeresource: configuration/configuration.json = configuration/pi1.json
+-includeresource: {configuration/configuration.json = configuration/pi1.json}

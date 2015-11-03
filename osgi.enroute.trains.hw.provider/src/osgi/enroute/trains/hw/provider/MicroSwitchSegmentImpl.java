@@ -40,7 +40,7 @@ public class MicroSwitchSegmentImpl implements RFIDSegmentController {
 
 	@ObjectClassDefinition
 	@interface Config {
-		int controller();
+		int controller_id();
 
 		String segment();
 

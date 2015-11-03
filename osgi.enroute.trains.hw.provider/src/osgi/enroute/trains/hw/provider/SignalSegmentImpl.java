@@ -29,7 +29,7 @@ public class SignalSegmentImpl implements SignalSegmentController {
 
 	@ObjectClassDefinition
 	@interface Config {
-		int controller();
+		int controller_id();
 
 		String segment();
 
@@ -90,7 +90,7 @@ public class SignalSegmentImpl implements SignalSegmentController {
 
 	@Override
 	public String toString() {
-		return "Signal[green=" + green + ", red=" + red + ", color=" + color + ",cntl=" + config.controller() + ", seg="+config.segment() + "]";
+		return "Signal[green=" + green + ", red=" + red + ", color=" + color + ",cntl=" + config.controller_id() + ", seg="+config.segment() + "]";
 	}
 
 }

@@ -15,8 +15,8 @@ import osgi.enroute.trains.train.api.TrainController;
 /**
  * 
  */
-@Designate(ocd = Config.class, factory=true)
-@Component(name = "osgi.enroute.trains.hw.train", immediate = true, configurationPolicy=ConfigurationPolicy.REQUIRE)
+@Designate(ocd = Config.class, factory = true)
+@Component(name = "osgi.enroute.trains.hw.train", immediate = true, configurationPolicy = ConfigurationPolicy.REQUIRE, property = "service.exported.interfaces=*")
 public class TrainControllerImpl extends LegoRC implements TrainController {
 
 	@ObjectClassDefinition
@@ -27,7 +27,7 @@ public class TrainControllerImpl extends LegoRC implements TrainController {
 
 		String train_name();
 
-		int divider() default 400;
+		int divider() default 200;
 	}
 
 	private double divider;
