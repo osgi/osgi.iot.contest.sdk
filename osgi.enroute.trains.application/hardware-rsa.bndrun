@@ -19,7 +19,7 @@
 -runpath: biz.aQute.remote.launcher
 
 -runremote: pi; \
-	host=192.168.10.10; \
+	host=192.168.99.2; \
 	jdb=1044; \
 	shell=-1
 
