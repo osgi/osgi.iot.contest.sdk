@@ -27,7 +27,7 @@ public class TrainControllerImpl extends LegoRC implements TrainController {
 
 		String train_name();
 
-		int divider() default 200;
+		int divider() default 100;
 	}
 
 	private double divider;
