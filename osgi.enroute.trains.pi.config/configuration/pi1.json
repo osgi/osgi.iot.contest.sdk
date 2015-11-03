@@ -12,17 +12,17 @@
 		"train.rfid":"rfid2222",
 		"train.name":"T2222"
 	},{
-		"service.pid":"A16_S-3",
+		"service.pid":"A22_S-2",
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",
-		"controller":3,
-		"segment":"A16_S",
+		"controller":2,
+		"segment":"A22_S",
 		"green":"GPIO 24",
 		"red":"GPIO 25"
 	},{
-		"service.pid":"C05_S-9",
+		"service.pid":"B04_S-5",
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",
-		"controller":9,
-		"segment":"C05_S",
+		"controller":5,
+		"segment":"B04_S",
 		"green":"GPIO 3",
 		"red":"GPIO 21"
 	},{
@@ -35,15 +35,21 @@
 	},{
 		"service.pid":"X02-10",
 		"service.factoryPid":"osgi.enroute.trains.hw.switch",
-		"controller":10,
+		"controller":8,
 		"segment":"X02",
 		"fwd":"GPIO 7",
 		"rev":"GPIO 2"
-	}, {
-        "service.pid":"A07_L-1",
+	},{
+        "service.pid":"A18_L-1",
         "service.factoryPid": "osgi.enroute.trains.hw.microswitch",
         "controller":1,
         "pin":"GPIO 10",
-        "segment":"A07_L"
+        "segment":"A18_L"
+	},{
+        "service.pid":"B05_L-6",
+        "service.factoryPid": "osgi.enroute.trains.hw.microswitch",
+        "controller":6,
+        "pin":"GPIO 11",
+        "segment":"B05_L"
 	}
 ]

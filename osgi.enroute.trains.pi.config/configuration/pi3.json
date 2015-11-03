@@ -1,0 +1,29 @@
+[
+	{
+		"service.pid":"E11_S-10",
+		"service.factoryPid":"osgi.enroute.trains.hw.signal",
+		"controller":10,
+		"segment":"A11_S",
+		"green":"GPIO 24",
+		"red":"GPIO 25"
+	},{
+		"service.pid":"D11_S-12",
+		"service.factoryPid":"osgi.enroute.trains.hw.signal",
+		"controller":12,
+		"segment":"D11_S",
+		"green":"GPIO 3",
+		"red":"GPIO 21"
+	},{
+        "service.pid":"E10_L-9",
+        "service.factoryPid": "osgi.enroute.trains.hw.microswitch",
+        "controller":9,
+        "pin":"GPIO 10",
+        "segment":"E10_L"
+	},{
+        "service.pid":"D10_L-11",
+        "service.factoryPid": "osgi.enroute.trains.hw.microswitch",
+        "controller":11,
+        "pin":"GPIO 11",
+        "segment":"D10_L"
+	}
+]
