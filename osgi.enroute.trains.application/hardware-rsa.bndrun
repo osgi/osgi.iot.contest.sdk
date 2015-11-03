@@ -19,7 +19,7 @@
 -runpath: biz.aQute.remote.launcher
 
 -runremote: pi; \
-	host=192.168.99.2; \
+	host=192.168.10.10; \
 	jdb=1044; \
 	shell=-1
 
@@ -59,7 +59,7 @@ rsa.bootstrap: false
 	osgi.enroute.configurer.simple.provider;version='[1.2.2,1.2.3)',\
 	osgi.enroute.dto.bndlib.provider;version='[1.0.0,1.0.1)',\
 	osgi.enroute.iot.circuit.provider;version='[2.0.1,2.0.2)',\
-	osgi.enroute.iot.pi.provider;version='[1.0.2,1.0.3)',\
+	osgi.enroute.iot.pi.provider;version='[1.1.0,1.1.1)',\
 	osgi.enroute.logger.simple.provider;version='[1.2.1,1.2.2)',\
 	osgi.enroute.scheduler.simple.provider;version='[1.1.1,1.1.2)',\
 	osgi.enroute.trains.hw.provider;version=snapshot,\
