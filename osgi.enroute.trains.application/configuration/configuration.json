@@ -40,9 +40,7 @@
             "A21        : CURVED     : 1      : -1     : A22",
             "A22        : CURVED     : 1      : -1     : A22_S",
             "A22_S      : SIGNAL     : 0      : 2      : X01",
-          
             "X01        : SWITCH     : 1      : 3      : B00,C00",
-
             "B00        : STRAIGHT   : 1      : -1     : B01",
             "B01        : CURVED     : 1      : -1     : B02",
             "B02        : CURVED     : 1      : -1     : B03",
@@ -50,7 +48,6 @@
             "B03_L      : LOCATOR    : 0      : 4      : B04",
             "B04        : CURVED     : 1      : -1     : B04_S",
             "B04_S      : SIGNAL     : 1      : 5      : X02",
-
             "C00        : STRAIGHT   : 1      : -1     : C01",
             "C01        : STRAIGHT   : 1      : -1     : C02",
             "C02        : STRAIGHT   : 1      : -1     : C03",
@@ -85,54 +82,47 @@
             "C31        : STRAIGHT   : 1      : -1     : C31_L",
             "C31_L      : LOCATOR    : 0      : 6      : C32",
             "C32        : STRAIGHT   : 1      : -1     : C32_S",
-            "C32_S      : SIGNAL     : 0      : 7      : X02",
-
+            "C32_S      : SIGNAL     : 0      : 7      : X04",
             "X02        : SWITCH     : 1      : 8     : E00,D00",
-
             "E00        : STRAIGHT   : 1      : -1     : E01",
             "E01        : STRAIGHT   : 1      : -1     : E02",
             "E02        : CURVED     : 1      : -1     : E03",
             "E03        : CURVED     : 1      : -1     : E04",
             "E04        : CURVED     : 1      : -1     : E05",
-            "E05        : STRAIGHT   : 1      : -1     : E05",
-            "E06        : STRAIGHT   : 1      : -1     : E06",
-            "E07        : STRAIGHT   : 1      : -1     : E07",
-            "E08        : CURVED     : 1      : -1     : E08",
-            "E09        : CURVED     : 1      : -1     : E09",            
+            "E05        : STRAIGHT   : 1      : -1     : E06",
+            "E06        : STRAIGHT   : 1      : -1     : E07",
+            "E07        : STRAIGHT   : 1      : -1     : E08",
+            "E08        : CURVED     : 1      : -1     : E09",
+            "E09        : CURVED     : 1      : -1     : E10",
             "E10        : CURVED     : 1      : -1     : E10_L",
             "E10_L      : LOCATOR    : 0      : 9      : E11",
             "E11        : STRAIGHT   : 1      : -1     : E11_S",
             "E11_S      : SIGNAL     : 0      : 10     : X03",
-
-            "D00        : STRAIGHT   : 1      : -1     : E01",
-            "D01        : STRAIGHT   : 1      : -1     : E02",
-            "D02        : CURVED     : 1      : -1     : E03",
-            "D03        : CURVED     : 1      : -1     : E04",
-            "D04        : CURVED     : 1      : -1     : E05",
-            "D05        : STRAIGHT   : 1      : -1     : E05",
-            "D06        : STRAIGHT   : 1      : -1     : E06",
-            "D07        : STRAIGHT   : 1      : -1     : E07",
-            "D08        : CURVED     : 1      : -1     : E08",
-            "D09        : CURVED     : 1      : -1     : E09",            
-            "D10        : CURVED     : 1      : -1     : E10_L",
-            "D10_L      : LOCATOR    : 0      : 11      : E11",
-            "D11        : STRAIGHT   : 1      : -1     : E11_S",
+            "D00        : STRAIGHT   : 1      : -1     : D01",
+            "D01        : STRAIGHT   : 1      : -1     : D02",
+            "D02        : CURVED     : 1      : -1     : D03",
+            "D03        : CURVED     : 1      : -1     : D04",
+            "D04        : CURVED     : 1      : -1     : D05",
+            "D05        : STRAIGHT   : 1      : -1     : D06",
+            "D06        : STRAIGHT   : 1      : -1     : D07",
+            "D07        : STRAIGHT   : 1      : -1     : D08",
+            "D08        : CURVED     : 1      : -1     : D09",
+            "D09        : CURVED     : 1      : -1     : D10",
+            "D10        : CURVED     : 1      : -1     : D10_L",
+            "D10_L      : LOCATOR    : 0      : 11      : D11",
+            "D11        : STRAIGHT   : 1      : -1     : D11_S",
             "D11_S      : SIGNAL     : 0      : 12     : X03!",
-
             "X03        : SWITCH     : 1      : 13     : F00",
-
             "F00        : CURVED     : 1      : -1     : F01",
             "F01        : CURVED     : 1      : -1     : F02",
             "F02        : CURVED     : 1      : -1     : F03",
             "F03        : CURVED     : 1      : -1     : F04_L",
             "F04_L      : LOCATOR    : 0      : 14     : F04",
-            "F04        : STRAIGHT   : 1      : -1     : F05_S",
+            "F04        : STRAIGHT   : 1      : -1     : F04_S",
             "F04_S      : SIGNAL     : 0      : 15     : X04!",
-
             "X04        : SWITCH     : 1      : 16     : A00"
         ]
     },
-
     {
         "service.pid": "com.paremus.net.encode"
     },
@@ -153,5 +143,4 @@
         "cluster.name": "${com.paremus.cluster}",
         "initial.peers": "${com.paremus.peers}"
     }
-
 ]
