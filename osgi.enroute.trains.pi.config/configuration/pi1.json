@@ -39,12 +39,11 @@
 		"segment":"X02",
 		"fwd":"GPIO 7",
 		"rev":"GPIO 2"
-	},{
-		"service.pid":"A07_L-1",
-		"service.factoryPid":"osgi.enroute.trains.hw.rfid",
-		"controller":1,
-		"segment":"A07_L",
-		"channel":1
+	}, {
+        "service.pid":"A07_L-1",
+        "service.factoryPid": "osgi.enroute.trains.hw.microswitch",
+        "controller":1,
+        "pin":"GPIO 10",
+        "segment":"A07_L"
 	}
-	
 ]
