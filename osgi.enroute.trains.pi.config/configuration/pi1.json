@@ -1,16 +1,16 @@
 [
 	{
-        "service.pid":"rfid1111",
+        "service.pid":"rfid101",
         "service.factoryPid": "osgi.enroute.trains.hw.train",
         "channel":"CH1",
-		"train.rfid":"rfid1111",
-		"train.name":"T1111"
+		"train.rfid":"rfid101",
+		"train.name":"T101"
 	},{
-        "service.pid":"rfid2222",
+        "service.pid":"rfid201",
         "service.factoryPid": "osgi.enroute.trains.hw.train",
         "channel":"CH2",
-		"train.rfid":"rfid2222",
-		"train.name":"T2222"
+		"train.rfid":"rfid201",
+		"train.name":"T201"
 	},{
 		"service.pid":"A22_S-2",
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",
