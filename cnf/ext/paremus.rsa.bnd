@@ -13,4 +13,5 @@ com.paremus.peers=192.168.99.1
 -runrequires.rsa:\
 	osgi.identity;filter:='(osgi.identity=com.paremus.gossip)',\
 	osgi.identity;filter:='(osgi.identity=com.paremus.dosgi.net)',\
-	osgi.identity;filter:='(osgi.identity=com.paremus.dosgi.topology.scoped)',\
+	osgi.identity;filter:='(osgi.identity=com.paremus.dosgi.discovery.gossip)',\
+	osgi.identity;filter:='(osgi.identity=com.paremus.dosgi.topology.scoped)'

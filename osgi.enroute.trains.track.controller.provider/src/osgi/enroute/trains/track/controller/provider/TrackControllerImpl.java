@@ -118,7 +118,7 @@ public class TrackControllerImpl implements EventHandler {
                     String train = p.getValue();
                     trackManager.locatedTrainAt(train, segment);
                     return null;
-                }
+                }, p -> p.getFailure().printStackTrace() 
                     ).then((p) -> {
                         // and then start tracking the next one
                         trackRFID(controller, segment);
