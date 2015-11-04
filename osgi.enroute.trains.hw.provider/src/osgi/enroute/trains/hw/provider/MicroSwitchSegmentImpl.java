@@ -11,6 +11,7 @@ import org.osgi.util.promise.Deferred;
 import org.osgi.util.promise.Promise;
 
 import osgi.enroute.debug.api.Debug;
+import osgi.enroute.trains.cloud.api.TrackForSegment;
 import osgi.enroute.trains.controller.api.RFIDSegmentController;
 
 import com.pi4j.io.gpio.GpioController;
@@ -32,6 +33,9 @@ public class MicroSwitchSegmentImpl implements RFIDSegmentController {
 
 	@Reference
 	private GpioController gpio;
+	
+	@Reference
+	private TrackForSegment trackManager;
 	
 	private String lastRFID = null;
 	private Deferred<String> nextRFID = new Deferred<String>();
@@ -98,6 +102,9 @@ public class MicroSwitchSegmentImpl implements RFIDSegmentController {
 
 	// This method is called when an RFID tag detected
 	private synchronized void trigger(String rfid) {
+		// bypass TrackController and immediately call locatedAt to avoid promise timeouts
+		trackManager.locatedTrainAt(rfid, config.segment());
+		
 		Deferred<String> toResolve = nextRFID;
 		nextRFID = new Deferred<String>();
 		toResolve.resolve(rfid);
