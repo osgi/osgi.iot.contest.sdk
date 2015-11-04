@@ -2,9 +2,12 @@ package osgi.enroute.gogo.extra.provider;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Formatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.felix.service.command.CommandSession;
 import org.apache.felix.service.command.Descriptor;
@@ -17,6 +20,10 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.runtime.ServiceComponentRuntime;
+import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
+import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
+import org.yaml.snakeyaml.Yaml;
 
 import aQute.libg.glob.Glob;
 import osgi.enroute.debug.api.Debug;
@@ -28,7 +35,8 @@ import osgi.enroute.dto.api.DTOs;
 @Component(name = "osgi.enroute.gogo.extra", property = { Debug.COMMAND_SCOPE + "=extra",
 		Debug.COMMAND_FUNCTION + "=extra", Debug.COMMAND_FUNCTION + "=srv",
 		Debug.COMMAND_FUNCTION + "=log",
-		Debug.COMMAND_FUNCTION + "=logt" }, service = ExtraImpl.class)
+		Debug.COMMAND_FUNCTION + "=logt",
+		Debug.COMMAND_FUNCTION + "=ds" }, service = ExtraImpl.class)
 public class ExtraImpl {
 	BundleContext context = FrameworkUtil.getBundle(ExtraImpl.class).getBundleContext();
 	private LogTracker logTracker;
@@ -36,6 +44,9 @@ public class ExtraImpl {
 	@Reference
 	DTOs dtos;
 
+	@Reference
+	ServiceComponentRuntime ds;
+	
 	@Activate
 	void act(BundleContext context) {
 		logTracker = new LogTracker(context);
@@ -75,7 +86,7 @@ public class ExtraImpl {
 				del = " : ";
 				for (String key : ref.getPropertyKeys()) {
 
-					if (columns.isEmpty() || has(columns, key)) {
+					if (columns.isEmpty() || has(columns, key) || g.matcher(key).matches()) {
 						sub.format("%s%s=%s", del, key, toString(ref.getProperty(key)));
 						del = ", ";
 					}
@@ -155,4 +166,24 @@ public class ExtraImpl {
 			logTracker.removeConsole(console);
 		}
 	}
+	
+	public List<String> ds() {
+		return ds.getComponentDescriptionDTOs().stream().map( d -> d.name ).collect(Collectors.toList());
+	}
+	
+	public List<String> ds( Glob g ) {
+		return ds.getComponentDescriptionDTOs().stream().
+				filter( r -> g.matcher(r.name).matches()  ).
+				map( d -> {
+			StringWriter sw = new StringWriter();
+			Yaml yaml = new Yaml();
+			yaml.dump(d, sw);
+			sw.write("-------------------");
+			Collection<ComponentConfigurationDTO> c = ds.getComponentConfigurationDTOs(d);
+			yaml.dump(c, sw);
+
+			return sw.toString();
+		} ).collect(Collectors.toList());
+	}
+
 }
