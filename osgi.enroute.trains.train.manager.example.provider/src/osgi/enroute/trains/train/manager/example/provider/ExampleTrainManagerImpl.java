@@ -12,6 +12,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import osgi.enroute.scheduler.api.Scheduler;
 import osgi.enroute.trains.cloud.api.Observation;
 import osgi.enroute.trains.cloud.api.TrackForTrain;
 import osgi.enroute.trains.track.util.Tracks;
@@ -33,7 +34,10 @@ public class ExampleTrainManagerImpl {
 	private Tracks<Object> tracks;
 
 	private Thread mgmtThread;
-
+	
+	@Reference
+	private Scheduler scheduler;
+	
 	@Activate
 	public void activate(TrainConfiguration config) throws Exception {
 		name = config.name();
@@ -121,6 +125,7 @@ public class ExampleTrainManagerImpl {
 						// assignment reached)
 						if (assignmentReached()) {
 							train.move(0);
+							blink(10);
 						} else {
 							followRoute();
 						}
@@ -143,6 +148,13 @@ public class ExampleTrainManagerImpl {
 			System.out.println("Train manager exited");
 		}
 
+		private void blink( int n ) {
+			train.light(false);
+			scheduler.after(()-> {
+				train.light(true);
+				scheduler.after( () -> blink(n-1), 500);
+			}, 500 );
+		}
 		private void planRoute() {
 			if (currentLocation == null)
 				return;
