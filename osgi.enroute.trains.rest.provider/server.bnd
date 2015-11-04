@@ -1,0 +1,5 @@
+-dsannotations: *
+-metatypeannotations: *
+Bundle-Version: 1.0.0.${tstamp}
+Private-Package: osgi.enroute.trains.rest.provider
+Service-Component: *

@@ -1,0 +1,7 @@
+Export-Package: \
+	osgi.enroute.trains.cloud.api,\
+	osgi.enroute.trains.rest.client,\
+	org.osgi.dto,\
+	osgi.enroute.dto.api
+	
+Conditional-Package: aQute.lib*
