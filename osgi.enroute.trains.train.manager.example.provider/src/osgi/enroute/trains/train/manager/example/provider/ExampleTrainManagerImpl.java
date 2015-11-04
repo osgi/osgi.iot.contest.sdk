@@ -34,10 +34,10 @@ public class ExampleTrainManagerImpl {
 	private Tracks<Object> tracks;
 
 	private Thread mgmtThread;
-	
+
 	@Reference
 	private Scheduler scheduler;
-	
+
 	@Activate
 	public void activate(TrainConfiguration config) throws Exception {
 		name = config.name();
@@ -125,7 +125,8 @@ public class ExampleTrainManagerImpl {
 						// assignment reached)
 						if (assignmentReached()) {
 							train.move(0);
-							blink(10);
+							train.light(false);
+							blink(3);
 						} else {
 							followRoute();
 						}
@@ -148,13 +149,16 @@ public class ExampleTrainManagerImpl {
 			System.out.println("Train manager exited");
 		}
 
-		private void blink( int n ) {
+		private void blink(int n) {
 			train.light(false);
-			scheduler.after(()-> {
-				train.light(true);
-				scheduler.after( () -> blink(n-1), 500);
-			}, 500 );
+			if (n > 0) {
+				scheduler.after(() -> {
+					train.light(true);
+					scheduler.after(() -> blink(n - 1), 500);
+				} , 500);
+			}
 		}
+
 		private void planRoute() {
 			if (currentLocation == null)
 				return;
@@ -171,6 +175,8 @@ public class ExampleTrainManagerImpl {
 		private void followRoute() {
 			if (route == null || route.isEmpty())
 				return;
+
+			train.light(true);
 
 			System.out.println("XX currentLocation=" + currentLocation);
 			boolean found = false;
