@@ -34,8 +34,8 @@ public class MicroSwitchSegmentImpl implements RFIDSegmentController {
 	@Reference
 	private GpioController gpio;
 	
-	@Reference
-	private TrackForSegment trackManager;
+	//@Reference
+	//private TrackForSegment trackManager;
 	
 	private String lastRFID = null;
 	private Deferred<String> nextRFID = new Deferred<String>();
@@ -54,6 +54,7 @@ public class MicroSwitchSegmentImpl implements RFIDSegmentController {
 
 	@Activate
 	void activate(Config config) {
+		System.out.println("XXXX");
 		this.config = config;
 		
 		Pin pin = RaspiPin.getPinByName(config.pin());
@@ -103,7 +104,7 @@ public class MicroSwitchSegmentImpl implements RFIDSegmentController {
 	// This method is called when an RFID tag detected
 	private synchronized void trigger(String rfid) {
 		// bypass TrackController and immediately call locatedAt to avoid promise timeouts
-		trackManager.locatedTrainAt(rfid, config.segment());
+		//trackManager.locatedTrainAt(rfid, config.segment());
 		
 		Deferred<String> toResolve = nextRFID;
 		nextRFID = new Deferred<String>();

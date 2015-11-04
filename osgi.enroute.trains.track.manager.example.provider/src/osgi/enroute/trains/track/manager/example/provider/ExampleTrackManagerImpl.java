@@ -45,9 +45,8 @@ import osgi.enroute.trains.track.util.Tracks.SwitchHandler;
  * 
  */
 @Component(name = TrackConfiguration.TRACK_CONFIGURATION_PID, 
-		service = { TrackForSegment.class, TrackForTrain.class,TrackInfo.class, TrackForCommand.class, Object.class },
 		property={"osgi.command.scope=trains",
-		"osgi.command.function=assign"})
+		"osgi.command.function=assign" , "service.exported.interfaces=*"})
 public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain,TrackForCommand {
 	static Logger logger = LoggerFactory.getLogger(ExampleTrackManagerImpl.class);
 	static Random random = new Random();
@@ -108,6 +107,12 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain,T
 		c.type = Command.Type.SWITCH;
 		c.segment = segmentId;
 		command(c);
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void assign(String name, String segmentId){
@@ -286,6 +291,7 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain,T
 	}
 
 	private Optional<SwitchHandler<Object>> getSwitch(String fromTrack, String toTrack){
+		System.out.printf("getSwitch from=%s tp=%s\n", fromTrack, toTrack);
 		return tracks.filter(new TypeReference<SwitchHandler<Object>>(){})
 				.filter(sh -> sh.prev.getTrack().equals(fromTrack)
 								|| (sh.altPrev!=null 
