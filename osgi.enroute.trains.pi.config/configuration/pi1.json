@@ -1,10 +1,10 @@
 [
 	{
-        "service.pid":"rfid101",
+        "service.pid":"rfid1111",
         "service.factoryPid": "osgi.enroute.trains.hw.train",
         "channel":"CH1",
-		"train.rfid":"rfid101",
-		"train.name":"T101"
+		"train.rfid":"rfid1111",
+		"train.name":"T1111"
 	},{
         "service.pid":"rfid201",
         "service.factoryPid": "osgi.enroute.trains.hw.train",
@@ -12,17 +12,17 @@
 		"train.rfid":"rfid201",
 		"train.name":"T201"
 	},{
-		"service.pid":"A22_S-2",
+		"service.pid":"A16_S-3",
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",
-		"controller.id":2,
-		"segment":"A22_S",
+		"controller.id":3,
+		"segment":"A16_S",
 		"green":"GPIO 24",
 		"red":"GPIO 25"
 	},{
-		"service.pid":"B04_S-5",
+		"service.pid":"C05_S-9",
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",
-		"controller.id":5,
-		"segment":"B04_S",
+		"controller.id":9,
+		"segment":"C05_S",
 		"green":"GPIO 3",
 		"red":"GPIO 21"
 	},{
@@ -35,22 +35,22 @@
 	},{
 		"service.pid":"X02-10",
 		"service.factoryPid":"osgi.enroute.trains.hw.switch",
-		"controller.id":8,
+		"controller.id":10,
 		"segment":"X02",
 		"fwd":"GPIO 7",
 		"rev":"GPIO 2"
 	},{
-        "service.pid":"A18_L-1",
+        "service.pid":"A16_L-2",
         "service.factoryPid": "osgi.enroute.trains.hw.microswitch",
-        "controller.id":1,
+        "controller.id":2,
         "pin":"GPIO 10",
-        "segment":"A18_L"
+        "segment":"A16_L"
 	},{
-        "service.pid":"B05_L-6",
+        "service.pid":"C05_L-8",
         "service.factoryPid": "osgi.enroute.trains.hw.microswitch",
-        "controller.id":6,
+        "controller.id":8,
         "pin":"GPIO 11",
-        "segment":"B05_L"
+        "segment":"C05_L"
 	},
 	{
         "service.pid": "com.paremus.net.encode"

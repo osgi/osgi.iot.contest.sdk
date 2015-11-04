@@ -1,44 +1,44 @@
 [
 	{
-		"service.pid":"C32_S-7",
+		"service.pid":"B16_S-7",
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",
 		"controller.id":7,
-		"segment":"C32_S",
+		"segment":"B16_S",
 		"green":"GPIO 24",
 		"red":"GPIO 25"
 	},{
-		"service.pid":"F04_S-15",
+		"service.pid":"F05_S-17",
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",
-		"controller.id":15,
-		"segment":"F04_S",
+		"controller.id":17,
+		"segment":"F05_S",
 		"green":"GPIO 3",
 		"red":"GPIO 21"
 	},{
-		"service.pid":"X03-13",
+		"service.pid":"X03-15",
 		"service.factoryPid":"osgi.enroute.trains.hw.switch",
-		"controller.id":13,
+		"controller.id":15,
 		"segment":"X03",
 		"fwd":"GPIO 8",
 		"rev":"GPIO 9"
 	},{
-		"service.pid":"X04-16",
+		"service.pid":"X04-18",
 		"service.factoryPid":"osgi.enroute.trains.hw.switch",
-		"controller.id":16,
+		"controller.id":18,
 		"segment":"X04",
 		"fwd":"GPIO 7",
 		"rev":"GPIO 2"
 	},{
-        "service.pid":"C31_L-6",
+        "service.pid":"B16_L-6",
         "service.factoryPid": "osgi.enroute.trains.hw.microswitch",
         "controller.id":6,
         "pin":"GPIO 10",
-        "segment":"C31_L"
+        "segment":"B16_L"
 	},{
-        "service.pid":"F04_L-14",
+        "service.pid":"F05_L-16",
         "service.factoryPid": "osgi.enroute.trains.hw.microswitch",
-        "controller.id":14,
+        "controller.id":16,
         "pin":"GPIO 11",
-        "segment":"F04_L"
+        "segment":"F05_L"
 	},
 	{
         "service.pid": "com.paremus.net.encode"

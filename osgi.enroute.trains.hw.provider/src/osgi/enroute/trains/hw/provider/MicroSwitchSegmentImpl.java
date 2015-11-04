@@ -37,6 +37,7 @@ public class MicroSwitchSegmentImpl implements RFIDSegmentController {
 	private Deferred<String> nextRFID = new Deferred<String>();
 	
 	private Config config;
+	private long debounce = 0;
 
 	@ObjectClassDefinition
 	@interface Config {
@@ -67,8 +68,14 @@ public class MicroSwitchSegmentImpl implements RFIDSegmentController {
             public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
                 // display pin state on console
             	if(event.getState() == PinState.LOW){
-            		System.out.println("RFID triggered at segment "+config.segment());
-            		trigger("rfid1111");
+            		if (System.currentTimeMillis() > debounce) {
+            		    System.out.println("RFID triggered at segment "+config.segment());
+            			debounce = System.currentTimeMillis() + 1000L;
+            		    trigger("rfid1111");
+            		}
+            		else {
+            		    System.out.println("ignored RFID triggered at segment "+config.segment());
+            		}
             	}
             }
             

@@ -363,7 +363,7 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain,T
 				observations.notifyAll();
 			}
 			Event event = new Event(Observation.TOPIC, dtos.asMap(o));
-			ea.postEvent(event);
+			ea.sendEvent(event);
 		} catch (Exception e) {
 			logger.error("Error posting observation " + o, e);
 		}

@@ -28,4 +28,8 @@ Conditional-Package: aQute.lib*
 	osgi.enroute.junit.wrapper
 Export-Package: \
 	osgi.enroute.trains.train.api,\
-	osgi.enroute.trains.controller.api
+	osgi.enroute.trains.controller.api,\
+	osgi.enroute.trains.cloud.api
+	
+	
+Provide-Capability: osgi.service;objectClass:List<String>=osgi.enroute.trains.train.api.TrainController;effective:=active

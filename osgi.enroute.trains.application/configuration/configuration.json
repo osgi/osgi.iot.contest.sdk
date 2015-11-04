@@ -7,8 +7,8 @@
     },
     {
         "service.pid":"osgi.enroute.trains.train.manager",
-        "name": "T101",
-        "rfid": "rfid101",
+        "name": "T1111",
+        "rfid": "rfid1111",
         "TrainController.target" : "(channel=CH1)"
     },
     {
@@ -22,8 +22,7 @@
             "A04        : STRAIGHT   : 1      : -1     : A05",
             "A05        : STRAIGHT   : 1      : -1     : A06",
             "A06        : STRAIGHT   : 1      : -1     : A07",
-            "A07        : STRAIGHT   : 1      : -1     : A07_L",
-            "A07_L      : LOCATOR    : 0      : 1      : A08",
+            "A07        : STRAIGHT   : 1      : -1     : A08",
             "A08        : STRAIGHT   : 1      : -1     : A09",
             "A09        : STRAIGHT   : 1      : -1     : A10",
             "A10        : STRAIGHT   : 1      : -1     : A11",
@@ -45,8 +44,7 @@
             "B04        : STRAIGHT   : 1      : -1     : B05",
             "B05        : STRAIGHT   : 1      : -1     : B06",
             "B06        : STRAIGHT   : 1      : -1     : B07",
-            "B07        : STRAIGHT   : 1      : -1     : B07_L",
-            "B07_L      : LOCATOR    : 0      : 5      : B08",
+            "B07        : STRAIGHT   : 1      : -1     : B08",
             "B08        : STRAIGHT   : 1      : -1     : B09",
             "B09        : STRAIGHT   : 1      : -1     : B10",
             "B10        : STRAIGHT   : 1      : -1     : B11",
