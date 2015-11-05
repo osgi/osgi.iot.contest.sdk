@@ -41,6 +41,7 @@ JPMCommand:					trains
 	osgi.enroute.stackexchange.pagedown.webresource;version='[1.1.1,1.1.2)',\
 	osgi.enroute.trains.application;version=snapshot,\
 	osgi.enroute.trains.emulator.provider;version=snapshot,\
+	osgi.enroute.trains.rest.provider.client;version=snapshot,\
 	osgi.enroute.trains.rest.provider.server;version=snapshot,\
 	osgi.enroute.trains.track.controller.provider;version=snapshot,\
 	osgi.enroute.trains.track.manager.example.provider;version=snapshot,\

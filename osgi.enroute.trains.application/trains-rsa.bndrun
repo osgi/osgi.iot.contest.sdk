@@ -9,7 +9,9 @@
 	jdb=1044; \
 	shell=-1
 
+-include: ~paremus.rsa.bndrun
 -resolve.effective: active;skip:="osgi.service"
+
 -runrequires: \
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.rest.simple.provider)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.rest.provider.server)'
