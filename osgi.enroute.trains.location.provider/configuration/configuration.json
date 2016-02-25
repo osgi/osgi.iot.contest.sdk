@@ -1,0 +1,30 @@
+[
+    {
+        "service.pid" : "osgi.enroute.trains.location.provider",
+
+        "accountName" : "NetLogix-WB",
+
+        "brokerUrl" : "mqtts://broker-sandbox.everyware-cloud.com:8883",
+        
+        "username" : "osgiTrain",
+        
+        "password" : "osg!TrainDem0",
+        
+
+        ".comment" : "map RFID codes to segment name",
+        ".comment" : "edit to match track layout",
+        "code2segment" : [
+            "1:A01",
+            "2:A02",
+            "3:A03"
+		],
+
+        ".comment" : "map RFID tag UUIDs to simple codes on stickers attached to tags",
+        ".comment" : "only edit to add new tags",
+        "tag2code" : [
+            "010E9CD250:1",
+            "010E9EF905:2",
+            "010E9CD8F6:3"
+		]
+	}
+]
