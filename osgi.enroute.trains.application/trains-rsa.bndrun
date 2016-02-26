@@ -2,14 +2,14 @@
 # OSGI ENROUTE TRAINS APPLICATION RUN SPECIFICATION
 #
 	
--runtrace: true
--runpath: biz.aQute.remote.launcher
--runremote: master; \
+x-runtrace: true
+x-runpath: biz.aQute.remote.launcher
+x-runremote: master; \
 	host=192.168.99.1; \
 	jdb=1044; \
 	shell=-1
 
--include: ~paremus.rsa.bndrun
+-include: ~paremus.rsa.bnd
 -resolve.effective: active;skip:="osgi.service"
 
 -runrequires: \
