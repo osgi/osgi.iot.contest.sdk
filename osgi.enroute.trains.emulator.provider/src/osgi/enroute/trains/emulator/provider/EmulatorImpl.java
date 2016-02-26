@@ -14,6 +14,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,7 @@ import osgi.enroute.trains.track.util.Tracks.SegmentHandler;
 /**
  * 
  */
+@Designate(ocd = EmulatorImpl.Config.class)
 @Component(name = "osgi.enroute.trains.emulator", immediate = true, configurationPolicy=ConfigurationPolicy.REQUIRE)
 public class EmulatorImpl {
 	static Logger logger = LoggerFactory.getLogger(EmulatorImpl.class);
@@ -57,6 +59,8 @@ public class EmulatorImpl {
 		double rfid_probability() default 90;
 		
 		double play_speed() default 0.5;
+
+		String channel() default "CH1";
 	}
 
 	@Activate	
@@ -72,7 +76,7 @@ public class EmulatorImpl {
 				TrainControllerImpl trainControllerImpl = new TrainControllerImpl(parts[0], parts[1],
 						config.rfid_probability(), config.play_speed(), track.getRoot(), this);
 				trainControllers.add(trainControllerImpl);
-				trainControllerImpl.register(context);
+				trainControllerImpl.register(context, config.channel());
 			} else
 				logger.error("Invalid emulator train def" + name_rfid);
 		}

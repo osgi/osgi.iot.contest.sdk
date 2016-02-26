@@ -95,10 +95,11 @@ public class TrainControllerImpl implements TrainController {
 		registration.unregister();
 	}
 
-	public void register(BundleContext context) {
+	public void register(BundleContext context, String channel) {
 		Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		properties.put("train.rfid", rfid);
 		properties.put("train.name", name);
+		properties.put("channel", channel);
 		registration = context.registerService(TrainController.class, this, properties);
 	}
 }
