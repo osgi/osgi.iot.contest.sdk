@@ -7,8 +7,8 @@
     },
     {
         "service.pid":"osgi.enroute.trains.train.manager",
-        "name": "T1111",
-        "rfid": "rfid1111",
+        "name": "DemoTrain",
+        "rfid": "rfid1234",
         "TrainController.target" : "(channel=CH1)"
     },
     {
