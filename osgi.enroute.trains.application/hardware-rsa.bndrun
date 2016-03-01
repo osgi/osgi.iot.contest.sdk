@@ -3,8 +3,14 @@
 #
 
 # Launch hardware.provider on remote system using Paremus RSA provider
+-runtrace: true
+-runpath: biz.aQute.remote.launcher
+-runremote: pi; \
+	host=192.168.2.30; \
+	jdb=1044; \
+	shell=-1
 
--include: ~../osgi.enroute.trains.application/remote-osgi.bndrun
+-include: ~paremus-rsa.bnd
 -resolve.effective: active;skip:="osgi.service"
 
 -runrequires.hardware: \
@@ -17,20 +23,6 @@
     osgi.identity;filter:='(osgi.identity=osgi.enroute.webconsole.xray.provider)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.gogo.extra.provider)'
 
--runpath: biz.aQute.remote.launcher
-
--runremote: pi; \
-	host=192.168.99.2; \
-	jdb=1044; \
-	shell=-1
-
-# peerIP is the IP address of the server running trains-rsa.bndrun
-#	you need to change it for your environment, before starting hardware.bndrun
-#	setting it to ${myIP} allows testing both hardware-rsa.bndrun and trains-rsa.bndrun on the same machine
-peerIP: ${myIP}
-rsa.bootstrap: false
-
-#
 -runbundles: \
 	com.paremus.deployment.framework.provider;version='[1.0.0,1.0.1)',\
 	com.paremus.dosgi.discovery.gossip;version='[1.0.0,1.0.1)',\

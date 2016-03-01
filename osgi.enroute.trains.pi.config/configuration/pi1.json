@@ -4,13 +4,13 @@
         "service.factoryPid": "osgi.enroute.trains.hw.train",
         "channel":"CH1",
 		"train.rfid":"OSGiExpress",
-		"train.name":"t1"
+		"train.name":"T1"
 	},{
-        "service.pid":"rfid201",
+        "service.pid":"OSGiCargo",
         "service.factoryPid": "osgi.enroute.trains.hw.train",
         "channel":"CH2",
-		"train.rfid":"rfid201",
-		"train.name":"T201"
+		"train.rfid":"OSGiCargo",
+		"train.name":"T2"
 	},{
 		"service.pid":"A16_S-3",
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",

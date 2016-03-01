@@ -2,14 +2,18 @@
 # OSGI ENROUTE TRAINS APPLICATION RUN SPECIFICATION
 #
 	
-x-runtrace: true
-x-runpath: biz.aQute.remote.launcher
-x-runremote: master; \
-	host=192.168.99.1; \
+#-runtrace: true
+X-runpath: biz.aQute.remote.launcher
+X-runremote: master; \
+	host=192.168.2.16; \
 	jdb=1044; \
 	shell=-1
 
--include: ~paremus.rsa.bnd
+# Note: ~ causes included properties to override
+-include: \
+	~paremus-rsa.bnd,\
+	~eurotech-mqtt.bnd
+
 -resolve.effective: active;skip:="osgi.service"
 
 -runrequires: \
@@ -87,4 +91,5 @@ x-runremote: master; \
 	osgi.enroute.trains.util;version=snapshot,\
 	osgi.enroute.twitter.bootstrap.webresource;version='[3.3.5,3.3.6)',\
 	osgi.enroute.web.simple.provider;version='[1.3.3,1.3.4)',\
-	osgi.promise;version='[6.0.0,6.0.1)'
+	osgi.promise;version='[6.0.0,6.0.1)',\
+	osgi.enroute.trains.location.provider;version=latest
