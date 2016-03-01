@@ -19,18 +19,18 @@ public @interface LocationConfiguration {
 	String password();
 	
 	/**
-	 * RFID tag short code and segment name
+	 * segment name to short code
 	 * 
-	 * {@code code:segment}
+	 * {@code segment:code}
 	 */
-	String[] code2segment();
+	String[] segment2code();
 
 
 	/**
-	 * RFID tag uuid and short code for tag
+	 * short code to RFID tag uuid
 	 * 
-	 * {@code tag:code}
+	 * {@code code:tag}
 	 */
-	String[] tag2code();
+	String[] code2tag();
 	
 }

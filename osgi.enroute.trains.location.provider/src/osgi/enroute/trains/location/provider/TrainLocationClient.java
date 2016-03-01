@@ -1,8 +1,10 @@
 package osgi.enroute.trains.location.provider;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -53,20 +55,46 @@ public class TrainLocationClient implements TrainLocator {
     //
     @Activate
     void activate(LocationConfiguration config) {
-        if (config.tag2code() == null || config.code2segment() == null) {
-            final String msg = "configuration MUST contain tag2code and code2segment";
+        if (config.code2tag() == null || config.segment2code() == null) {
+            final String msg = "configuration MUST contain code2tag and segment2code";
             error("{}: {}.\n", getClass().getSimpleName(), msg);
             throw new Error(msg);
         }
 
-        for (String s : config.tag2code()) {
-            String[] split = s.split(":", 2);
-            tag2code.put(split[0], split[1]);
+        for (String s : config.segment2code()) {
+            String[] split = s.split("\\s*:\\s*", 2);
+
+            if (code2segment.containsValue(split[0])) {
+                List<String> keys = code2segment.entrySet().stream()
+                        .filter(e -> e.getValue().equals(split[0]))
+                        .map(e -> e.getKey())
+                        .collect(Collectors.toList());
+                keys.add(split[1]);
+                warn("duplicate segment {} for codes {}", split[0], keys);
+            } else {
+                String old = code2segment.put(split[1], split[0]);
+                if (old != null && !split[1].equals("-")) {
+                    warn("duplicate segments [{}, {}] for code {}", old, split[0], split[1]);
+                }
+            }
         }
 
-        for (String s : config.code2segment()) {
-            String[] split = s.split(":", 2);
-            code2segment.put(split[0], split[1]);
+        for (String s : config.code2tag()) {
+            String[] split = s.split("\\s*:\\s*", 2);
+
+            if (tag2code.containsValue(split[0])) {
+                List<String> keys = tag2code.entrySet().stream()
+                        .filter(e -> e.getValue().equals(split[0]))
+                        .map(e -> e.getKey())
+                        .collect(Collectors.toList());
+                keys.add(split[1]);
+                warn("duplicate code {} for tags {}", split[0], keys);
+            } else {
+                String old = tag2code.put(split[1], split[0]);
+                if (old != null && !old.equals("-")) {
+                    warn("duplicate codes [{}, {}] for tag {}", old, split[0], split[1]);
+                }
+            }
         }
 
         // info("tag2code=" + tag2code);
@@ -98,17 +126,17 @@ public class TrainLocationClient implements TrainLocator {
             //
             edcCloudClient = EdcClientFactory.newInstance(conf, prof, new MyCallbackHandler());
             edcCloudClient.startSession();
-            info("Session started");
+            info("Everywhere Device Cloud client started");
 
             //
             // Subscribe
             //
-            info("Subscribe to data topics of TrainDemo assets in the account");
+            // info("Subscribe to data topics of TrainDemo assets in the
+            // account");
             edcCloudClient.subscribe("+", "TrainDemo/#", 1);
 
             // info("Subscribe to control topics of all assets in the account");
             // edcCloudClient.controlSubscribe("+", "#", 1);
-
         } catch (EdcClientException e) {
             error(e.toString());
             throw new RuntimeException(e);
@@ -120,7 +148,7 @@ public class TrainLocationClient implements TrainLocator {
     //
     @Deactivate
     void deactivate() {
-        info("Terminating EDC Cloud Client");
+        info("Terminating Everywhere Device Cloud client");
         try {
             edcCloudClient.stopSession();
             edcCloudClient.terminate();
@@ -134,11 +162,11 @@ public class TrainLocationClient implements TrainLocator {
         return nextLocation.getPromise();
     }
 
-    private synchronized void trigger(String train, String segment) {
-        info("trigger: train={} segment={}", train, segment);
+    private synchronized void trigger(String trainId, String segment) {
+        // info("trigger: train={} segment={}", train, segment);
         Deferred<String> currentLocation = nextLocation;
         nextLocation = new Deferred<String>();
-        currentLocation.resolve(train + ":" + segment);
+        currentLocation.resolve(trainId + ":" + segment);
     }
 
     // logging is configured to use OSGi logger and so need webconsole to view
@@ -148,36 +176,38 @@ public class TrainLocationClient implements TrainLocator {
         log.error(fmt, args);
     }
 
+    private static void warn(String fmt, Object... args) {
+        System.err.printf("WARNING: " + fmt.replaceAll("\\{}", "%s") + "\n", args);
+        log.warn(fmt, args);
+    }
+
     private static void info(String fmt, Object... args) {
         System.out.printf(fmt.replaceAll("\\{}", "%s") + "\n", args);
         log.info(fmt, args);
     }
 
+    /**
+     * MQTT Callback class
+     */
     class MyCallbackHandler implements EdcCallbackHandler {
-        // -----------------------------------------------------------------------
-        //
-        // MQTT Callback methods
-        //
-        // -----------------------------------------------------------------------
-
         // display data messages received from broker
         @Override
         public void publishArrived(String assetId, String topic, EdcPayload msg, int qos, boolean retain) {
 
-            String train = String.valueOf(msg.getMetric("train"));
+            String trainId = String.valueOf(msg.getMetric("train"));
             Object location = msg.getMetric("location");
 
             if (location != null) {
                 String tag = location.toString();
                 String code = tag2code.get(tag);
                 if (code == null) {
-                    error("unknown tag <{}>", tag);
+                    warn("unknown tag <{}>", tag);
                 } else {
                     String segment = code2segment.get(code);
                     if (segment == null) {
-                        error("no segment for code <{}>", code);
+                        warn("no segment defined for code <{}>", code);
                     } else {
-                        trigger(train, segment);
+                        trigger(trainId, segment);
                     }
                 }
             } else if (msg.getMetric("connection") != null) {
