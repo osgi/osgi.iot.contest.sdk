@@ -22,6 +22,7 @@ import osgi.enroute.trains.controller.api.RFIDSegmentController;
 import osgi.enroute.trains.controller.api.SegmentController;
 import osgi.enroute.trains.controller.api.SignalSegmentController;
 import osgi.enroute.trains.controller.api.SwitchSegmentController;
+import osgi.enroute.trains.controller.api.TrainLocator;
 
 /**
  * The TrackController listens for Command events and performs those on the
@@ -41,6 +42,8 @@ public class TrackControllerImpl implements EventHandler {
             .synchronizedMap(new HashMap<Integer, SignalSegmentController>());
     private Map<Integer, SwitchSegmentController> switches = Collections
             .synchronizedMap(new HashMap<Integer, SwitchSegmentController>());
+    
+    private Map<Integer, Boolean> sw = new HashMap<>();
 
     @Override
     public void handleEvent(Event event) {
@@ -48,48 +51,72 @@ public class TrackControllerImpl implements EventHandler {
         String s = (String) event.getProperty("segment");
 
         Segment segment = trackManager.getSegments().get(s);
-        
+
         if (segment == null) {
-            System.err.println("Segment " + s + " does not exist");
-            logger.error("Segment " + s + " does not exist");
+            error("Segment <{}> does not exist", s);
             return;
         }
-        
+
         if (!segment.type.toString().equals(type.toString())) {
-            String msg = String .format("Event type<%s> doesn't match Segment type<%s>", type, segment.type);
-            System.err.println(msg);
-            logger.error(msg);
+            error("Event type<{}> doesn't match Segment type<{}>", type, segment.type);
             return;
         }
 
         switch (type) {
-        case SIGNAL: {
+
+        case SIGNAL:
             Color color = (Color) event.getProperty("signal");
 
-            SignalSegmentController controller = signals.get(segment.controller);
-            if (controller == null) {
-                System.err.println("Controller " + segment.controller + " not found");
-                logger.error("Controller " + segment.controller + " not found");
-                return;
+            SignalSegmentController sigCtrl = signals.get(segment.controller);
+            if (sigCtrl == null) {
+                error("signal controller <{}> not found", segment.controller);
+            } else {
+                sigCtrl.signal(color);
             }
-
-            controller.signal(color);
             trackManager.signal(s, color);
-            return;
-        }
-        case SWITCH: {
-            SwitchSegmentController controller = switches.get(segment.controller);
-            if (controller == null) {
-                System.err.println("Controller " + segment.controller + " not found");
-                logger.error("Controller " + segment.controller + " not found");
-                return;
-            }
+            break;
 
-            controller.swtch(!controller.getSwitch());
-            trackManager.switched(s, controller.getSwitch());
-            return;
+        case SWITCH:
+            SwitchSegmentController swCtrl = switches.get(segment.controller);
+            Boolean target = false;
+            
+            if (swCtrl == null) {
+                error("switch controller <{}> not found", segment.controller);
+                target = sw.get(segment.controller);
+                if (target == null) {
+                    target = true;
+                }
+                sw.put(segment.controller, !target);
+            } else {
+                target = !swCtrl.getSwitch();
+                swCtrl.swtch(target);
+            }
+            trackManager.switched(s, target);
+            break;
+
         }
-        }
+    }
+
+    // use RFID/bluetooth TrainLocator service
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL)
+    void setTrainLocator(TrainLocator locator) {
+        trackLocation(locator);
+    }
+
+    private void trackLocation(TrainLocator locator) {
+        locator.nextLocation().then(p -> {
+            String[] split = p.getValue().split("\\s*:\\s*", 2);
+            String train = split[0];
+            String segment = split[1];
+            System.err.printf("Located train<%s> at segment<%s>\n", train, segment);
+            try {
+                trackManager.locatedTrainAt(train, segment);
+            } catch (Exception e) {
+                System.err.printf("XXX eek! %s\n", e.toString());
+            }
+            trackLocation(locator);
+            return null;
+        });
     }
 
     private void startTracking(int controller) {
@@ -100,7 +127,7 @@ public class TrackControllerImpl implements EventHandler {
                     rfidSegment = s;
                 }
             }
-            
+
             // track new rfid detections on this controller
             if (rfidSegment != null) {
                 String segment = rfidSegment.id;
@@ -115,18 +142,17 @@ public class TrackControllerImpl implements EventHandler {
         if (c != null) {
             c.nextRFID().then((p) -> {
                 // notify track manager when a train passes by
-                    String train = p.getValue();
-                    trackManager.locatedTrainAt(train, segment);
-                    return null;
-                }, p -> {
-                	System.out.println("Retry rfid check");
-                	trackRFID(controller,segment);
-                }
-                    ).then((p) -> {
-                        // and then start tracking the next one
-                        trackRFID(controller, segment);
-                        return null;
-                    });
+                String train = p.getValue();
+                trackManager.locatedTrainAt(train, segment);
+                return null;
+            } , p -> {
+                System.out.println("Retry rfid check: " + p.getFailure());
+                trackRFID(controller, segment);
+            }).then((p) -> {
+                // and then start tracking the next one
+                trackRFID(controller, segment);
+                return null;
+            });
         }
     }
 
@@ -148,7 +174,7 @@ public class TrackControllerImpl implements EventHandler {
         }
     }
 
-	@Reference(cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC)
+    @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
     public void addRFIDController(RFIDSegmentController c, Map<String, Object> properties) {
         int id = (Integer) properties.get(SegmentController.CONTROLLER_ID);
         rfids.put(id, c);
@@ -162,7 +188,7 @@ public class TrackControllerImpl implements EventHandler {
         rfids.remove(id);
     }
 
-	@Reference(cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC)
+    @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
     public void addSignalController(SignalSegmentController c, Map<String, Object> properties) {
         int id = (Integer) properties.get(SegmentController.CONTROLLER_ID);
         signals.put(id, c);
@@ -173,7 +199,7 @@ public class TrackControllerImpl implements EventHandler {
         signals.remove(id);
     }
 
-	@Reference(cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC)
+    @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
     public void addSwitchController(SwitchSegmentController c, Map<String, Object> properties) {
         int id = (Integer) properties.get(SegmentController.CONTROLLER_ID);
         switches.put(id, c);
@@ -182,5 +208,10 @@ public class TrackControllerImpl implements EventHandler {
     public void removeSwitchController(SwitchSegmentController c, Map<String, Object> properties) {
         int id = (Integer) properties.get(SegmentController.CONTROLLER_ID);
         switches.remove(id);
+    }
+
+    private static void error(String fmt, Object... args) {
+        System.err.printf("ERROR: " + fmt.replaceAll("\\{}", "%s") + "\n", args);
+        logger.error(fmt, args);
     }
 }
