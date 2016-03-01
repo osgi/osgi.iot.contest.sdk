@@ -1,15 +1,23 @@
 [
     {
         "service.pid":"osgi.enroute.trains.emulator",
-        "name.rfids":[ "DemoTrain:rfid1234" ],
+        "name.rfids":[ "T1:OSGiExpress:CH1", "T2:OSGiCargo:CH2" ],
         "rfid.probability": 500,
         "play.speed":0.5
     },
     {
-        "service.pid":"osgi.enroute.trains.train.manager",
-        "name": "DemoTrain",
-        "rfid": "rfid1234",
+        "service.pid": "OSGiExpress",
+        "service.factoryPid":"osgi.enroute.trains.train.manager",
+        "name": "T1",
+        "rfid": "OSGiExpress",
         "TrainController.target" : "(channel=CH1)"
+    },
+    {
+        "service.pid": "OSGiCargo",
+        "service.factoryPid":"osgi.enroute.trains.train.manager",
+        "name": "T2",
+        "rfid": "OSGiCargo",
+        "TrainController.target" : "(channel=CH2)"
     },
     {
         "service.pid":"osgi.enroute.trains.track.manager",
@@ -109,7 +117,7 @@
     },
     {
         "service.pid": "com.paremus.dosgi.net",
-        "server.bind.address": "iot-1",
+        "server.bind.address": "192.168.2.20",
         "allow.insecure.transports": true
     },
     {
@@ -122,5 +130,5 @@
         "cluster.name": "${com.paremus.cluster}",
         "initial.peers": "${com.paremus.peers}"
     }
-
+    
 ]
