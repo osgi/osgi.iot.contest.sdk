@@ -1,10 +1,10 @@
 [
 	{
-        "service.pid":"rfid1111",
+        "service.pid":"OSGiExpress",
         "service.factoryPid": "osgi.enroute.trains.hw.train",
         "channel":"CH1",
-		"train.rfid":"rfid1111",
-		"train.name":"T1111"
+		"train.rfid":"OSGiExpress",
+		"train.name":"t1"
 	},{
         "service.pid":"rfid201",
         "service.factoryPid": "osgi.enroute.trains.hw.train",
@@ -57,17 +57,17 @@
     },
     {
         "service.pid": "com.paremus.dosgi.net",
-        "server.bind.address": "iot-2",
+        "server.bind.address": "192.168.2.30",
         "allow.insecure.transports": true
     },
     {
         "service.pid": "com.paremus.dosgi.discovery.gossip",
-        "root.cluster": "${com.paremus.cluster}"
+        "root.cluster": "IOT_DEMO"
     },
     {
         "service.pid": "com.paremus.gossip",
         "service.factoryPid": "com.paremus.gossip",
-        "cluster.name": "${com.paremus.cluster}",
-        "initial.peers": "${com.paremus.peers}"
+        "cluster.name": "IOT_DEMO",
+        "initial.peers": "192.168.2.20"
     }
 ]
