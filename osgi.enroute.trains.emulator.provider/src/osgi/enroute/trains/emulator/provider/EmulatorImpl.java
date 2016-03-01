@@ -59,8 +59,6 @@ public class EmulatorImpl {
 		double rfid_probability() default 90;
 		
 		double play_speed() default 0.5;
-
-		String channel() default "CH1";
 	}
 
 	@Activate	
@@ -72,11 +70,11 @@ public class EmulatorImpl {
 
 		for (String name_rfid : name_rfids) {
 			String[] parts = name_rfid.split("\\s*:\\s*");
-			if (parts.length == 2) {
+			if (parts.length == 3) {
 				TrainControllerImpl trainControllerImpl = new TrainControllerImpl(parts[0], parts[1],
 						config.rfid_probability(), config.play_speed(), track.getRoot(), this);
 				trainControllers.add(trainControllerImpl);
-				trainControllerImpl.register(context, config.channel());
+				trainControllerImpl.register(context, parts[2]);
 			} else
 				logger.error("Invalid emulator train def" + name_rfid);
 		}
