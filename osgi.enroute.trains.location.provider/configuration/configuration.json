@@ -1,30 +1,109 @@
 [
     {
         "service.pid" : "osgi.enroute.trains.location.provider",
-
         "accountName" : "NetLogix-WB",
-
         "brokerUrl" : "mqtts://broker-sandbox.everyware-cloud.com:8883",
-        
         "username" : "osgiTrain",
-        
         "password" : "osg!TrainDem0",
-        
 
         ".comment" : "map RFID codes to segment name",
         ".comment" : "edit to match track layout",
-        "code2segment" : [
-            "1:A01",
-            "2:A02",
-            "3:A03"
+        "segment2code" : [
+
+            "A00:-",
+            "A01:-",
+            "A02:-",
+            "A03:-",
+            "A04:-",
+            "A05:-",
+            "A06:-",
+            "A07:-",
+            "A08:-",
+            "A09:-",
+            "A10:-",
+            "A11:-",
+            "A12:-",
+            "A13:-",
+            "A14:-",
+            "A15:-",
+            "A16:-",
+            "A16_L:1",
+
+            "B00:-",
+            "B01:-",
+            "B02:-",
+            "B03:-",
+            "B04:-",
+            "B05:-",
+            "B06:-",
+            "B07:-",
+            "B08:-",
+            "B09:-",
+            "B10:-",
+            "B11:-",
+            "B12:-",
+            "B13:-",
+            "B14:-",
+            "B15:-",
+            "B16:-",
+            "B16_L:7",
+
+            "C00:-",
+            "C01:-",
+            "C02:-",
+            "C03:-",
+            "C04:-",
+            "C05:-",
+            "C05_L:14",
+
+            "D00:-",
+            "D01:-",
+            "D02:-",
+            "D03:-",
+            "D04:-",
+            "D05:-",
+            "D06:-",
+            "D07:-",
+            "D07_L:10",
+
+            "E00:-",
+            "E01:-",
+            "E02:-",
+            "E03:-",
+            "E04:-",
+            "E05:-",
+            "E06:-",
+            "E06_L:5",
+
+            "F00:-",
+            "F01:-",
+            "F02:-",
+            "F03:-",
+            "F04:-",
+            "F05:-",
+            "F05_L:16",
+
 		],
 
         ".comment" : "map RFID tag UUIDs to simple codes on stickers attached to tags",
         ".comment" : "only edit to add new tags",
-        "tag2code" : [
-            "010E9CD250:1",
-            "010E9EF905:2",
-            "010E9CD8F6:3"
+        "code2tag" : [
+            "1:010E9CD250",
+            "2:010E9EF905",
+            "3:010E9CD8F6",
+			"4:010E9EF8F9",
+			"5:010E9CD69F",
+			"6:010E9ECAB7",
+			"7:010E9CE805",
+			"8:010E9CD61D",
+			"9:ambiguous - not used",
+			"10:010E9ED6C1",
+			"11:010E9CCC3C",
+			"12:010E9CDB1D",
+			"13:010E9CDDDD",
+			"14:010E9ECE7D",
+			"15:010E9ED6BE",
+			"16:010E9CDAC1",
 		]
 	}
 ]
