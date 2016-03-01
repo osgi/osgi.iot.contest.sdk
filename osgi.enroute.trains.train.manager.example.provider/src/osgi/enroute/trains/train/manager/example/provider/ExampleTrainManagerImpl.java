@@ -23,234 +23,248 @@ import osgi.enroute.trains.train.api.TrainController;
 /**
  * 
  */
-@Component(name = TrainConfiguration.TRAIN_CONFIGURATION_PID, configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true, service = Object.class)
+@Component(name = TrainConfiguration.TRAIN_CONFIGURATION_PID, configurationPolicy = ConfigurationPolicy.REQUIRE,
+        immediate = true, service = Object.class)
 public class ExampleTrainManagerImpl {
-	static Logger logger = LoggerFactory.getLogger(ExampleTrainManagerImpl.class);
+    static Logger logger = LoggerFactory.getLogger(ExampleTrainManagerImpl.class);
 
-	private TrackForTrain trackManager;
-	private TrainController train;
-	private String name;
-	private String rfid;
-	private Tracks<Object> tracks;
+    private TrackForTrain trackManager;
+    private TrainController trainCtrl;
+    private String name;
+    private String rfid;
+    private Tracks<Object> tracks;
 
-	private Thread mgmtThread;
+    private Thread mgmtThread;
 
-	@Reference
-	private Scheduler scheduler;
+    @Reference
+    private Scheduler scheduler;
 
-	@Activate
-	public void activate(TrainConfiguration config) throws Exception {
-		name = config.name();
-		rfid = config.rfid();
+    @Activate
+    public void activate(TrainConfiguration config) throws Exception {
+        name = config.name();
+        rfid = config.rfid();
 
-		// register train with Track Manager
-		trackManager.registerTrain(name, rfid);
-		// create Track
-		tracks = new Tracks<Object>(trackManager.getSegments().values(), new TrainManagerFactory());
+        // register train with Track Manager
+        trackManager.registerTrain(name, rfid);
+        // create Track
+        tracks = new Tracks<Object>(trackManager.getSegments().values(), new TrainManagerFactory());
 
-		mgmtThread = new Thread(new TrainMgmtLoop());
-		mgmtThread.start();
-	}
+        mgmtThread = new Thread(new TrainMgmtLoop());
+        mgmtThread.start();
+    }
 
-	@Deactivate
-	public void deactivate() {
-		try {
-			mgmtThread.interrupt();
-			mgmtThread.join(5000);
-		} catch (InterruptedException e) {
-		}
-		// stop when deactivated
-		train.move(0);
-		// turn lights off
-		train.light(false);
-	}
+    @Deactivate
+    public void deactivate() {
+        info("deactivate");
+        try {
+            mgmtThread.interrupt();
+            mgmtThread.join(5000);
+        } catch (InterruptedException e) {
+        }
+        // stop when deactivated
+        trainCtrl.move(0);
+        // turn lights off
+        trainCtrl.light(false);
+    }
 
-	@Reference
-	public void setTrainController(TrainController t) {
-		this.train = t;
-	}
+    @Reference
+    public void setTrainController(TrainController t) {
+        this.trainCtrl = t;
+    }
 
-	@Reference
-	public void setTrackManager(TrackForTrain t) {
-		this.trackManager = t;
-	}
+    @Reference
+    public void setTrackManager(TrackForTrain t) {
+        this.trackManager = t;
+    }
 
-	private class TrainMgmtLoop implements Runnable {
+    private class TrainMgmtLoop implements Runnable {
 
-		private String currentAssignment = null;
-		private String currentLocation = null;
-		private LinkedList<SegmentHandler<Object>> route = null;
+        private String currentAssignment = null;
+        private String currentLocation = null;
+        private LinkedList<SegmentHandler<Object>> route = null;
 
-		@Override
-		public void run() {
-			// turn the train light on
-			train.light(true);
-			// start moving on activation
-			train.move(50);
+        @Override
+        public void run() {
+            long lastObservation = -1;
+            boolean blocked = false;
 
-			// last observation id
-			long lastObservation = -1;
+            while (isActive()) {
 
-			while (isActive()) {
-				// mgmt loop
-				List<Observation> observations = trackManager.getRecentObservations(lastObservation);
-				for (Observation o : observations) {
-					lastObservation = o.id;
+                List<Observation> observations = trackManager
+                        .getRecentObservations(lastObservation - (blocked ? 1 : 0));
 
-					tracks.event(o);
+                if (blocked && observations.size() > 1) {
+                    // remove the observation that caused block and process next
+                    // otherwise re-process previous observation, which should
+                    // drop back to followRoute()
+                    observations.remove(0);
+                    blocked = false;
+                }
 
-					if (name == null || !name.equals(o.train)) {
-						continue;
-					}
+                for (Observation o : observations) {
+                    lastObservation = o.id;
 
-					switch (o.type) {
-					case ASSIGNMENT:
-						currentAssignment = o.assignment;
-						// new assignment, plan and follow the route
-						logger.info(name + "/" + rfid + " gets new assignment " + o.assignment);
-						planRoute();
-						followRoute();
-						break;
-					case LOCATED:
-						currentLocation = o.segment;
+                    tracks.event(o);
 
-						// if first time location found and already an
-						// assignment is set,
-						// plan route
-						if (currentLocation == null && currentAssignment != null) {
-							planRoute();
-						}
+                    if (name == null || !name.equals(o.train)) {
+                        continue;
+                    }
 
-						// stop current assignment reached (no assignment =
-						// assignment reached)
-						if (assignmentReached()) {
-							train.move(0);
-							train.light(false);
-							blink(3);
-						} else {
-							followRoute();
-						}
-						break;
-					case BLOCKED:
-						break;
-					case CHANGE:
-						break;
-					case SIGNAL:
-						break;
-					case SWITCH:
-						break;
-					case TIMEOUT:
-						break;
-					default:
-						break;
-					}
-				}
-			}
-			System.out.println("Train manager exited");
-		}
+                    switch (o.type) {
+                    case ASSIGNMENT:
+                        // new assignment, plan and follow the route
+                        currentAssignment = o.assignment;
+                        info("Assignment: {} -> {}", name, currentAssignment);
 
-		private void blink(int n) {
-			train.light(false);
-			if (n > 0) {
-				scheduler.after(() -> {
-					train.light(true);
-					scheduler.after(() -> blink(n - 1), 500);
-				} , 500);
-			}
-		}
+                        if (currentLocation == null) {
+                            // start moving to find location
+                            trainCtrl.move(50);
+                            trainCtrl.light(true);
+                        } else {
+                            planRoute();
+                            blocked = followRoute();
+                        }
+                        break;
 
-		private void planRoute() {
-			if (currentLocation == null)
-				return;
+                    case LOCATED:
+                        // if first time location found and an assignment is
+                        // already set plan route
+                        if (currentLocation == null && currentAssignment != null) {
+                            currentLocation = o.segment;
+                            planRoute();
+                        } else {
+                            currentLocation = o.segment;
+                        }
 
-			if (currentAssignment == null)
-				return;
+                        // stop current assignment reached (no assignment =
+                        // assignment reached)
+                        if (assignmentReached()) {
+                            trainCtrl.move(0);
+                            trainCtrl.light(false);
+                            blink(3);
+                        } else {
+                            blocked = followRoute();
+                        }
+                        break;
 
-			// plan the route
-			SegmentHandler<Object> src = tracks.getHandler(currentLocation);
-			SegmentHandler<Object> dest = tracks.getHandler(currentAssignment);
-			route = src.findForward(dest);
-		}
+                    case BLOCKED:
+                    case CHANGE:
+                    case SIGNAL:
+                    case SWITCH:
+                    case TIMEOUT:
+                    default:
+                        break;
+                    }
+                }
+            }
+            info("management loop terminated.");
+        }
 
-		private void followRoute() {
-			if (route == null || route.isEmpty())
-				return;
+        private void blink(int n) {
+            trainCtrl.light(false);
+            if (n > 0) {
+                scheduler.after(() -> {
+                    trainCtrl.light(true);
+                    scheduler.after(() -> blink(n - 1), 500);
+                } , 500);
+            }
+        }
 
-			train.light(true);
+        private void planRoute() {
+            if (currentLocation == null)
+                return;
 
-			System.out.println("XX currentLocation=" + currentLocation);
-			boolean found = false;
-			for (SegmentHandler<Object> s : route) {
-				System.out.println("XX route element=" + s);
-				if (s.segment.id.equals(currentLocation)) {
-					found = true;
-				}
-			}
+            if (currentAssignment == null)
+                return;
 
-			if (found) {
-				// update the remaining part of the current route
-				while (route.size() > 0 && !route.getFirst().segment.id.equals(currentLocation)) {
-					route.removeFirst();
-				}
-			}
+            // plan the route
+            SegmentHandler<Object> src = tracks.getHandler(currentLocation);
+            SegmentHandler<Object> dest = tracks.getHandler(currentAssignment);
+            route = src.findForward(dest);
+        }
 
-			// figure out where to go to next
-			String fromTrack = route.removeFirst().getTrack();
+        private boolean followRoute() {
+            if (route == null || route.isEmpty())
+                return false;
 
-			// check if we have to go to a new track before we have a new
-			// Locator
-			Optional<SegmentHandler<Object>> nextLocator = route.stream().filter(sh -> sh.isLocator()).findFirst();
-			if (!nextLocator.isPresent()) {
-				// no locator to go to, stop now
-				train.move(0);
-				return;
-			}
+            trainCtrl.light(true);
 
-			String toTrack = nextLocator.get().getTrack();
+            boolean found = false;
+            for (SegmentHandler<Object> s : route) {
+                if (s.segment.id.equals(currentLocation)) {
+                    found = true;
+                    break;
+                }
+            }
 
-			// check if we have to go to other track, in that case request
-			// access
-			if (!fromTrack.equals(toTrack)) {
-				// stop and request access
-				train.move(0);
+            if (found) {
+                // update the remaining part of the current route
+                while (route.size() > 0 && !route.getFirst().segment.id.equals(currentLocation)) {
+                    route.removeFirst();
+                }
+            }
 
-				boolean access = false;
-				// simply keep on trying until access is given
-				while (!access && isActive()) {
-					logger.info(name + " requests access from track " + fromTrack + " to " + toTrack);
-					try {
-						access = trackManager.requestAccessTo(rfid, fromTrack, toTrack);
-					} catch (Exception e) {
-						currentLocation = null;
-						train.move(40);
-					}
-				}
-			}
+            // figure out where to go to next
+            String fromTrack = route.removeFirst().getTrack();
 
-			// just go forward
-			train.move(50);
-		}
+            // check if we have to go to a new track before we have a new
+            // Locator
+            Optional<SegmentHandler<Object>> nextLocator = route.stream().filter(sh -> sh.isLocator()).findFirst();
+            if (!nextLocator.isPresent()) {
+                // no locator to go to, stop now
+                trainCtrl.move(0);
+                return false;
+            }
 
-		private boolean isActive() {
-			return !Thread.currentThread().isInterrupted();
-		}
+            String toTrack = nextLocator.get().getTrack();
 
-		private boolean assignmentReached() {
-			if (currentAssignment == null || currentAssignment.equals(currentLocation)) {
-				if (currentAssignment != null) {
-					logger.info(name + " has reached assignment " + currentAssignment);
-				} else {
-					logger.info(name + " is waiting for an assignment");
-				}
-				return true;
-			}
-			return false;
-		}
-	}
+            // check if we have to go to other track, in that case request
+            // access
+            if (!fromTrack.equals(toTrack)) {
+                // stop and request access
+                trainCtrl.move(0);
 
-	// make train move from gogo shell command
-	public void move(int directionAndSpeed) {
-		this.train.move(directionAndSpeed);
-	}
+                boolean access = false;
+                // simply keep on trying until access is given
+                while (!access && isActive()) {
+                    try {
+                        access = trackManager.requestAccessTo(name, fromTrack, toTrack);
+                    } catch (Exception e) {
+                        currentLocation = null;
+                        trainCtrl.move(40);
+                    }
+
+                    if (!access) {
+                        return true;
+                    }
+                }
+            }
+
+            // just go forward
+            trainCtrl.move(50);
+            return false;
+        }
+
+        private boolean isActive() {
+            return !Thread.currentThread().isInterrupted();
+        }
+
+        private boolean assignmentReached() {
+            if (currentAssignment == null || currentAssignment.equals(currentLocation)) {
+                if (currentAssignment != null) {
+                    info(name + " has reached assignment " + currentAssignment);
+                } else {
+                    info(name + " is waiting for an assignment");
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+
+    private static void info(String fmt, Object... args) {
+        System.out.printf("Train: " + fmt.replaceAll("\\{}", "%s") + "\n", args);
+        logger.info(fmt, args);
+    }
 
 }

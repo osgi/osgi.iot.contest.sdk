@@ -145,7 +145,7 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
 
     @Override
     public List<String> getTrains() {
-        return new ArrayList<String>(rfid2Name.values());
+        return new ArrayList<String>(name2Rfid.keySet());
     }
 
     @Override
@@ -198,9 +198,10 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
 
     @Override
     public boolean requestAccessTo(String train, String fromTrack, String toTrack) {
+        info("{} requests access {} -> {}", train, fromTrack, toTrack);
         long start = System.currentTimeMillis();
         boolean granted = false;
-        System.out.println("TRAIN " + train + " requests access to " + toTrack);
+
         while (!granted && System.currentTimeMillis() - start < TIMEOUT) {
             synchronized (access) {
                 if (!isBlocked(toTrack)
@@ -209,25 +210,35 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
                     access.put(toTrack, train);
 
                     // check if switch is ok
-                    Optional<SwitchHandler<Object>> swtch = getSwitch(fromTrack, toTrack);
-                    if (shouldSwitch(getSwitch(fromTrack, toTrack), fromTrack, toTrack)) {
-                        doSwitch(swtch.get().segment.id);
+                    Optional<SwitchHandler<Object>> optSwitch = getSwitch(fromTrack, toTrack);
+                    if (!optSwitch.isPresent()) {
+                        logger.error("No switch between " + fromTrack + " and " + toTrack);
                     } else {
-                        // set green signal
-                        greenSignal(getSignal(fromTrack));
-                        // now grant the access
-                        granted = true;
+                        SwitchHandler<Object> switchHandler = optSwitch.get();
+                        if (shouldSwitch(switchHandler, fromTrack, toTrack)) {
+                            doSwitch(switchHandler.segment.id);
+                        } else {
+                            // set green signal
+                            greenSignal(getSignal(fromTrack));
+                            // now grant the access
+                            granted = true;
+                        }
                     }
                 }
 
                 // if not granted, wait until timeout
                 if (!granted) {
+                    info("access blocked: {} -> {}: %s", train, toTrack, access);
                     try {
                         long wait = TIMEOUT - System.currentTimeMillis() + start;
-                        if (wait > 0)
+                        if (wait > 0) {
                             access.wait(wait);
+                        }
                     } catch (InterruptedException e) {
                     }
+                }
+                else {
+                    info("access granted: {} -> {}", train, toTrack);
                 }
             }
         }
@@ -246,35 +257,29 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
 
     // checks whether the switch is in the right state to go from fromTrack to
     // toTrack
-    private boolean shouldSwitch(Optional<SwitchHandler<Object>> swtch, String fromTrack, String toTrack) {
-        if (!swtch.isPresent()) {
-            logger.debug("No switch between " + fromTrack + " and " + toTrack);
-            return true;
-        }
-        SwitchHandler<Object> s = swtch.get();
-
-        // check (and set) signal and switch
+    private boolean shouldSwitch(SwitchHandler<Object> sh, String fromTrack, String toTrack) {
         boolean switchOK = true;
-        if (s.isMerge()) {
+
+        if (sh.isMerge()) {
             // check if previous is fromTrack
-            if (s.prev.getTrack().equals(fromTrack)) {
+            if (sh.prev.getTrack().equals(fromTrack)) {
                 // if so, then alternate should be false
-                if (s.toAlternate) {
+                if (sh.toAlternate) {
                     switchOK = false;
                 }
                 // else alternate should be true
-            } else if (!s.toAlternate) {
+            } else if (!sh.toAlternate) {
                 switchOK = false;
             }
         } else {
             // check if next is toTrack
-            if (s.next.getTrack().equals(toTrack)) {
+            if (sh.next.getTrack().equals(toTrack)) {
                 // if so, then alternate should be false
-                if (s.toAlternate) {
+                if (sh.toAlternate) {
                     switchOK = false;
                 }
                 // else alternate should be true
-            } else if (!s.toAlternate) {
+            } else if (!sh.toAlternate) {
                 switchOK = false;
             }
         }
@@ -293,7 +298,7 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
     }
 
     private Optional<SwitchHandler<Object>> getSwitch(String fromTrack, String toTrack) {
-        System.out.printf("getSwitch from=%s tp=%s\n", fromTrack, toTrack);
+        //info("getSwitch from={} to={}", fromTrack, toTrack);
         return tracks.filter(new TypeReference<SwitchHandler<Object>>() {
         })
                 .filter(sh -> sh.prev.getTrack().equals(fromTrack)
@@ -313,15 +318,16 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
     }
 
     private void releasePreviousTrack(String train, String track) {
+        //info("releasePreviousTrack: {} {}", train, track);
         synchronized (access) {
             // remove the previous track of the train currently at @track to
             // release from access
             Optional<String> previous = access.entrySet().stream()
-                    .filter(e -> e.getKey().equals(train))
+                    .filter(e -> e.getValue().equals(train))
                     .filter(e -> !e.getKey().equals(track))
                     .map(e -> e.getKey()).findFirst();
             if (previous.isPresent()) {
-                access.remove(previous);
+                access.remove(previous.get());
                 access.notifyAll();
             }
         }
@@ -329,7 +335,7 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
 
     @Override
     public void registerTrain(String name, String rfid) {
-        logger.info("Train " + name + " with rfid " + rfid + " registered");
+        info("register train<{}> rfid<{}>", name, rfid);
         rfid2Name.put(rfid, name);
         name2Rfid.put(name, rfid);
     }
@@ -337,13 +343,27 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
     @Override
     public void locatedTrainAt(String rfid, String segment) {
         String train = rfid2Name.get(rfid);
-        if (train == null)
-            throw new IllegalArgumentException("Unknown train for rfid " + rfid);
+        if (train == null) {
+            throw new IllegalArgumentException("Unknown train for rfid:" + rfid);
+        }
 
-        Locator handler = tracks.getHandler(Locator.class, segment);
-        handler.locatedAt(rfid);
+        SegmentHandler<Object> handler = tracks.getHandler(segment);
+        if (handler == null) {
+            throw new IllegalArgumentException("Unknown segment: " + segment);
+        }
 
-        releasePreviousTrack(train, tracks.getHandler(segment).getTrack());
+        if (handler.isLocator()) {
+            Locator locator = tracks.getHandler(Locator.class, segment);
+            locator.locatedAt(rfid);
+            releasePreviousTrack(train, handler.getTrack());
+        }
+        else {
+            Observation observation = new Observation();
+            observation.type = Observation.Type.LOCATED;
+            observation.segment = segment;
+            observation.train = train;
+            observation(observation); 
+        }
     }
 
     @Override
@@ -414,5 +434,10 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
 
     public String getNameForRfid(String rfid) {
         return rfid2Name.get(rfid);
+    }
+    
+    private static void info(String fmt, Object... args) {
+        System.out.printf("Track: " + fmt.replaceAll("\\{}", "%s") + "\n", args);
+        logger.info(fmt, args);
     }
 }
