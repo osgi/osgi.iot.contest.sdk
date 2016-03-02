@@ -54,7 +54,6 @@ public class MicroSwitchSegmentImpl implements RFIDSegmentController {
 
 	@Activate
 	void activate(Config config) {
-		System.out.println("XXXX");
 		this.config = config;
 		
 		Pin pin = RaspiPin.getPinByName(config.pin());
