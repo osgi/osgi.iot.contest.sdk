@@ -3,14 +3,14 @@
         "service.pid":"OSGiExpress",
         "service.factoryPid": "osgi.enroute.trains.hw.train",
         "channel":"CH1",
-		"train.rfid":"OSGiExpress",
-		"train.name":"T1"
+		"train.rfid":"OSGi1",
+		"train.name":"Express"
 	},{
         "service.pid":"OSGiCargo",
         "service.factoryPid": "osgi.enroute.trains.hw.train",
         "channel":"CH2",
-		"train.rfid":"OSGiCargo",
-		"train.name":"T2"
+		"train.rfid":"OSGi2",
+		"train.name":"Cargo"
 	},{
 		"service.pid":"A16_S-3",
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",
@@ -57,7 +57,7 @@
     },
     {
         "service.pid": "com.paremus.dosgi.net",
-        "server.bind.address": "192.168.2.30",
+        "server.bind.address": "192.168.99.11",
         "allow.insecure.transports": true
     },
     {
@@ -68,6 +68,6 @@
         "service.pid": "com.paremus.gossip",
         "service.factoryPid": "com.paremus.gossip",
         "cluster.name": "IOT_DEMO",
-        "initial.peers": "192.168.2.20"
+        "initial.peers": "192.168.99.10"
     }
 ]

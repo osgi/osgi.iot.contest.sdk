@@ -2,14 +2,14 @@
 # OSGI ENROUTE TRAINS APPLICATION RUN SPECIFICATION
 #
 	
-#-runtrace: true
-X-runpath: biz.aQute.remote.launcher
-X-runremote: master; \
-	host=192.168.2.16; \
+x-runpath: biz.aQute.remote.launcher
+x-runremote: master; \
+	host=192.168.99.10; \
 	jdb=1044; \
 	shell=-1
 
-# Note: ~ causes included properties to override
+-runtrace: false
+
 -include: \
 	~paremus-rsa.bnd,\
 	~eurotech-mqtt.bnd

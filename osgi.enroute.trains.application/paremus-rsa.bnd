@@ -1,9 +1,8 @@
 
 # enRoute Configurer substitutes these properties in configuration.json
--runproperties: \
-	posh.home=${user.home},\
+-runproperties.rsa: \
 	com.paremus.cluster=IOT_DEMO,\
-	com.paremus.peers=192.168.2.20
+	com.paremus.peers=192.168.99.10
 
 -runsystempackages.rsa:		sun.misc
 

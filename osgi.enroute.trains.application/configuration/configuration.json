@@ -117,7 +117,7 @@
     },
     {
         "service.pid": "com.paremus.dosgi.net",
-        "server.bind.address": "192.168.2.20",
+        "server.bind.address": "192.168.99.10",
         "allow.insecure.transports": true
     },
     {

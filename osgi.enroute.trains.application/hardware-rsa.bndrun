@@ -2,13 +2,13 @@
 # OSGI ENROUTE TRAINS HARDWARE RUN SPECIFICATION
 #
 
-# Launch hardware.provider on remote system using Paremus RSA provider
--runtrace: true
--runpath: biz.aQute.remote.launcher
--runremote: pi; \
-	host=192.168.2.30; \
+x-runpath: biz.aQute.remote.launcher
+x-runremote: pi-1; \
+	host=192.168.99.11; \
 	jdb=1044; \
 	shell=-1
+	
+-runtrace: false
 
 -include: ~paremus-rsa.bnd
 -resolve.effective: active;skip:="osgi.service"
