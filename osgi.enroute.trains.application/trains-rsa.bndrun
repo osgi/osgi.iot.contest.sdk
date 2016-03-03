@@ -8,6 +8,9 @@ x-runremote: master; \
 	jdb=1044; \
 	shell=-1
 
+x-runproperties.posh: \
+	posh.home=${user.home}
+
 -runtrace: false
 
 -include: \
@@ -16,9 +19,14 @@ x-runremote: master; \
 
 -resolve.effective: active;skip:="osgi.service"
 
+-augment.rsa:\
+		osgi.enroute.trains.application: \
+			capability:="osgi.service;objectClass:List<String>=osgi.enroute.trains.train.api.TrainController;effective:=active"
+
 -runrequires: \
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.rest.simple.provider)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.rest.provider.server)'
+
 -runrequires.app: \
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.application)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.track.controller.provider)',\
@@ -41,11 +49,6 @@ x-runremote: master; \
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.hw.provider)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.rest.provider.client)'
 
--augment.rsa:\
-		osgi.enroute.trains.application: \
-			capability:="osgi.service;objectClass:List<String>=osgi.enroute.trains.train.api.TrainController;effective:=active"
-	
-	
 -runbundles: \
 	com.paremus.deployment.framework.provider;version='[1.0.0,1.0.1)',\
 	com.paremus.dosgi.discovery.gossip;version='[1.0.0,1.0.1)',\

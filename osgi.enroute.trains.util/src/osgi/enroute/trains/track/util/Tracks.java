@@ -366,7 +366,7 @@ public class Tracks<T> {
 		Segment segment = new Segment();
 		segment.id = parts[0];
 		segment.type = Enum.valueOf(Segment.Type.class, parts[1]);
-		segment.maxSpeed = Integer.parseInt(parts[2]);
+		segment.tagCode = Integer.parseInt(parts[2]);
 		segment.controller = Integer.parseInt(parts[3]);
 
 		segment.to = parts[4].split("\\s*,\\s*");
@@ -497,7 +497,7 @@ public class Tracks<T> {
 	private String toLine(SegmentHandler<T> handler) {
 		Segment s = handler.segment;
 		try (Formatter formatter = new Formatter();) {
-			formatter.format("%-10s : %-10s : %-6s : %-6s ", s.id, s.type, s.maxSpeed, s.controller);
+			formatter.format("%-10s : %-10s : %-6s : %-6s ", s.id, s.type, s.tagCode, s.controller);
 
 			String nextId = getNextId(handler.next);
 			formatter.format(": %s", nextId);

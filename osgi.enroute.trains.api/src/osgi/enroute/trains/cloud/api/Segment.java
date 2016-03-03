@@ -46,9 +46,9 @@ public class Segment extends DTO {
 	public int length;
 
 	/**
-	 * Maximum speed in mm/s
+	 * Short code for RFID tag attached to this segment, or 0 for none.
 	 */
-	public int maxSpeed;
+	public int tagCode;
 
 	/**
 	 * The associated controller

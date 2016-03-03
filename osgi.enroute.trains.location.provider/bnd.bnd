@@ -1,3 +1,13 @@
+#
+# OSGI ENROUTE TRAINS LOCATION PROVIDER
+#
+
+Bundle-Version: 			1.0.0.${tstamp}
+Bundle-Description: \
+	Subscribes to raw location info via MQTT, maps it to a segment name and publishes as TrainLocator service.
+	
+Private-Package: osgi.enroute.trains.location.provider
+	
 -buildpath: \
 	edc-client,\
 	osgi.enroute.base.api,\
@@ -7,8 +17,6 @@
 -includeresource: \
 	{configuration=configuration}
 	
-Private-Package: osgi.enroute.trains.location.provider
-
 -runbundles: \
 	edc-client;version=2.1.0,\
 	org.hsqldb.hsqldb;version=2.3.0,\
@@ -22,11 +30,7 @@ Private-Package: osgi.enroute.trains.location.provider
 	osgi.enroute.logger.simple.provider;version='[1.2.1,1.2.2)',\
 	osgi.enroute.configurer.simple.provider,\
 	org.eclipse.equinox.coordinator
-xx:\
-	org.apache.felix.gogo.command,\
-	org.apache.felix.gogo.runtime,\
-	org.apache.felix.gogo.shell,\
 
-Export-Package: \
+xxExport-Package: \
 	osgi.enroute.trains.controller.api;version=1.0,\
 	osgi.enroute.trains.cloud.api
