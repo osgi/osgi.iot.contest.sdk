@@ -23,7 +23,7 @@ x-runproperties.posh: \
 		osgi.enroute.trains.application: \
 			capability:="osgi.service;objectClass:List<String>=osgi.enroute.trains.train.api.TrainController;effective:=active"
 
--runrequires: \
+-runrequires.rest: \
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.rest.simple.provider)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.rest.provider.server)'
 
@@ -31,7 +31,8 @@ x-runproperties.posh: \
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.application)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.track.controller.provider)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.track.manager.example.provider)',\
-	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.train.manager.example.provider)'
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.train.manager.example.provider)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.location.provider)'
 
 -runrequires.xtra: \
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.bostock.d3.webresource)',\
@@ -39,7 +40,7 @@ x-runproperties.posh: \
 	osgi.identity;filter:='(osgi.identity=osgi.promise)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.gogo.extra.provider)'
 	
--runrequires.trains: \
+-runrequires.console: \
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.shell)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.command)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.webconsole)'
@@ -50,6 +51,7 @@ x-runproperties.posh: \
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.rest.provider.client)'
 
 -runbundles: \
+	com.paremus-com.google.protobuf;version='[2.4.1,2.4.2)',\
 	com.paremus.deployment.framework.provider;version='[1.0.0,1.0.1)',\
 	com.paremus.dosgi.discovery.gossip;version='[1.0.0,1.0.1)',\
 	com.paremus.dosgi.net;version='[1.0.0,1.0.1)',\
@@ -57,6 +59,7 @@ x-runproperties.posh: \
 	com.paremus.gossip;version='[1.0.0,1.0.1)',\
 	com.paremus.net;version='[1.0.0,1.0.1)',\
 	com.springsource.org.json;version='[1.0.0,1.0.1)',\
+	edc-client;version='[2.1.0,2.1.1)',\
 	org.apache.commons.fileupload;version='[1.3.1,1.3.2)',\
 	org.apache.commons.io;version='[2.4.0,2.4.1)',\
 	org.apache.felix.configadmin;version='[1.8.6,1.8.7)',\
@@ -72,6 +75,8 @@ x-runproperties.posh: \
 	org.eclipse.equinox.coordinator;version='[1.3.100,1.3.101)',\
 	org.eclipse.equinox.event;version='[1.3.100,1.3.101)',\
 	org.eclipse.equinox.metatype;version='[1.4.100,1.4.101)',\
+	org.eclipse.paho.mqtt-client;version='[1.0.1,1.0.2)',\
+	org.hsqldb.hsqldb;version='[2.3.0,2.3.1)',\
 	org.osgi.service.event;version='[1.3.1,1.3.2)',\
 	org.osgi.service.metatype;version='[1.3.0,1.3.1)',\
 	osgi.enroute.bostock.d3.webresource;version='[3.5.6,3.5.7)',\
@@ -87,6 +92,7 @@ x-runproperties.posh: \
 	osgi.enroute.scheduler.simple.provider;version='[1.1.1,1.1.2)',\
 	osgi.enroute.stackexchange.pagedown.webresource;version='[1.1.1,1.1.2)',\
 	osgi.enroute.trains.application;version=snapshot,\
+	osgi.enroute.trains.location.provider;version=snapshot,\
 	osgi.enroute.trains.rest.provider.server;version=snapshot,\
 	osgi.enroute.trains.track.controller.provider;version=snapshot,\
 	osgi.enroute.trains.track.manager.example.provider;version=snapshot,\
@@ -94,5 +100,4 @@ x-runproperties.posh: \
 	osgi.enroute.trains.util;version=snapshot,\
 	osgi.enroute.twitter.bootstrap.webresource;version='[3.3.5,3.3.6)',\
 	osgi.enroute.web.simple.provider;version='[1.3.3,1.3.4)',\
-	osgi.promise;version='[6.0.0,6.0.1)',\
-	osgi.enroute.trains.location.provider;version=latest
+	osgi.promise;version='[6.0.0,6.0.1)'
