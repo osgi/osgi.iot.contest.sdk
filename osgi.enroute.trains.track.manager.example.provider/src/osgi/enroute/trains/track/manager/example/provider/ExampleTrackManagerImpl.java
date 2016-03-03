@@ -237,9 +237,6 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
                     } catch (InterruptedException e) {
                     }
                 }
-                else {
-                    info("access granted: {} -> {}", train, toTrack);
-                }
             }
         }
 

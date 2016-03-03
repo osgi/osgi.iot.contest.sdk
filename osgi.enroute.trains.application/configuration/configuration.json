@@ -1,19 +1,19 @@
 [
     {
         "service.pid":"osgi.enroute.trains.emulator",
-        "name.rfids":[ "T1:OSGiExpress:CH1", "T2:OSGiCargo:CH2" ],
+        "name.rfids":[ "White:OSGi1:CH1", "Red:OSGi2:CH2" ],
         "rfid.probability": 500,
         "play.speed":0.5
     },
     {
-        "service.pid": "OSGiExpress",
+        "service.pid": "osgi.enroute.trains.train.manager.1",
         "service.factoryPid":"osgi.enroute.trains.train.manager",
         "name": "White",
         "rfid": "OSGi1",
         "TrainController.target" : "(channel=CH1)"
     },
     {
-        "service.pid": "OSGiCargo",
+        "service.pid": "osgi.enroute.trains.train.manager.2",
         "service.factoryPid":"osgi.enroute.trains.train.manager",
         "name": "Red",
         "rfid": "OSGi2",
