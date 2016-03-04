@@ -70,7 +70,7 @@ public class LegoRC extends ICAdapter<LegoPowerFunctions, Wave> implements
 
     @Override
     public String getName() {
-        return "LRC-" + (channel + 1);
+        return "LRC-CH" + (channel + 1);
     }
 
     void sendpulse(int width) {
@@ -94,7 +94,7 @@ public class LegoRC extends ICAdapter<LegoPowerFunctions, Wave> implements
         data &= ~0xf;
         data |= check & 0xf;
 
-        System.out.printf("send %04x\n", data);
+        // System.out.printf("send %04x\n", data);
 
         where = 0;
         sendpulse(START_STOP);
@@ -160,8 +160,8 @@ public class LegoRC extends ICAdapter<LegoPowerFunctions, Wave> implements
         value = Math.min(1, value);
         int vint = (int) Math.round(value * 7) & 0xF;
 
-        System.out.printf("LegoRC CH=%d.%c speed=%d (%.0f%%)\n",
-                channel, (index == 0 ? 'A' : 'B'), vint, value * 100);
+        System.out.printf("%s.%c speed=%d (%.0f%%)\n",
+                getName(), (index == 0 ? 'A' : 'B'), vint, value * 100);
 
         lock.lock();
         try {

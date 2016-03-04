@@ -48,15 +48,17 @@ public class SwitchSegmentImpl implements SwitchSegmentController {
 		fwd = setup(config.fwd());
 		rev = setup(config.rev());
 		duration = config.duration();
+		
+		// force switch into known state
 		state = true;
-		swtch(false);
+		swtch(!state);
 	}
 
 
 	private GpioPinDigitalOutput setup(String name) {
 		Pin pin = RaspiPin.getPinByName(name);
 		if ( pin == null) {
-			System.out.println("Pin is " + name + " is null");
+			System.out.println("Pin " + name + " is null");
 			return null;
 		}
 		for (GpioPin e : gpio.getProvisionedPins()) {

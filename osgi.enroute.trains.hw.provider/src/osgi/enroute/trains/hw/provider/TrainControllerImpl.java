@@ -3,6 +3,7 @@ package osgi.enroute.trains.hw.provider;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
@@ -13,7 +14,7 @@ import osgi.enroute.trains.hw.provider.TrainControllerImpl.Config;
 import osgi.enroute.trains.train.api.TrainController;
 
 /**
- * 
+ *  Train controller
  */
 @Designate(ocd = Config.class, factory = true)
 @Component(name = "osgi.enroute.trains.hw.train", immediate = true, configurationPolicy = ConfigurationPolicy.REQUIRE, property = "service.exported.interfaces=*")
@@ -39,6 +40,12 @@ public class TrainControllerImpl extends LegoRC implements TrainController {
 		this.setWave(new LIRCImpl());
 		super.activate(config.channel());
 		this.divider = config.divider();
+		System.out.println("activate: " + toString());
+	}
+	
+	@Deactivate
+	void stop() {
+		System.out.println("deactivate: " + toString());
 	}
 
 	@Override

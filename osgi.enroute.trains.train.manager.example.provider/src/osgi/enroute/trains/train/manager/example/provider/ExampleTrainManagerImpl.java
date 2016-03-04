@@ -9,6 +9,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,35 +19,59 @@ import osgi.enroute.trains.cloud.api.Observation;
 import osgi.enroute.trains.cloud.api.TrackForTrain;
 import osgi.enroute.trains.track.util.Tracks;
 import osgi.enroute.trains.track.util.Tracks.SegmentHandler;
-import osgi.enroute.trains.train.api.TrainConfiguration;
 import osgi.enroute.trains.train.api.TrainController;
+import osgi.enroute.trains.train.manager.example.provider.ExampleTrainManagerImpl.Config;
 
 /**
- * 
+ * Train manager.
  */
-@Component(name = TrainConfiguration.TRAIN_CONFIGURATION_PID, configurationPolicy = ConfigurationPolicy.REQUIRE,
+@Designate(ocd = Config.class, factory = true)
+@Component(name = Config.TRAIN_CONFIG_PID, configurationPolicy = ConfigurationPolicy.REQUIRE,
         immediate = true, service = Object.class)
 public class ExampleTrainManagerImpl {
+
+    @ObjectClassDefinition
+    @interface Config {
+        final static public String TRAIN_CONFIG_PID = "osgi.enroute.trains.train.manager";
+
+        String name();
+
+        String rfid();
+
+        int speed() default 50;
+
+        String target_TrainController();
+    }
+
     static Logger logger = LoggerFactory.getLogger(ExampleTrainManagerImpl.class);
 
-    private TrackForTrain trackManager;
+    // TrainController.target is set in config
+    @Reference(name = "TrainController")
     private TrainController trainCtrl;
-    private String name;
-    private String rfid;
-    private Tracks<Object> tracks;
 
-    private Thread mgmtThread;
+    @Reference
+    private TrackForTrain trackManager;
 
     @Reference
     private Scheduler scheduler;
 
+    private Tracks<Object> tracks;
+    private String name;
+    private String rfid;
+    private int speed;
+
+    private Thread mgmtThread;
+
     @Activate
-    public void activate(TrainConfiguration config) throws Exception {
+    public void activate(Config config) throws Exception {
         name = config.name();
         rfid = config.rfid();
-
+        speed = config.speed();
+        info("activate: {} speed={}", name, speed);
+        
         // register train with Track Manager
         trackManager.registerTrain(name, rfid);
+
         // create Track
         tracks = new Tracks<Object>(trackManager.getSegments().values(), new TrainManagerFactory());
 
@@ -55,7 +81,7 @@ public class ExampleTrainManagerImpl {
 
     @Deactivate
     public void deactivate() {
-        info("deactivate");
+        info("deactivate: {}", name);
         try {
             mgmtThread.interrupt();
             mgmtThread.join(5000);
@@ -67,16 +93,6 @@ public class ExampleTrainManagerImpl {
         trainCtrl.light(false);
     }
 
-    @Reference
-    public void setTrainController(TrainController t) {
-        this.trainCtrl = t;
-    }
-
-    @Reference
-    public void setTrackManager(TrackForTrain t) {
-        this.trackManager = t;
-    }
-
     private class TrainMgmtLoop implements Runnable {
 
         private String currentAssignment = null;
@@ -85,13 +101,26 @@ public class ExampleTrainManagerImpl {
 
         @Override
         public void run() {
-            long lastObservation = -1;
+            // get all recent observations, without blocking
+            // to determine lastObservation and to avoid re-processing same
+            // observations on restart
+            List<Observation> observations = trackManager.getRecentObservations(-1);
+            long lastObsId = -1;
             boolean blocked = false;
+
+            if (!observations.isEmpty()) {
+                Observation lastObs = observations.get(observations.size() - 1);
+                lastObsId = lastObs.id;
+                info("disgarding old observations: last<{}>", lastObs);
+            }
+
+            trainCtrl.move(0);
+            trainCtrl.light(false);
 
             while (isActive()) {
 
-                List<Observation> observations = trackManager
-                        .getRecentObservations(lastObservation - (blocked ? 1 : 0));
+                observations = trackManager
+                        .getRecentObservations(lastObsId - (blocked ? 1 : 0));
 
                 if (blocked && observations.size() > 1) {
                     // remove the observation that caused block and process next
@@ -102,7 +131,7 @@ public class ExampleTrainManagerImpl {
                 }
 
                 for (Observation o : observations) {
-                    lastObservation = o.id;
+                    lastObsId = o.id;
 
                     tracks.event(o);
 
@@ -118,7 +147,7 @@ public class ExampleTrainManagerImpl {
 
                         if (currentLocation == null) {
                             // start moving to find location
-                            trainCtrl.move(50);
+                            trainCtrl.move(speed);
                             trainCtrl.light(true);
                         } else {
                             planRoute();
@@ -166,7 +195,7 @@ public class ExampleTrainManagerImpl {
                 scheduler.after(() -> {
                     trainCtrl.light(true);
                     scheduler.after(() -> blink(n - 1), 500);
-                } , 500);
+                }, 500);
             }
         }
 
@@ -231,7 +260,7 @@ public class ExampleTrainManagerImpl {
                         access = trackManager.requestAccessTo(name, fromTrack, toTrack);
                     } catch (Exception e) {
                         currentLocation = null;
-                        trainCtrl.move(40);
+                        trainCtrl.move(speed);
                     }
 
                     if (!access) {
@@ -241,7 +270,7 @@ public class ExampleTrainManagerImpl {
             }
 
             // just go forward
-            trainCtrl.move(50);
+            trainCtrl.move(speed);
             return false;
         }
 
@@ -263,7 +292,7 @@ public class ExampleTrainManagerImpl {
     }
 
     private static void info(String fmt, Object... args) {
-        System.out.printf("Train: " + fmt.replaceAll("\\{}", "%s") + "\n", args);
+        System.out.printf("TrainMgr: " + fmt.replaceAll("\\{}", "%s") + "\n", args);
         logger.info(fmt, args);
     }
 

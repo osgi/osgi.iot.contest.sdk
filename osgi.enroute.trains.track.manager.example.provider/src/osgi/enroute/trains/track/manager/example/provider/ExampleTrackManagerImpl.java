@@ -434,7 +434,7 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
     }
     
     private static void info(String fmt, Object... args) {
-        System.out.printf("Track: " + fmt.replaceAll("\\{}", "%s") + "\n", args);
+        System.out.printf("TrackMgr: " + fmt.replaceAll("\\{}", "%s") + "\n", args);
         logger.info(fmt, args);
     }
 }

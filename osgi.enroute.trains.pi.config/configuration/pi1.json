@@ -1,16 +1,16 @@
 [
 	{
-        "service.pid":"OSGiExpress",
+        "service.pid":"OSGi1",
         "service.factoryPid": "osgi.enroute.trains.hw.train",
         "channel":"CH1",
 		"train.rfid":"OSGi1",
-		"train.name":"Express"
+		"train.name":"White"
 	},{
-        "service.pid":"OSGiCargo",
+        "service.pid":"OSGi2",
         "service.factoryPid": "osgi.enroute.trains.hw.train",
         "channel":"CH2",
 		"train.rfid":"OSGi2",
-		"train.name":"Cargo"
+		"train.name":"Red"
 	},{
 		"service.pid":"A16_S-3",
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",

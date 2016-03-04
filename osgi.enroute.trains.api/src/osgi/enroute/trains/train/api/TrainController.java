@@ -21,4 +21,5 @@ public interface TrainController {
 	 * @param on
 	 */
 	void light(boolean on);
+	
 }

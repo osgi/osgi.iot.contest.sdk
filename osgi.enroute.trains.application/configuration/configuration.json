@@ -6,14 +6,14 @@
         "play.speed":0.5
     },
     {
-        "service.pid": "osgi.enroute.trains.train.manager.1",
+        "service.pid": "osgi1",
         "service.factoryPid":"osgi.enroute.trains.train.manager",
         "name": "White",
         "rfid": "OSGi1",
         "TrainController.target" : "(channel=CH1)"
     },
     {
-        "service.pid": "osgi.enroute.trains.train.manager.2",
+        "service.pid": "osgi2",
         "service.factoryPid":"osgi.enroute.trains.train.manager",
         "name": "Red",
         "rfid": "OSGi2",
@@ -123,13 +123,13 @@
     },
     {
         "service.pid": "com.paremus.dosgi.discovery.gossip",
-        "root.cluster": "${com.paremus.cluster}"
+        "root.cluster": "IOT_DEMO"
     },
     {
         "service.pid": "com.paremus.gossip",
         "service.factoryPid": "com.paremus.gossip",
-        "cluster.name": "${com.paremus.cluster}",
-        "initial.peers": "${com.paremus.peers}"
+        "cluster.name": "IOT_DEMO",
+        "initial.peers": "192.168.99.10"
     }
     
 ]

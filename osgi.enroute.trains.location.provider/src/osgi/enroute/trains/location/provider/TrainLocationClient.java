@@ -90,7 +90,7 @@ public class TrainLocationClient implements TrainLocator {
             //
             edcCloudClient = EdcClientFactory.newInstance(conf, prof, new MyCallbackHandler());
             edcCloudClient.startSession();
-            info("Connected to Everywhere Device Cloud");
+            info("Connected to MQTT broker <{}>", brokerUrl);
 
             //
             // Subscribe
@@ -103,6 +103,20 @@ public class TrainLocationClient implements TrainLocator {
             // edcCloudClient.controlSubscribe("+", "#", 1);
         } catch (EdcClientException e) {
             error(e.toString());
+            throw new RuntimeException(e);
+        }
+    }
+
+    //
+    // Stop the session and close the connection
+    //
+    @Deactivate
+    void deactivate() {
+        info("Terminating MQTT client");
+        try {
+            edcCloudClient.stopSession();
+            edcCloudClient.terminate();
+        } catch (EdcClientException e) {
             throw new RuntimeException(e);
         }
     }
@@ -171,27 +185,13 @@ public class TrainLocationClient implements TrainLocator {
 //        info("code2segment=" + code2segment);
     }
 
-    //
-    // Stop the session and close the connection
-    //
-    @Deactivate
-    void deactivate() {
-        info("Terminating Everywhere Device Cloud client");
-        try {
-            edcCloudClient.stopSession();
-            edcCloudClient.terminate();
-        } catch (EdcClientException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Override
     public synchronized Promise<String> nextLocation() {
         return nextLocation.getPromise();
     }
 
     private synchronized void trigger(String trainId, String segment) {
-        // info("trigger: train={} segment={}", train, segment);
+        // info("trigger: trainId={} segment={}", trainId, segment);
         Deferred<String> currentLocation = nextLocation;
         nextLocation = new Deferred<String>();
         currentLocation.resolve(trainId + ":" + segment);
@@ -210,7 +210,7 @@ public class TrainLocationClient implements TrainLocator {
     }
 
     private static void info(String fmt, Object... args) {
-        System.out.printf(fmt.replaceAll("\\{}", "%s") + "\n", args);
+        System.out.printf("Locator: " + fmt.replaceAll("\\{}", "%s") + "\n", args);
         log.info(fmt, args);
     }
 
@@ -239,7 +239,7 @@ public class TrainLocationClient implements TrainLocator {
                     }
                 }
             } else if (msg.getMetric("connection") != null) {
-                info("Connection: " + msg.getMetric("connection"));
+                info("trainId<{}>: {}", trainId, msg.getMetric("connection"));
             } else {
                 info("Data publish arrived on semantic topic: " + topic + ", qos: " + qos + ", assetId: " + assetId);
             }

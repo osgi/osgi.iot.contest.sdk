@@ -42,7 +42,7 @@ public class TrackControllerImpl implements EventHandler {
             .synchronizedMap(new HashMap<Integer, SignalSegmentController>());
     private Map<Integer, SwitchSegmentController> switches = Collections
             .synchronizedMap(new HashMap<Integer, SwitchSegmentController>());
-    
+
     private Map<Integer, Boolean> sw = new HashMap<>();
 
     @Override
@@ -79,7 +79,7 @@ public class TrackControllerImpl implements EventHandler {
         case SWITCH:
             SwitchSegmentController swCtrl = switches.get(segment.controller);
             Boolean target = false;
-            
+
             if (swCtrl == null) {
                 error("switch controller <{}> not found", segment.controller);
                 target = sw.get(segment.controller);
@@ -98,23 +98,28 @@ public class TrackControllerImpl implements EventHandler {
     }
 
     // use RFID/bluetooth TrainLocator service
-    @Reference(cardinality = ReferenceCardinality.OPTIONAL)
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
     void setTrainLocator(TrainLocator locator) {
-        trackLocation(locator);
+        info("Found TrainLocator {}", locator);
+        locateTrain(locator);
     }
 
-    private void trackLocation(TrainLocator locator) {
+    void unsetTrainLocator(TrainLocator locator) {
+        info("Lost TrainLocator {}", locator);
+    }
+
+    private void locateTrain(TrainLocator locator) {
         locator.nextLocation().then(p -> {
             String[] split = p.getValue().split("\\s*:\\s*", 2);
-            String train = split[0];
+            String trainId = split[0];
             String segment = split[1];
-            System.err.printf("Located train<%s> at segment<%s>\n", train, segment);
+            info("Located trainId<{}> at segment<{}>", trainId, segment);
             try {
-                trackManager.locatedTrainAt(train, segment);
-            } catch (Exception e) {
-                System.err.printf("XXX eek! %s\n", e.toString());
+                trackManager.locatedTrainAt(trainId, segment);
+            } catch (IllegalArgumentException e) {
+                error("bad train or segment! {}", e.toString());
             }
-            trackLocation(locator);
+            locateTrain(locator);
             return null;
         });
     }
@@ -145,8 +150,10 @@ public class TrackControllerImpl implements EventHandler {
                 String train = p.getValue();
                 trackManager.locatedTrainAt(train, segment);
                 return null;
-            } , p -> {
-                System.out.println("Retry rfid check: " + p.getFailure());
+            }, p -> {
+                // Paremus RSA has 30s timeout on remote service
+                // can be changed by setting com.paremus.dosgi.net.timeout=60000
+                // info("RSA timeout?: " + p.getFailure());
                 trackRFID(controller, segment);
             }).then((p) -> {
                 // and then start tracking the next one
@@ -214,4 +221,10 @@ public class TrackControllerImpl implements EventHandler {
         System.err.printf("ERROR: " + fmt.replaceAll("\\{}", "%s") + "\n", args);
         logger.error(fmt, args);
     }
+
+    private static void info(String fmt, Object... args) {
+        System.err.printf("TrackCtl: " + fmt.replaceAll("\\{}", "%s") + "\n", args);
+        logger.info(fmt, args);
+    }
+
 }

@@ -102,4 +102,5 @@ public class TrainControllerImpl implements TrainController {
 		properties.put("channel", channel);
 		registration = context.registerService(TrainController.class, this, properties);
 	}
+
 }

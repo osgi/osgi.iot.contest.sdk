@@ -21,7 +21,7 @@ import osgi.enroute.trains.controller.api.SignalSegmentController;
 public class SignalSegmentImpl implements SignalSegmentController {
 	private GpioPinDigitalOutput green;
 	private GpioPinDigitalOutput red;
-	private Color color = Color.RED;
+	private Color color = Color.YELLOW;
 
 	@Reference
 	private GpioController gpio;
