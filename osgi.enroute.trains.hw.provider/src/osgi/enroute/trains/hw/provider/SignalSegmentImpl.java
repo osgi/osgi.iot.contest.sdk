@@ -43,7 +43,7 @@ public class SignalSegmentImpl implements SignalSegmentController {
     @Activate
     void activate(Config config) {
         this.config = config;
-        System.out.printf("activate: signal<%s>\n", config.segment());
+        info("activate");
         green = setup(config.green());
         red = setup(config.red());
         signal(Color.YELLOW);
@@ -51,7 +51,7 @@ public class SignalSegmentImpl implements SignalSegmentController {
 
     @Deactivate
     void deactivate() {
-        System.out.printf("dectivate: signal<%s>\n", config.segment());
+        info("deactivate");
         green.setState(true);
         red.setState(false);
         red.blink(0);
@@ -90,7 +90,7 @@ public class SignalSegmentImpl implements SignalSegmentController {
     private GpioPinDigitalOutput setup(String name) {
         Pin pin = RaspiPin.getPinByName(name);
         if (pin == null) {
-            System.out.println("Pin is " + name + " is null");
+            info("Pin<{}> is null", name);
             return null;
         }
         for (GpioPin e : gpio.getProvisionedPins()) {
@@ -106,6 +106,11 @@ public class SignalSegmentImpl implements SignalSegmentController {
     public String toString() {
         return "Signal[green=" + green + ", red=" + red + ", color=" + color + ",cntl=" + config.controller_id()
                 + ", seg=" + config.segment() + "]";
+    }
+
+    private void info(String fmt, Object... args) {
+        String ident = String.format("Signal<%s>: ", config.segment());
+        System.out.printf(ident + fmt.replaceAll("\\{}", "%s") + "\n", args);
     }
 
 }

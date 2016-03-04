@@ -89,7 +89,6 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
         synchronized (observations) {
             observations.notifyAll();
         }
-
     }
 
     private void setSignal(String segmentId, Color color) {
@@ -119,14 +118,23 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
         }
 
         SegmentHandler<Object> sh = tracks.getHandler(segmentId);
+
         if (sh == null) {
             System.out.println("No valid segment id given.");
             logger.error("No valid segment id given.");
             return;
         }
+
         if (!sh.isLocator()) {
             logger.error("Only locator segments can be used for assignments.");
             return;
+        }
+
+        if (assignments.isEmpty()) {
+            // first assignment - ensure all signals are RED
+            getSignals().keySet().forEach(seg -> {
+                setSignal(seg, Color.RED);
+            });
         }
 
         assignments.put(name, segmentId);
@@ -184,6 +192,11 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
                     return Collections.emptyList();
                 }
             }
+            
+            if (sinceId < -1) {
+                sinceId = -1;
+            }
+
             if (sinceId + 1 < observations.size()) {
                 o.addAll(observations.subList((int) (sinceId + 1), observations.size()));
             }
@@ -295,7 +308,7 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
     }
 
     private Optional<SwitchHandler<Object>> getSwitch(String fromTrack, String toTrack) {
-        //info("getSwitch from={} to={}", fromTrack, toTrack);
+        // info("getSwitch from={} to={}", fromTrack, toTrack);
         return tracks.filter(new TypeReference<SwitchHandler<Object>>() {
         })
                 .filter(sh -> sh.prev.getTrack().equals(fromTrack)
@@ -315,7 +328,7 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
     }
 
     private void releasePreviousTrack(String train, String track) {
-        //info("releasePreviousTrack: {} {}", train, track);
+        // info("releasePreviousTrack: {} {}", train, track);
         synchronized (access) {
             // remove the previous track of the train currently at @track to
             // release from access
@@ -353,13 +366,12 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
             Locator locator = tracks.getHandler(Locator.class, segment);
             locator.locatedAt(rfid);
             releasePreviousTrack(train, handler.getTrack());
-        }
-        else {
+        } else {
             Observation observation = new Observation();
             observation.type = Observation.Type.LOCATED;
             observation.segment = segment;
             observation.train = train;
-            observation(observation); 
+            observation(observation);
         }
     }
 
@@ -432,7 +444,7 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
     public String getNameForRfid(String rfid) {
         return rfid2Name.get(rfid);
     }
-    
+
     private static void info(String fmt, Object... args) {
         System.out.printf("TrackMgr: " + fmt.replaceAll("\\{}", "%s") + "\n", args);
         logger.info(fmt, args);

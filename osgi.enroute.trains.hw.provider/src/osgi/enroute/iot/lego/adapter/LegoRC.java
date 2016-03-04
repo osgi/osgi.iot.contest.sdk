@@ -160,8 +160,10 @@ public class LegoRC extends ICAdapter<LegoPowerFunctions, Wave> implements
         value = Math.min(1, value);
         int vint = (int) Math.round(value * 7) & 0xF;
 
-        System.out.printf("%s.%c speed=%d (%.0f%%)\n",
-                getName(), (index == 0 ? 'A' : 'B'), vint, value * 100);
+        if (index == 0) {  // only channel A == move()
+            System.out.printf("%s.%c speed=%d (%.0f%%)\n",
+                    getName(), (index == 0 ? 'A' : 'B'), vint, value * 100);
+        }
 
         lock.lock();
         try {

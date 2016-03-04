@@ -49,7 +49,7 @@ public class SwitchSegmentImpl implements SwitchSegmentController {
 		rev = setup(config.rev());
 		duration = config.duration();
 		
-		System.out.printf("activate: force switch<%s> into NORMAL state\n", config.segment());
+		info("activate: force to state<NORMAL>");
 		state = true;
 		swtch(!state);
 	}
@@ -58,7 +58,7 @@ public class SwitchSegmentImpl implements SwitchSegmentController {
 	private GpioPinDigitalOutput setup(String name) {
 		Pin pin = RaspiPin.getPinByName(name);
 		if ( pin == null) {
-			System.out.println("Pin " + name + " is null");
+			info("Pin<{}> is null", name);
 			return null;
 		}
 		for (GpioPin e : gpio.getProvisionedPins()) {
@@ -79,7 +79,7 @@ public class SwitchSegmentImpl implements SwitchSegmentController {
 	@Override
 	public void swtch(boolean alt) {
 		if (state == alt) {
-			System.out.printf("switch is already in %s state\n", alt ? "ALT" : "NORMAL");
+			info("already at state<{}>", alt ? "ALT" : "NORMAL");
 			return;
 		}
 		if (alt) {
@@ -96,5 +96,10 @@ public class SwitchSegmentImpl implements SwitchSegmentController {
 	public boolean getSwitch() {
 		return state;
 	}
+
+    private void info(String fmt, Object... args) {
+        String ident = String.format("Switch<%s>: ", config.segment());
+        System.out.printf(ident + fmt.replaceAll("\\{}", "%s") + "\n", args);
+    }
 
 }

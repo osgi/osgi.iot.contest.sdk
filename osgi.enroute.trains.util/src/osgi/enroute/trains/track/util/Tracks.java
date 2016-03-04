@@ -253,7 +253,7 @@ public class Tracks<T> {
 	}
 
 	public static class SignalHandler<T> extends SegmentHandler<T> {
-		public Color color = Color.RED;
+		public Color color = Color.YELLOW;
 
 		public SignalHandler(Segment segment) {
 			super(segment);

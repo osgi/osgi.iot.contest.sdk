@@ -40,7 +40,7 @@ public class ExampleTrainManagerImpl {
 
         int speed() default 50;
 
-        String target_TrainController();
+        String TrainController_target();
     }
 
     static Logger logger = LoggerFactory.getLogger(ExampleTrainManagerImpl.class);
@@ -67,7 +67,7 @@ public class ExampleTrainManagerImpl {
         name = config.name();
         rfid = config.rfid();
         speed = config.speed();
-        info("activate: {} speed={}", name, speed);
+        info("activate: speed<{}> rfid<{}>", speed, rfid);
         
         // register train with Track Manager
         trackManager.registerTrain(name, rfid);
@@ -81,7 +81,7 @@ public class ExampleTrainManagerImpl {
 
     @Deactivate
     public void deactivate() {
-        info("deactivate: {}", name);
+        info("deactivate");
         try {
             mgmtThread.interrupt();
             mgmtThread.join(5000);
@@ -104,14 +104,14 @@ public class ExampleTrainManagerImpl {
             // get all recent observations, without blocking
             // to determine lastObservation and to avoid re-processing same
             // observations on restart
-            List<Observation> observations = trackManager.getRecentObservations(-1);
+            List<Observation> observations = trackManager.getRecentObservations(-2);
             long lastObsId = -1;
             boolean blocked = false;
 
             if (!observations.isEmpty()) {
                 Observation lastObs = observations.get(observations.size() - 1);
                 lastObsId = lastObs.id;
-                info("disgarding old observations: last<{}>", lastObs);
+                info("disgard old observations: last: {}", lastObs);
             }
 
             trainCtrl.move(0);
@@ -143,7 +143,7 @@ public class ExampleTrainManagerImpl {
                     case ASSIGNMENT:
                         // new assignment, plan and follow the route
                         currentAssignment = o.assignment;
-                        info("Assignment: {} -> {}", name, currentAssignment);
+                        info("New Assignment<{}>", currentAssignment);
 
                         if (currentLocation == null) {
                             // start moving to find location
@@ -281,9 +281,9 @@ public class ExampleTrainManagerImpl {
         private boolean assignmentReached() {
             if (currentAssignment == null || currentAssignment.equals(currentLocation)) {
                 if (currentAssignment != null) {
-                    info(name + " has reached assignment " + currentAssignment);
+                    info("Reached assignment<{}>", currentAssignment);
                 } else {
-                    info(name + " is waiting for an assignment");
+                    info("Waiting for an assignment");
                 }
                 return true;
             }
@@ -291,9 +291,9 @@ public class ExampleTrainManagerImpl {
         }
     }
 
-    private static void info(String fmt, Object... args) {
-        System.out.printf("TrainMgr: " + fmt.replaceAll("\\{}", "%s") + "\n", args);
-        logger.info(fmt, args);
+    private void info(String fmt, Object... args) {
+        String ident = String.format("Train<%s>: ", name);
+        System.out.printf(ident + fmt.replaceAll("\\{}", "%s") + "\n", args);
     }
 
 }
