@@ -49,7 +49,7 @@ public class SwitchSegmentImpl implements SwitchSegmentController {
 		rev = setup(config.rev());
 		duration = config.duration();
 		
-		// force switch into known state
+		System.out.printf("activate: force switch<%s> into NORMAL state\n", config.segment());
 		state = true;
 		swtch(!state);
 	}
