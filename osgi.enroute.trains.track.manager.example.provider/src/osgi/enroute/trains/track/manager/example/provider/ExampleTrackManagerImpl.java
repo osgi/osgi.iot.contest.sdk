@@ -99,17 +99,12 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
         command(c);
     }
 
-    private void doSwitch(String segmentId) {
+    private void doSwitch(String segmentId, boolean alt) {
         Command c = new Command();
         c.type = Command.Type.SWITCH;
         c.segment = segmentId;
+        c.alternate = alt;
         command(c);
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     public void assign(String name, String segmentId) {
@@ -229,7 +224,13 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
                     } else {
                         SwitchHandler<Object> switchHandler = optSwitch.get();
                         if (shouldSwitch(switchHandler, fromTrack, toTrack)) {
-                            doSwitch(switchHandler.segment.id);
+                            doSwitch(switchHandler.segment.id, !switchHandler.toAlternate);
+                            try {
+                                Thread.sleep(3000);
+                            } catch (InterruptedException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
                         } else {
                             // set green signal
                             greenSignal(getSignal(fromTrack));

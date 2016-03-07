@@ -71,7 +71,7 @@
             "C02        : CURVED     : 0      : -1     : C03",
             "C03        : CURVED     : 0      : -1     : C04",
             "C04        : CURVED     : 0      : -1     : C05_L",
-            "C05_L      : LOCATOR    : 14      : 8      : C05",
+            "C05_L      : LOCATOR    : 14     : 8      : C05",
             "C05        : CURVED     : 0      : -1     : C05_S",
             "C05_S      : SIGNAL     : 0      : 9      : X02",
 

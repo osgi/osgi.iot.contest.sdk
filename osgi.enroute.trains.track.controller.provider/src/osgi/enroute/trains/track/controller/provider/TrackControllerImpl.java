@@ -43,8 +43,6 @@ public class TrackControllerImpl implements EventHandler {
     private Map<Integer, SwitchSegmentController> switches = Collections
             .synchronizedMap(new HashMap<Integer, SwitchSegmentController>());
 
-    private Map<Integer, Boolean> sw = new HashMap<>();
-
     @Override
     public void handleEvent(Event event) {
         Type type = (Type) event.getProperty("type");
@@ -77,18 +75,12 @@ public class TrackControllerImpl implements EventHandler {
             break;
 
         case SWITCH:
+            Boolean target = (Boolean) event.getProperty("alternate");
             SwitchSegmentController swCtrl = switches.get(segment.controller);
-            Boolean target = false;
 
             if (swCtrl == null) {
                 error("switch controller <{}> not found", segment.controller);
-                target = sw.get(segment.controller);
-                if (target == null) {
-                    target = true;
-                }
-                sw.put(segment.controller, !target);
             } else {
-                target = !swCtrl.getSwitch();
                 swCtrl.swtch(target);
             }
             trackManager.switched(s, target);
