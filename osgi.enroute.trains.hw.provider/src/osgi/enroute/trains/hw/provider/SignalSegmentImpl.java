@@ -52,7 +52,7 @@ public class SignalSegmentImpl implements SignalSegmentController {
     @Deactivate
     void deactivate() {
         info("deactivate");
-        green.setState(true);
+        green.setState(false);
         red.setState(false);
         red.blink(0);
     }
