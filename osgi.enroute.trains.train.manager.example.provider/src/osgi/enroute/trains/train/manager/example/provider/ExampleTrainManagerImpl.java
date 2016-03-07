@@ -68,7 +68,7 @@ public class ExampleTrainManagerImpl {
         rfid = config.rfid();
         speed = config.speed();
         info("activate: speed<{}> rfid<{}>", speed, rfid);
-        
+
         // register train with Track Manager
         trackManager.registerTrain(name, rfid);
 
@@ -101,9 +101,8 @@ public class ExampleTrainManagerImpl {
 
         @Override
         public void run() {
-            // get all recent observations, without blocking
-            // to determine lastObservation and to avoid re-processing same
-            // observations on restart
+            // get observations, without blocking, to find lastObservation
+            // and to avoid re-processing same observations on restart
             List<Observation> observations = trackManager.getRecentObservations(-2);
             long lastObsId = -1;
             boolean blocked = false;

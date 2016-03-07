@@ -3,6 +3,7 @@ package osgi.enroute.trains.track.controller.provider;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -166,11 +167,6 @@ public class TrackControllerImpl implements EventHandler {
                 startTracking(c);
             }
         }
-
-        // publish initial states
-        synchronized (switches) {
-
-        }
     }
 
     @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
@@ -186,11 +182,26 @@ public class TrackControllerImpl implements EventHandler {
         int id = (Integer) properties.get(SegmentController.CONTROLLER_ID);
         rfids.remove(id);
     }
+    
+    private Optional<String> getSegment(int controller) {
+        return trackManager.getSegments().values().stream()
+                .filter(s -> s.controller == controller)
+                .map(s -> s.id)
+                .findFirst();
+    }
 
     @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
     public void addSignalController(SignalSegmentController c, Map<String, Object> properties) {
         int id = (Integer) properties.get(SegmentController.CONTROLLER_ID);
         signals.put(id, c);
+
+        Optional<String> segment = getSegment(id);
+
+        if (segment.isPresent()) {
+            Color color = c.getSignal() ;
+            info("initialise signal<{}> to {}", segment.get(), color);
+            trackManager.signal(segment.get(), color);
+        }
     }
 
     public void removeSignalController(SignalSegmentController c, Map<String, Object> properties) {
@@ -202,6 +213,14 @@ public class TrackControllerImpl implements EventHandler {
     public void addSwitchController(SwitchSegmentController c, Map<String, Object> properties) {
         int id = (Integer) properties.get(SegmentController.CONTROLLER_ID);
         switches.put(id, c);
+
+        Optional<String> segment = getSegment(id);
+        
+        if (segment.isPresent()) {
+            boolean alt = c.getSwitch();
+            info("initialise switch<{}> to {}", segment.get(), alt ? "ALT" : "NORMAL");
+            trackManager.switched(segment.get(), alt);
+        }
     }
 
     public void removeSwitchController(SwitchSegmentController c, Map<String, Object> properties) {

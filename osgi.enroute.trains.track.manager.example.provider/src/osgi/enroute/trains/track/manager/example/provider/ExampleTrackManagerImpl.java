@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.osgi.service.component.annotations.Activate;
@@ -75,9 +76,12 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
     private int offset;
     private Closeable ticker;
 
+    private AtomicInteger commandCount;
+
     @Activate
     public void activate(TrackConfiguration config) throws Exception {
         tracks = new Tracks<Object>(config.segments(), new TrackManagerFactory(this));
+        commandCount = new AtomicInteger(0);
     }
 
     @Deactivate
@@ -187,7 +191,7 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
                     return Collections.emptyList();
                 }
             }
-            
+
             if (sinceId < -1) {
                 sinceId = -1;
             }
@@ -381,6 +385,12 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
         Switch swtch = tracks.getHandler(Switch.class, segment);
         swtch.alternative(alternative);
 
+        if (commandCount.decrementAndGet() < 0) {
+            // not called in response to command, so must be initialization
+            assignments.clear();
+            commandCount.set(0);
+        }
+
         synchronized (access) {
             access.notifyAll();
         }
@@ -390,6 +400,12 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
     public void signal(String segment, Color color) {
         Signal signal = tracks.getHandler(Signal.class, segment);
         signal.setColor(color);
+
+        if (commandCount.decrementAndGet() < 0) {
+            // not called in response to command, so must be initialization
+            assignments.clear();
+            commandCount.set(0);
+        }
 
         synchronized (access) {
             access.notifyAll();
