@@ -1,47 +1,43 @@
 [
 	{
-		"service.pid":"E06_S-12",
+		"service.pid":"Controller-12",
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",
 		"controller.id":12,
-		"segment":"E06_S",
 		"green":"GPIO 24",
 		"red":"GPIO 25"
 	},{
-		"service.pid":"D07_S-14",
+		"service.pid":"Controller-14",
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",
 		"controller.id":14,
-		"segment":"D07_S",
 		"green":"GPIO 3",
 		"red":"GPIO 21"
 	},{
-        "service.pid":"E06_L-11",
+        "service.pid":"Controller-11",
         "service.factoryPid": "osgi.enroute.trains.hw.microswitch",
         "controller.id":11,
-        "pin":"GPIO 10",
-        "segment":"E06_L"
+        "pin":"GPIO 10"
 	},{
-        "service.pid":"D07_L-13",
+        "service.pid":"Controller-13",
         "service.factoryPid": "osgi.enroute.trains.hw.microswitch",
         "controller.id":13,
-        "pin":"GPIO 11",
-        "segment":"D07_L"
+        "pin":"GPIO 11"
 	},
 	{
         "service.pid": "com.paremus.net.encode"
     },
     {
         "service.pid": "com.paremus.dosgi.net",
-        "server.bind.address": "iot-4",
+        "server.bind.address": "192.168.99.13",
         "allow.insecure.transports": true
     },
     {
         "service.pid": "com.paremus.dosgi.discovery.gossip",
-        "root.cluster": "${com.paremus.cluster}"
+        "root.cluster": "IOT_DEMO"
     },
     {
         "service.pid": "com.paremus.gossip",
         "service.factoryPid": "com.paremus.gossip",
-        "cluster.name": "${com.paremus.cluster}",
-        "initial.peers": "${com.paremus.peers}"
+        "cluster.name": "IOT_DEMO",
+        "initial.peers": "192.168.99.10"
     }
 ]

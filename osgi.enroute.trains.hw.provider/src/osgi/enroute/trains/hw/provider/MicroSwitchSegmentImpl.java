@@ -10,10 +10,6 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.osgi.util.promise.Deferred;
 import org.osgi.util.promise.Promise;
 
-import osgi.enroute.debug.api.Debug;
-import osgi.enroute.trains.cloud.api.TrackForSegment;
-import osgi.enroute.trains.controller.api.RFIDSegmentController;
-
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioPin;
 import com.pi4j.io.gpio.GpioPinDigitalInput;
@@ -23,6 +19,9 @@ import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
+
+import osgi.enroute.debug.api.Debug;
+import osgi.enroute.trains.controller.api.RFIDSegmentController;
 
 @Designate(ocd = MicroSwitchSegmentImpl.Config.class, factory = true)
 @Component(name = "osgi.enroute.trains.hw.microswitch", immediate = true, property = { "service.exported.interfaces=*", //
@@ -46,8 +45,6 @@ public class MicroSwitchSegmentImpl implements RFIDSegmentController {
 	@ObjectClassDefinition
 	@interface Config {
 		int controller_id();
-
-		String segment();
 
 		String pin();
 	}
@@ -73,12 +70,12 @@ public class MicroSwitchSegmentImpl implements RFIDSegmentController {
                 // display pin state on console
             	if(event.getState() == PinState.LOW){
             		if (System.currentTimeMillis() > debounce) {
-            		    System.out.println("RFID triggered at segment "+config.segment());
+            		    System.out.println("RFID triggered at controller "+config.controller_id());
             			debounce = System.currentTimeMillis() + 1000L;
             		    trigger("rfid1111");
             		}
             		else {
-            		    System.out.println("ignored RFID triggered at segment "+config.segment());
+            		    System.out.println("ignored RFID triggered at controller "+config.controller_id());
             		}
             	}
             }

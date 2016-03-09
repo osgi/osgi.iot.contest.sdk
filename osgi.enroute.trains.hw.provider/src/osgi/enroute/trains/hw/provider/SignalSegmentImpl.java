@@ -33,8 +33,6 @@ public class SignalSegmentImpl implements SignalSegmentController {
     @interface Config {
         int controller_id();
 
-        String segment();
-
         String green();
 
         String red();
@@ -105,11 +103,11 @@ public class SignalSegmentImpl implements SignalSegmentController {
     @Override
     public String toString() {
         return "Signal[green=" + green + ", red=" + red + ", color=" + color + ",cntl=" + config.controller_id()
-                + ", seg=" + config.segment() + "]";
+                + "]";
     }
 
     private void info(String fmt, Object... args) {
-        String ident = String.format("Signal<%s>: ", config.segment());
+        String ident = String.format("Signal<%d>: ", config.controller_id());
         System.out.printf(ident + fmt.replaceAll("\\{}", "%s") + "\n", args);
     }
 
