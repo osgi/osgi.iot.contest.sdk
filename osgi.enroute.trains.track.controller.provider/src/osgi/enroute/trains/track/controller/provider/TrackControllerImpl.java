@@ -106,7 +106,7 @@ public class TrackControllerImpl implements EventHandler {
             String[] split = p.getValue().split("\\s*:\\s*", 2);
             String trainId = split[0];
             String segment = split[1];
-            info("Located trainId<{}> at segment<{}>", trainId, segment);
+            // info("Located trainId<{}> at segment<{}>", trainId, segment);
             try {
                 trackManager.locatedTrainAt(trainId, segment);
             } catch (IllegalArgumentException e) {
