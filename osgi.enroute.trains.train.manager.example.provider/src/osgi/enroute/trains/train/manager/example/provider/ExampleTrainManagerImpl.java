@@ -59,6 +59,7 @@ public class ExampleTrainManagerImpl {
     private String name;
     private String rfid;
     private int speed;
+    private int move = 0;
 
     private Thread mgmtThread;
 
@@ -88,9 +89,20 @@ public class ExampleTrainManagerImpl {
         } catch (InterruptedException e) {
         }
         // stop when deactivated
-        trainCtrl.move(0);
+        move(0);
         // turn lights off
         trainCtrl.light(false);
+    }
+    
+    private void move(int speed) {
+        if (move != speed || speed == 0) {
+            info("move({})", speed);
+            move = speed;
+            trainCtrl.move(speed);
+        }
+        else {
+            info("move({}) - ignored", speed);
+        }
     }
 
     private class TrainMgmtLoop implements Runnable {
@@ -113,7 +125,7 @@ public class ExampleTrainManagerImpl {
                 info("disgard old observations: last: {}", lastObs);
             }
 
-            trainCtrl.move(0);
+            move(0);
             trainCtrl.light(false);
 
             while (isActive()) {
@@ -141,13 +153,12 @@ public class ExampleTrainManagerImpl {
                     switch (o.type) {
                     case ASSIGNMENT:
                         // new assignment, plan and follow the route
+                        info("New Assignment<{}>", o.assignment);
                         currentAssignment = o.assignment;
-                        info("New Assignment<{}>", currentAssignment);
 
                         if (currentLocation == null) {
-                            // start moving to find location
-                            trainCtrl.move(speed);
-                            trainCtrl.light(true);
+                            info("start moving to find location");
+                            move(speed);
                         } else {
                             planRoute();
                             blocked = followRoute();
@@ -155,24 +166,32 @@ public class ExampleTrainManagerImpl {
                         break;
 
                     case LOCATED:
-                        // if first time location found and an assignment is
-                        // already set plan route
+                        info("Located @ {}", o.segment);
+
                         if (currentLocation == null && currentAssignment != null) {
                             currentLocation = o.segment;
+                            move(0);
                             planRoute();
                         } else {
                             currentLocation = o.segment;
                         }
 
-                        // stop current assignment reached (no assignment =
-                        // assignment reached)
-                        if (assignmentReached()) {
-                            trainCtrl.move(0);
+                        // stop when assignment reached
+                        if (currentAssignment == null) {
+                            info("Waiting for an assignment");
+                            move(0);
+                        }
+                        else if (currentAssignment.equals(currentLocation)) {
+                            info("Reached assignment<{}>", currentAssignment);
+                            currentAssignment = null;
+                            move(0);
                             trainCtrl.light(false);
                             blink(3);
-                        } else {
+                        }
+                        else {
                             blocked = followRoute();
                         }
+
                         break;
 
                     case BLOCKED:
@@ -239,18 +258,18 @@ public class ExampleTrainManagerImpl {
             // Locator
             Optional<SegmentHandler<Object>> nextLocator = route.stream().filter(sh -> sh.isLocator()).findFirst();
             if (!nextLocator.isPresent()) {
-                // no locator to go to, stop now
-                trainCtrl.move(0);
+                info("no locator to go to, stop now");
+                move(0);
+                trainCtrl.light(false);
                 return false;
             }
 
             String toTrack = nextLocator.get().getTrack();
 
-            // check if we have to go to other track, in that case request
-            // access
+            // if we have to go to other track, request access
             if (!fromTrack.equals(toTrack)) {
-                // stop and request access
-                trainCtrl.move(0);
+                info("stop and request access to track<{}> from <{}>", toTrack, currentLocation);
+                move(0);
 
                 boolean access = false;
                 // simply keep on trying until access is given
@@ -258,41 +277,37 @@ public class ExampleTrainManagerImpl {
                     try {
                         access = trackManager.requestAccessTo(name, fromTrack, toTrack);
                     } catch (Exception e) {
+                        error("request access failed: " + e);
                         currentLocation = null;
-                        trainCtrl.move(speed);
+                        move(0);
                     }
 
+                    info("access is {}", access ? "granted" : "blocked");
                     if (!access) {
-                        return true;
+//                        return true;
                     }
                 }
             }
 
             // just go forward
-            trainCtrl.move(speed);
+            move(speed);
             return false;
         }
 
         private boolean isActive() {
             return !Thread.currentThread().isInterrupted();
         }
-
-        private boolean assignmentReached() {
-            if (currentAssignment == null || currentAssignment.equals(currentLocation)) {
-                if (currentAssignment != null) {
-                    info("Reached assignment<{}>", currentAssignment);
-                } else {
-                    info("Waiting for an assignment");
-                }
-                return true;
-            }
-            return false;
-        }
     }
 
     private void info(String fmt, Object... args) {
         String ident = String.format("Train<%s>: ", name);
         System.out.printf(ident + fmt.replaceAll("\\{}", "%s") + "\n", args);
+    }
+
+    private void error(String fmt, Object... args) {
+        String ident = String.format("Train<%s>: ", name);
+        System.err.printf("ERROR: " + ident + fmt.replaceAll("\\{}", "%s") + "\n", args);
+        logger.error(ident + fmt, args);
     }
 
 }

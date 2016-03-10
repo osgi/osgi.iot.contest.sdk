@@ -119,13 +119,12 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
         SegmentHandler<Object> sh = tracks.getHandler(segmentId);
 
         if (sh == null) {
-            System.out.println("No valid segment id given.");
-            logger.error("No valid segment id given.");
+            error("No valid segment id given.");
             return;
         }
 
         if (!sh.isLocator()) {
-            logger.error("Only locator segments can be used for assignments.");
+            error("Only locator segments can be used for assignments.");
             return;
         }
 
@@ -207,7 +206,7 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
     public String getAssignment(String train) {
         return assignments.get(train);
     }
-
+    
     @Override
     public boolean requestAccessTo(String train, String fromTrack, String toTrack) {
         info("{} requests access {} -> {}", train, fromTrack, toTrack);
@@ -224,20 +223,18 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
                     // check if switch is ok
                     Optional<SwitchHandler<Object>> optSwitch = getSwitch(fromTrack, toTrack);
                     if (!optSwitch.isPresent()) {
-                        logger.error("No switch between " + fromTrack + " and " + toTrack);
+                        error("No switch between " + fromTrack + " and " + toTrack);
                     } else {
                         SwitchHandler<Object> switchHandler = optSwitch.get();
                         if (shouldSwitch(switchHandler, fromTrack, toTrack)) {
                             doSwitch(switchHandler.segment.id, !switchHandler.toAlternate);
-                            try {
-                                Thread.sleep(3000);
-                            } catch (InterruptedException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
+                            sleep(3000);
                         } else {
                             // set green signal
-                            greenSignal(getSignal(fromTrack));
+                            if (!greenSignal(getSignal(fromTrack))) {
+                                sleep(1000);
+                            }
+
                             // now grant the access
                             granted = true;
                         }
@@ -262,12 +259,18 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
     }
 
     // set the signal to green for 10 seconds
-    private void greenSignal(Optional<SignalHandler<Object>> signal) {
-        if (signal.isPresent()) {
-            setSignal(signal.get().segment.id, Color.GREEN);
-            scheduler.after(() -> setSignal(signal.get().segment.id, Color.YELLOW), 10000);
-            scheduler.after(() -> setSignal(signal.get().segment.id, Color.RED), 15000);
+    private boolean greenSignal(Optional<SignalHandler<Object>> optSignal) {
+        boolean alreadyGreen = false;
+        
+        if (optSignal.isPresent()) {
+            SignalHandler<Object> signal = optSignal.get();
+            alreadyGreen = (signal.color.equals(Color.GREEN));
+            setSignal(signal.segment.id, Color.GREEN);
+            scheduler.after(() -> setSignal(signal.segment.id, Color.YELLOW), 10000);
+            scheduler.after(() -> setSignal(signal.segment.id, Color.RED), 15000);
         }
+
+        return alreadyGreen;
     }
 
     // checks whether the switch is in the right state to go from fromTrack to
@@ -367,6 +370,8 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
             throw new IllegalArgumentException("Unknown segment: " + segment);
         }
 
+        info("Located {} @ {}", train, segment);
+
         if (handler.isLocator()) {
             Locator locator = tracks.getHandler(Locator.class, segment);
             locator.locatedAt(rfid);
@@ -462,8 +467,19 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
         return rfid2Name.get(rfid);
     }
 
+    private void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+        }
+    }
+
+    private static void error(String fmt, Object... args) {
+        System.err.printf("TrackMgr: " + fmt.replaceAll("\\{}", "%s") + "\n", args);
+        logger.error(fmt,args);
+    }
+
     private static void info(String fmt, Object... args) {
         System.out.printf("TrackMgr: " + fmt.replaceAll("\\{}", "%s") + "\n", args);
-        logger.info(fmt, args);
     }
 }
