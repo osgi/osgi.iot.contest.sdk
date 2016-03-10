@@ -160,19 +160,31 @@ public class LegoRC extends ICAdapter<LegoPowerFunctions, Wave> implements
         value = Math.min(1, value);
         int vint = (int) Math.round(value * 7) & 0xF;
 
-        if (index == 0) {  // only channel A == move()
+        if (index == 0) {  // only debug channel A == move()
             System.out.printf("%s.%c speed=%d (%.0f%%)\n",
                     getName(), (index == 0 ? 'A' : 'B'), vint, value * 100);
         }
 
+        
+        if (vint == 0) {
+            // send brake, then float
+            send(8, index, singleOutputMode);
+        }
+
+        send(vint, index, singleOutputMode);
+    }
+    
+    void send(int vint, int index, int mode) throws Exception {
         lock.lock();
         try {
             values[index] = vint;
-            int data = ADDRESS | (channel << 12) | singleOutputMode | (vint << 4);
+            int data = ADDRESS | (channel << 12) | mode | (vint << 4);
             sendword(data);
         } finally {
             lock.unlock();
         }
+
+
     }
 
     public void setCircuitBoard(CircuitBoard cb) {
