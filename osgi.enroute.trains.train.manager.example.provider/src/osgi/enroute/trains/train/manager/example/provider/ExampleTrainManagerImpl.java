@@ -109,6 +109,7 @@ public class ExampleTrainManagerImpl {
 
         private String currentAssignment = null;
         private String currentLocation = null;
+        private String currentAccess = null;
         private LinkedList<SegmentHandler<Object>> route = null;
 
         private void abort() {
@@ -288,7 +289,7 @@ public class ExampleTrainManagerImpl {
             toTrack = nextLocator.get().getTrack();
 
             // if we have to go to other track, request access
-            if (!fromTrack.equals(toTrack)) {
+            if (!fromTrack.equals(toTrack) && !toTrack.equals(currentAccess)) {
                 info("stop and request access to track<{}> from <{}>", toTrack, currentLocation);
                 move(0);
 
@@ -299,6 +300,7 @@ public class ExampleTrainManagerImpl {
                     granted = requestAccess(fromTrack, toTrack);
 
                     if (!granted) {
+                        // allow mgmt loop to process other events
                         // return true;
                     }
                 }
@@ -320,6 +322,8 @@ public class ExampleTrainManagerImpl {
             }
 
             info("access is {}", granted ? "granted" : "blocked");
+            currentAccess = (granted ? toTrack : null);
+
             return granted;
         }
 
