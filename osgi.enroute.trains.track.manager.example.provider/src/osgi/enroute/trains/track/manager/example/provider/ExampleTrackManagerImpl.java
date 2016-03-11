@@ -51,16 +51,22 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
     static Logger logger = LoggerFactory.getLogger(ExampleTrackManagerImpl.class);
     static Random random = new Random();
 
-    private Map<String, String> rfid2Name = new HashMap<String, String>();
-    private Map<String, String> name2Rfid = new HashMap<String, String>();
-    private List<Observation> observations = new ArrayList<Observation>();
+    private Map<String, String> rfid2Name = new HashMap<>();
+    private Map<String, String> name2Rfid = new HashMap<>();
+    private List<Observation> observations = new ArrayList<>();
 
     // train assignments train->segment
-    private Map<String, String> assignments = new HashMap<String, String>();
+    private Map<String, String> assignments = new HashMap<>();
+
     // track access track->train
-    private Map<String, String> access = new HashMap<String, String>();
+    private Map<String, String> access = new HashMap<>();
+
+    // last track access train->track
+    private Map<String, String> lastAccess = new HashMap<>();
+
     // blocked segments
-    private Set<String> blocked = new HashSet<String>();
+    private Set<String> blocked = new HashSet<>();
+
     private volatile boolean quit = false;
 
     static final int TIMEOUT = 60000;
@@ -206,7 +212,7 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
     public String getAssignment(String train) {
         return assignments.get(train);
     }
-    
+
     @Override
     public boolean requestAccessTo(String train, String fromTrack, String toTrack) {
         info("{} requests access {} -> {}", train, fromTrack, toTrack);
@@ -215,10 +221,13 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
 
         while (!granted && System.currentTimeMillis() - start < TIMEOUT) {
             synchronized (access) {
+                lastAccess.remove(train);
+
                 if (!isBlocked(toTrack)
                         && (access.get(toTrack) == null || access.get(toTrack).equals(train))) {
                     // assign track to this train
                     access.put(toTrack, train);
+                    lastAccess.put(train, toTrack);
 
                     // check if switch is ok
                     Optional<SwitchHandler<Object>> optSwitch = getSwitch(fromTrack, toTrack);
@@ -261,7 +270,7 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
     // set the signal to green for 10 seconds
     private boolean greenSignal(Optional<SignalHandler<Object>> optSignal) {
         boolean alreadyGreen = false;
-        
+
         if (optSignal.isPresent()) {
             SignalHandler<Object> signal = optSignal.get();
             alreadyGreen = (signal.color.equals(Color.GREEN));
@@ -335,17 +344,19 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
                 .findFirst();
     }
 
-    private void releasePreviousTrack(String train, String track) {
-        // info("releasePreviousTrack: {} {}", train, track);
+    private void releaseOtherTracks(String train, String track) {
         synchronized (access) {
-            // remove the previous track of the train currently at @track to
-            // release from access
-            Optional<String> previous = access.entrySet().stream()
+            String lastTrack = lastAccess.get(train);
+
+            List<String> tracks = access.entrySet().stream()
                     .filter(e -> e.getValue().equals(train))
                     .filter(e -> !e.getKey().equals(track))
-                    .map(e -> e.getKey()).findFirst();
-            if (previous.isPresent()) {
-                access.remove(previous.get());
+                    .filter(e -> !e.getKey().equals(lastTrack))
+                    .map(e -> e.getKey()).collect(Collectors.toList());
+
+            if (!tracks.isEmpty()) {
+                info("releasing: tracks<{}> from train<{}>", tracks, train);
+                tracks.forEach(t -> access.remove(t));
                 access.notifyAll();
             }
         }
@@ -375,7 +386,6 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
         if (handler.isLocator()) {
             Locator locator = tracks.getHandler(Locator.class, segment);
             locator.locatedAt(rfid);
-            releasePreviousTrack(train, handler.getTrack());
         } else {
             Observation observation = new Observation();
             observation.type = Observation.Type.LOCATED;
@@ -383,6 +393,21 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
             observation.train = train;
             observation(observation);
         }
+
+        String track = handler.getTrack();
+
+        synchronized (access) {
+            String trainForTrack = access.get(track);
+            if (trainForTrack == null) {
+                info("initial access for train<{}> to track<{}>", train, track);
+                access.put(track, train);
+            }
+            else if (!trainForTrack.equals(train)) {
+                error("train<{}> doesn't have access to track<{}>", train, track);
+            }
+        }
+
+        releaseOtherTracks(train, track);
     }
 
     @Override
@@ -476,7 +501,7 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
 
     private static void error(String fmt, Object... args) {
         System.err.printf("TrackMgr: " + fmt.replaceAll("\\{}", "%s") + "\n", args);
-        logger.error(fmt,args);
+        logger.error(fmt, args);
     }
 
     private static void info(String fmt, Object... args) {
