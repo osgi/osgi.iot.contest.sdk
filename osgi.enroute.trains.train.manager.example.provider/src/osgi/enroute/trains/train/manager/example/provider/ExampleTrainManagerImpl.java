@@ -59,7 +59,7 @@ public class ExampleTrainManagerImpl {
     private String name;
     private String rfid;
     private int speed;
-    private int move = 0;
+    private int lastMove = 0;
 
     private Thread mgmtThread;
 
@@ -89,20 +89,20 @@ public class ExampleTrainManagerImpl {
         } catch (InterruptedException e) {
         }
         // stop when deactivated
-        move(0);
-        // turn lights off
-        trainCtrl.light(false);
+        stop();
     }
-    
-    private void move(int speed) {
-        if (move != speed || speed == 0) {
-            info("move({})", speed);
-            move = speed;
-            trainCtrl.move(speed);
+
+    private void move(int moveSpeed) {
+        if (lastMove != moveSpeed || moveSpeed == 0) {
+            info("move({})", moveSpeed);
+            lastMove = moveSpeed;
+            trainCtrl.move(moveSpeed);
         }
-        else {
-            info("move({}) - ignored", speed);
-        }
+    }
+
+    private void stop() {
+        move(0);
+        trainCtrl.light(false);
     }
 
     private class TrainMgmtLoop implements Runnable {
@@ -110,6 +110,13 @@ public class ExampleTrainManagerImpl {
         private String currentAssignment = null;
         private String currentLocation = null;
         private LinkedList<SegmentHandler<Object>> route = null;
+
+        private void abort() {
+            trainCtrl.move(0);
+            trainCtrl.light(false);
+            currentAssignment = null;
+            route = null;
+        }
 
         @Override
         public void run() {
@@ -125,8 +132,7 @@ public class ExampleTrainManagerImpl {
                 info("disgard old observations: last: {}", lastObs);
             }
 
-            move(0);
-            trainCtrl.light(false);
+            stop();
 
             while (isActive()) {
 
@@ -179,16 +185,13 @@ public class ExampleTrainManagerImpl {
                         // stop when assignment reached
                         if (currentAssignment == null) {
                             info("Waiting for an assignment");
-                            move(0);
-                        }
-                        else if (currentAssignment.equals(currentLocation)) {
+                            stop();
+                        } else if (currentAssignment.equals(currentLocation)) {
                             info("Reached assignment<{}>", currentAssignment);
                             currentAssignment = null;
-                            move(0);
-                            trainCtrl.light(false);
+                            stop();
                             blink(3);
-                        }
-                        else {
+                        } else {
                             blocked = followRoute();
                         }
 
@@ -236,55 +239,67 @@ public class ExampleTrainManagerImpl {
 
             trainCtrl.light(true);
 
-            boolean found = false;
-            for (SegmentHandler<Object> s : route) {
-                if (s.segment.id.equals(currentLocation)) {
-                    found = true;
-                    break;
-                }
+            Optional<SegmentHandler<Object>> mySegment = route.stream()
+                    .filter(sh -> sh.segment.id.equals(currentLocation))
+                    .findFirst();
+
+            if (!mySegment.isPresent()) {
+                error("location<{}> is not on route. stop.", currentLocation);
+                abort();
+                return false;
             }
 
-            if (found) {
-                // update the remaining part of the current route
-                while (route.size() > 0 && !route.getFirst().segment.id.equals(currentLocation)) {
-                    route.removeFirst();
+            Optional<SegmentHandler<Object>> nextLocator;
+            String fromTrack;
+            String toTrack;
+
+            // update the remaining part of the current route
+            while (route.size() > 0 && !route.getFirst().segment.id.equals(currentLocation)) {
+                SegmentHandler<Object> removed = route.removeFirst();
+                if (removed.isLocator()) {
+                    info("eek! missed locator <{}>", removed.segment.id);
+                    nextLocator = route.stream().filter(sh -> sh.isLocator()).findFirst();
+
+                    if (nextLocator.isPresent()) {
+                        fromTrack = removed.getTrack();
+                        toTrack = nextLocator.get().getTrack();
+                        if (!fromTrack.equals(toTrack)) {
+                            info("retrospectively request access to <{}> from <{}>", toTrack, fromTrack);
+                            move(0);
+                            requestAccess(fromTrack, toTrack);
+                        }
+                    }
                 }
             }
 
             // figure out where to go to next
-            String fromTrack = route.removeFirst().getTrack();
+            fromTrack = route.removeFirst().getTrack();
 
             // check if we have to go to a new track before we have a new
             // Locator
-            Optional<SegmentHandler<Object>> nextLocator = route.stream().filter(sh -> sh.isLocator()).findFirst();
+            nextLocator = route.stream().filter(sh -> sh.isLocator()).findFirst();
+
             if (!nextLocator.isPresent()) {
-                info("no locator to go to, stop now");
-                move(0);
-                trainCtrl.light(false);
+                error("no locator to go to, stop now");
+                abort();
                 return false;
             }
 
-            String toTrack = nextLocator.get().getTrack();
+            toTrack = nextLocator.get().getTrack();
 
             // if we have to go to other track, request access
             if (!fromTrack.equals(toTrack)) {
                 info("stop and request access to track<{}> from <{}>", toTrack, currentLocation);
                 move(0);
 
-                boolean access = false;
-                // simply keep on trying until access is given
-                while (!access && isActive()) {
-                    try {
-                        access = trackManager.requestAccessTo(name, fromTrack, toTrack);
-                    } catch (Exception e) {
-                        error("request access failed: " + e);
-                        currentLocation = null;
-                        move(0);
-                    }
+                boolean granted = false;
 
-                    info("access is {}", access ? "granted" : "blocked");
-                    if (!access) {
-//                        return true;
+                // simply keep on trying until access is given
+                while (!granted && isActive()) {
+                    granted = requestAccess(fromTrack, toTrack);
+
+                    if (!granted) {
+                        // return true;
                     }
                 }
             }
@@ -292,6 +307,20 @@ public class ExampleTrainManagerImpl {
             // just go forward
             move(speed);
             return false;
+        }
+
+        private boolean requestAccess(String fromTrack, String toTrack) {
+            boolean granted = false;
+
+            try {
+                granted = trackManager.requestAccessTo(name, fromTrack, toTrack);
+            } catch (Exception e) {
+                error("request access failed: " + e);
+                abort();
+            }
+
+            info("access is {}", granted ? "granted" : "blocked");
+            return granted;
         }
 
         private boolean isActive() {
