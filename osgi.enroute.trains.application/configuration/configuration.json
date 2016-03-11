@@ -6,14 +6,14 @@
         "play.speed":0.5
     },
     {
-        "service.pid": "osgi1",
+        "service.pid": "Train-1",
         "service.factoryPid":"osgi.enroute.trains.train.manager",
         "name": "White",
         "rfid": "OSGi1",
         "TrainController.target" : "(channel=CH1)"
     },
     {
-        "service.pid": "osgi2",
+        "service.pid": "Train-2",
         "service.factoryPid":"osgi.enroute.trains.train.manager",
         "name": "Red",
         "rfid": "OSGi2",
@@ -46,10 +46,10 @@
             "A19        : CURVED     : 0      : -1     : A19_L",
             "A19_L      : LOCATOR    : 1      : 2      : A20",
             "#A20        : CURVED     : 45      : -1     : A20_S",
-            "A20        : CURVED     : 0      : -1     : A20_S",
+            "A20        : CURVED     : 45      : -1     : A20_S",
             "A20_S      : SIGNAL     : 0      : 3      : A21",
             "#A21        : STRAIGHT   : 52      : -1     : X01",
-            "A21        : STRAIGHT   : 0      : -1     : X01",
+            "A21        : STRAIGHT   : 52      : -1     : X01",
 
             "X01        : SWITCH     : 0      : 4      : B00,C00",
 
@@ -74,9 +74,9 @@
             "B18        : CURVED     : 0      : -1     : B18_L",
             "B18_L      : LOCATOR    : 7      : 6      : B19",
             "#B19        : CURVED     : 29      : -1     : B20",
-            "B19        : CURVED     : 0      : -1     : B20",
+            "B19        : CURVED     : 29      : -1     : B20",
             "#B20        : CURVED     : 31      : -1     : B20_S",
-            "B20        : CURVED     : 0      : -1     : B20_S",
+            "B20        : CURVED     : 31      : -1     : B20_S",
             "B20_S      : SIGNAL     : 0      : 7      : B21",
             "B21        : STRAIGHT   : 0      : -1     : X04",
 
@@ -87,10 +87,10 @@
             "C04        : CURVED     : 0      : -1     : C04_L",
             "C04_L      : LOCATOR    : 3      : 8      : C05",
             "#C05        : CURVED     : 53      : -1     : C05_S",
-            "C05        : CURVED     : 0      : -1     : C05_S",
+            "C05        : CURVED     : 53      : -1     : C05_S",
             "C05_S      : SIGNAL     : 0      : 9      : C06",
             "#C06        : STRAIGHT   : 54      : -1     : X02",
-            "C06        : STRAIGHT   : 0      : -1     : X02",
+            "C06        : STRAIGHT   : 54      : -1     : X02",
 
             "X02        : SWITCH     : 0      : 10     : E00,D00",
 
@@ -104,9 +104,9 @@
             "E07        : STRAIGHT   : 0      : -1     : E07_L",
             "E07_L      : LOCATOR    : 4      : 11     : E08",
             "#E08        : STRAIGHT   : 68      : -1     : E09",
-            "E08        : STRAIGHT   : 0      : -1     : E09",
+            "E08        : STRAIGHT   : 68      : -1     : E09",
             "#E09        : STRAIGHT   : 70      : -1     : E09_S",
-            "E09        : STRAIGHT   : 0      : -1     : E09_S",
+            "E09        : STRAIGHT   : 70      : -1     : E09_S",
             "E09_S      : SIGNAL     : 0      : 12     : E10",
             "E10        : STRAIGHT   : 0      : -1     : X03",
 
@@ -120,9 +120,9 @@
             "D07        : STRAIGHT   : 0      : -1     : D07_L",
             "D07_L      : LOCATOR    : 2      : 13     : D08",
             "#D08        : STRAIGHT   : 82      : -1     : D09",
-            "D08        : STRAIGHT   : 0      : -1     : D09",
+            "D08        : STRAIGHT   : 82      : -1     : D09",
             "#D09        : CURVED     : 65      : -1     : D09_S",
-            "D09        : CURVED     : 0      : -1     : D09_S",
+            "D09        : CURVED     : 65      : -1     : D09_S",
             "D09_S      : SIGNAL     : 0      : 14     : D10",
             "D10        : CURVED     : 0      : -1     : X03!",
 
@@ -133,7 +133,7 @@
             "F02        : CURVED     : 59      : -1     : F02_L",
             "F02_L      : LOCATOR    : 5      : 16     : F03",
             "#F03        : CURVED     : 61      : -1     : F03_S",
-            "F03        : CURVED     : 0      : -1     : F03_S",
+            "F03        : CURVED     : 61      : -1     : F03_S",
             "F03_S      : SIGNAL     : 0      : 17     : F04",
             "F04        : CURVED     : 0      : -1     : X04!",
 
