@@ -4,4 +4,4 @@ OSGi IoT Trains Demo using enRoute</h1>
 
 This is the repository for the OSGi IoT Trains SDK. It contains the SDK for this demo: controlling a train or a track layout.
 
-To find out about the architecture of this demo please visit the home page. 
+To find out about the architecture of this demo please visit the home page at  http://enroute.osgi.org/trains/200-architecture.html
