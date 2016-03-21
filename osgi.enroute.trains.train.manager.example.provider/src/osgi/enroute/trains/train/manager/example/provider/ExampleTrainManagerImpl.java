@@ -1,5 +1,6 @@
 package osgi.enroute.trains.train.manager.example.provider;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -9,6 +10,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
@@ -45,9 +48,19 @@ public class ExampleTrainManagerImpl {
 
     static Logger logger = LoggerFactory.getLogger(ExampleTrainManagerImpl.class);
 
+    List<TrainController> trainControllers = new ArrayList<>();
+
     // TrainController.target is set in config
-    @Reference(name = "TrainController")
-    private TrainController trainCtrl;
+    @Reference(name = "TrainController",
+            cardinality = ReferenceCardinality.AT_LEAST_ONE,
+            policy = ReferencePolicy.DYNAMIC)
+    void addTrainController(TrainController trainCtrl) {
+        trainControllers.add(trainCtrl);
+    }
+
+    void removeTrainController(TrainController trainCtrl) {
+        trainControllers.remove(trainCtrl);
+    }
 
     @Reference
     private TrackForTrain trackManager;
@@ -96,13 +109,18 @@ public class ExampleTrainManagerImpl {
         if (lastMove != moveSpeed || moveSpeed == 0) {
             info("move({})", moveSpeed);
             lastMove = moveSpeed;
-            trainCtrl.move(moveSpeed);
+
+            trainControllers.forEach(c -> c.move(moveSpeed));
         }
     }
 
     private void stop() {
         move(0);
-        trainCtrl.light(false);
+        light(false);
+    }
+
+    private void light(boolean on) {
+        trainControllers.forEach(c -> c.light(on));
     }
 
     private class TrainMgmtLoop implements Runnable {
@@ -113,8 +131,7 @@ public class ExampleTrainManagerImpl {
         private LinkedList<SegmentHandler<Object>> route = null;
 
         private void abort() {
-            trainCtrl.move(0);
-            trainCtrl.light(false);
+            stop();
             currentAssignment = null;
             route = null;
         }
@@ -212,10 +229,10 @@ public class ExampleTrainManagerImpl {
         }
 
         private void blink(int n) {
-            trainCtrl.light(false);
+            light(false);
             if (n > 0) {
                 scheduler.after(() -> {
-                    trainCtrl.light(true);
+                    light(true);
                     scheduler.after(() -> blink(n - 1), 500);
                 }, 500);
             }
@@ -238,7 +255,7 @@ public class ExampleTrainManagerImpl {
             if (route == null || route.isEmpty())
                 return false;
 
-            trainCtrl.light(true);
+            light(true);
 
             Optional<SegmentHandler<Object>> mySegment = route.stream()
                     .filter(sh -> sh.segment.id.equals(currentLocation))
