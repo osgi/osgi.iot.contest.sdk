@@ -24,10 +24,6 @@ public class TrainControllerImpl extends LegoRC implements TrainController {
 	@interface Config {
 		Channel channel() default Channel.CH1;
 
-		String train_rfid();
-
-		String train_name();
-
 		int divider() default 100;
 	}
 
@@ -50,8 +46,7 @@ public class TrainControllerImpl extends LegoRC implements TrainController {
 
 	@Override
 	public String toString() {
-		return "TrainController[channel=" + config.channel() + ", rfid=" + config.train_rfid() + ", name="
-				+ config.train_name() + ", divider=" + config.divider() + "]";
+		return "TrainController[channel=" + config.channel() + ", divider=" + config.divider() + "]";
 	}
 
 	@Override
