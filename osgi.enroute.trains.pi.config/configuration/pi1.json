@@ -1,17 +1,16 @@
 [
+
 	{
         "service.pid":"Train-1",
         "service.factoryPid": "osgi.enroute.trains.hw.train",
-        "channel":"CH1",
-		"train.rfid":"OSGi1",
-		"train.name":"White"
+        "channel":"CH1"
 	},{
         "service.pid":"Train-2",
         "service.factoryPid": "osgi.enroute.trains.hw.train",
-        "channel":"CH2",
-		"train.rfid":"OSGi2",
-		"train.name":"Red"
-	},{
+        "channel":"CH2"
+	},
+
+	{
 		"service.pid":"Controller-3",
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",
 		"controller.id":3,
