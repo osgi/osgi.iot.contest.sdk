@@ -8,10 +8,11 @@ Bundle-Description: \
 	
 Private-Package: osgi.enroute.trains.location.provider
 	
+x: edc-client,\
+
 -buildpath: \
-	edc-client,\
 	osgi.enroute.base.api,\
-	org.eclipse.paho.mqtt-client,\
+	org.eclipse.paho.client.mqttv3;version="[1.0.2,2.0.0)",\
 	osgi.enroute.trains.api;version=latest
 	
 -includeresource: \

@@ -6,12 +6,6 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
@@ -23,6 +17,15 @@ import org.osgi.util.promise.Promise;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.eurotech.cloud.client.EdcCallbackHandler;
+import com.eurotech.cloud.client.EdcClientException;
+import com.eurotech.cloud.client.EdcClientFactory;
+import com.eurotech.cloud.client.EdcCloudClient;
+import com.eurotech.cloud.client.EdcConfiguration;
+import com.eurotech.cloud.client.EdcConfigurationFactory;
+import com.eurotech.cloud.client.EdcDeviceProfile;
+import com.eurotech.cloud.client.EdcDeviceProfileFactory;
+import com.eurotech.cloud.message.EdcPayload;
 
 import osgi.enroute.trains.cloud.api.Segment;
 import osgi.enroute.trains.cloud.api.TrackForSegment;
@@ -40,9 +43,12 @@ public class TrainLocationClient implements TrainLocator {
     private static final String USERNAME = "osgiTrain";
     private static final String PASSWORD = "osg!TrainDem0";
 
+    private static final String ASSET_ID = "myAssetId";
     private static final String CLIENT_ID = "TrainLocator";
+    private static final double LATITUDE = 52.3188909; // Hanover
+    private static final double LONGITUDE = 9.8009607; // Hanover
 
-    private MqttClient mqttClient = null;
+    private EdcCloudClient edcCloudClient = null;
     private Map<String, Integer> tag2code = new HashMap<>();
     private Map<Integer, String> code2segment = new HashMap<>();
     private Deferred<String> nextLocation = new Deferred<String>();
@@ -62,29 +68,40 @@ public class TrainLocationClient implements TrainLocator {
 
         String accountName = getOrDefault.apply(config.accountName(), ACCOUNT_NAME);
         String brokerUrl = getOrDefault.apply(config.brokerUrl(), BROKER_URL);
-        
-        // paho mqtt client impl uses different URL schemes to EDC client
-        // user should not be aware of impl, so map schemes
-        brokerUrl = brokerUrl.replaceFirst("^mqtt:", "tcp:").replaceFirst("^mqtts:", "ssl:");
-        
         String username = getOrDefault.apply(config.username(), USERNAME);
         String password = getOrDefault.apply(config.password(), PASSWORD);
 
-        MqttConnectOptions options = new MqttConnectOptions();
-        options.setUserName(username);
-        options.setPassword(password.toCharArray());
+        EdcConfigurationFactory confFact = EdcConfigurationFactory.getInstance();
+        EdcConfiguration conf = confFact.newEdcConfiguration(
+                accountName, ASSET_ID, brokerUrl, CLIENT_ID, username, password);
+
+        EdcDeviceProfileFactory profFactory = EdcDeviceProfileFactory.getInstance();
+        EdcDeviceProfile prof = profFactory.newEdcDeviceProfile();
+        prof.setDisplayName("Train Locator Client");
+        prof.setModelName("JavaClient");
+
+        // set GPS position in device profile - this is sent only once
+        prof.setLongitude(LONGITUDE);
+        prof.setLatitude(LATITUDE);
 
         try {
+            //
             // Connect and start the session
-            info("Connecting to MQTT broker <{}>", brokerUrl);
-            mqttClient = new MqttClient(brokerUrl, CLIENT_ID);
-            mqttClient.setCallback(new MyCallbackHandler());
-            mqttClient.connect(options);
+            //
+            edcCloudClient = EdcClientFactory.newInstance(conf, prof, new MyCallbackHandler());
+            edcCloudClient.startSession();
+            info("Connected to MQTT broker <{}>", brokerUrl);
 
+            //
             // Subscribe
-            info("Subscribing to topic <{}>", "+/TrainDemo/#");
-            mqttClient.subscribe(new String[] {"+", "TrainDemo/#"});
-        } catch (MqttException e) {
+            //
+            // info("Subscribe to data topics of TrainDemo assets in the
+            // account");
+            edcCloudClient.subscribe("+", "TrainDemo/#", 1);
+
+            // info("Subscribe to control topics of all assets in the account");
+            // edcCloudClient.controlSubscribe("+", "#", 1);
+        } catch (EdcClientException e) {
             error(e.toString());
             throw new RuntimeException(e);
         }
@@ -97,8 +114,9 @@ public class TrainLocationClient implements TrainLocator {
     void deactivate() {
         info("Terminating MQTT client");
         try {
-            mqttClient.disconnect();
-        } catch (MqttException e) {
+            edcCloudClient.stopSession();
+            edcCloudClient.terminate();
+        } catch (EdcClientException e) {
             throw new RuntimeException(e);
         }
     }
@@ -199,16 +217,13 @@ public class TrainLocationClient implements TrainLocator {
     /**
      * MQTT Callback class
      */
-    class MyCallbackHandler implements MqttCallback {
+    class MyCallbackHandler implements EdcCallbackHandler {
         // display data messages received from broker
         @Override
-        public void messageArrived(String topic, MqttMessage msg) throws Exception {
-            info("messageArrived on topic=<{}>: {}", topic, msg);
+        public void publishArrived(String assetId, String topic, EdcPayload msg, int qos, boolean retain) {
 
-            byte[] payload = msg.getPayload();
-
-            String trainId = String.valueOf(getMetric("train", payload));
-            Object location = getMetric("location", payload);
+            String trainId = String.valueOf(msg.getMetric("train"));
+            Object location = msg.getMetric("location");
 
             if (location != null) {
                 String tag = location.toString();
@@ -223,28 +238,57 @@ public class TrainLocationClient implements TrainLocator {
                         trigger(trainId, segment);
                     }
                 }
-            } else if (getMetric("connection", payload) != null) {
-                info("trainId<{}>: {}", trainId, getMetric("connection", payload));
+            } else if (msg.getMetric("connection") != null) {
+                info("trainId<{}>: {}", trainId, msg.getMetric("connection"));
             } else {
-                info("Data publish arrived on semantic topic: " + topic);
+                info("Data publish arrived on semantic topic: " + topic + ", qos: " + qos + ", assetId: " + assetId);
+            }
+        }
+
+        // display control messages received from broker
+        @Override
+        public void controlArrived(String assetId, String topic, EdcPayload msg, int qos, boolean retain) {
+            info("Control publish arrived on semantic topic: " + topic + " , qos: " + qos);
+            // Print all the metrics
+            for (String name : msg.metricNames()) {
+                info(name + ":" + msg.getMetric(name));
             }
         }
 
         @Override
-        public void connectionLost(Throwable t) {
-            info("MQTT client connection lost: " + t);
+        public void connectionLost() {
+            info("EDC client connection lost");
         }
 
         @Override
-        public void deliveryComplete(IMqttDeliveryToken token) {
-            info("MQTT client delivery complete: " + token);
-        }
-        
-        
-        String getMetric(String metric, byte[] payload) {
-            return null;
+        public void connectionRestored() {
+            info("EDC client reconnected");
         }
 
+        @Override
+        public void published(int messageId) {
+            // info("Publish message ID: " + messageId + " confirmed");
+        }
+
+        @Override
+        public void subscribed(int messageId) {
+            // info("Subscribe message ID: " + messageId + " confirmed");
+        }
+
+        @Override
+        public void unsubscribed(int messageId) {
+            // info("Unsubscribe message ID: " + messageId + " confirmed");
+        }
+
+        @Override
+        public void controlArrived(String assetId, String topic, byte[] payload, int qos, boolean retain) {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public void publishArrived(String assetId, String topic, byte[] payload, int qos, boolean retain) {
+            // TODO Auto-generated method stub
+        }
     }
 
 }
