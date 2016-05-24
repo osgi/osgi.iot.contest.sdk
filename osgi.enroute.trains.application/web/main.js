@@ -108,6 +108,7 @@
 						trains.destinations.push( i );
 					}
 				}
+				trains.destinations.sort();
 			});
 			
 			trains.ep.getTrains().then( function(t) {

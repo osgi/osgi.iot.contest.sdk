@@ -80,7 +80,7 @@ public class Command extends ICAdapter<Void, Analog>{
 		data &= ~0xf;
 		data |= check & 0xf;
 
-		System.out.printf("send %04x\n", data);
+//		System.out.printf("send %04x\n", data);
 
 		count = send_start(pulses);
 		for (i = 0; i < 16; i++) {

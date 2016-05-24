@@ -1,9 +1,8 @@
--runvm: -Dposh.home=${user.home}
-
 
 # enRoute Configurer substitutes these properties in configuration.json
-com.paremus.cluster=IOT_DEMO
-com.paremus.peers=192.168.99.1
+-runproperties.rsa: \
+	com.paremus.cluster=IOT_DEMO,\
+	com.paremus.peers=192.168.99.10
 
 -runsystempackages.rsa:		sun.misc
 

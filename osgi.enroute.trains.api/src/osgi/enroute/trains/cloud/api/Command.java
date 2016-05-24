@@ -15,5 +15,6 @@ public class Command extends DTO {
 	public Type type;
 	public String segment;
 	public Color signal;
+	public Boolean alternate;
 	
 }
