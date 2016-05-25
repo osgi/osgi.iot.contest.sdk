@@ -28,8 +28,8 @@
             "A01        : CURVED     : 33      : -1     : A02",
             "A02        : CURVED     : 35      : -1     : A03",
             "A03        : CURVED     : 37      : -1     : A04",
-            "A04        : CURVED     : 39      : -1     : A05",
-            "A05        : STRAIGHT   : 28      : -1     : X05",
+            "A04        : CURVED     : 39      : -1     : A99_R",
+            "A99_R      : STRAIGHT   : 28      : -1     : X05",
 
             "X05        : SWITCH     : 0       : 19     : G00,H00",
 

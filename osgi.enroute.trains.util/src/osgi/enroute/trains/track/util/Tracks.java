@@ -37,6 +37,7 @@ import osgi.enroute.trains.cloud.api.TrackConfiguration;
  *            to layout or do something else
  */
 public class Tracks<T> {
+    static final String rootSegment = "A99_R";
 	final Map<String, SegmentHandler<T>> handlers = new HashMap<>();
 	final Map<String, Segment> segments = new HashMap<>();
 
@@ -153,7 +154,7 @@ public class Tracks<T> {
 		}
 
 		protected boolean isRoot() {
-			return segment.id.equals("A10");
+			return segment.id.equals(rootSegment);
 		}
 
 		/**
@@ -535,9 +536,9 @@ public class Tracks<T> {
 	}
 
 	public SegmentHandler<T> getRoot() {
-		SegmentHandler<T> root = getHandler("A10");
+		SegmentHandler<T> root = getHandler(rootSegment);
 		if (root == null)
-			throw new IllegalArgumentException("No root named A10");
+			throw new IllegalArgumentException("No root named: " + rootSegment);
 		return root;
 	}
 
