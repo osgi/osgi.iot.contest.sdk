@@ -12,7 +12,9 @@ Export-Package: \
 	osgi.enroute.trains.controller.api,\
 	osgi.enroute.trains.train.api,\
 	osgi.enroute.trains.hardware.api,\
-	osgi.enroute.trains.operator.api
+	osgi.enroute.trains.operator.api,\
+	osgi.enroute.trains.passenger.api,\
+	osgi.enroute.trains.stations.api
 
 
 Require-Capability: \

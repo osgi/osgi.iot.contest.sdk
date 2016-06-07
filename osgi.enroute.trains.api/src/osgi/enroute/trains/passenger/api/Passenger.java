@@ -1,6 +1,4 @@
-package osgi.enroute.trains.operator.api;
-
-import org.osgi.dto.DTO;
+package osgi.enroute.trains.passenger.api;
 
 /**
  * Represents a passenger traveling in a train or waiting in a station
@@ -8,20 +6,13 @@ import org.osgi.dto.DTO;
  * @author tverbele
  *
  */
-public class Passenger extends DTO {
+public class Passenger extends Person {
 
-	public String firstName;
-	public String lastName;
-	
-	// for "networking" applications?
-	public String company;
-	public String email;
-	
-	public PassengerStatistics statistics;
-	
 	// on which train the passenger is currently on?
 	public String onTrain = null;
 	// in which station the passenger is currently waiting?
 	public String inStation = null;
+	// passenger destination
+	public String destination = null;
 	
 }

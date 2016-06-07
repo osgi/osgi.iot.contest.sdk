@@ -1,4 +1,4 @@
-package osgi.enroute.trains.operator.api;
+package osgi.enroute.trains.passenger.api;
 
 import java.util.HashMap;
 import java.util.Map;

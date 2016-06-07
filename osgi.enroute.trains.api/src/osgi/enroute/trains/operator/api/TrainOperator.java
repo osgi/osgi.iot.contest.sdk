@@ -2,17 +2,17 @@ package osgi.enroute.trains.operator.api;
 
 import java.util.List;
 
-import org.osgi.util.promise.Promise;
+import osgi.enroute.trains.passenger.api.Passenger;
 
 /**
  * A Train Operator will manage his fleet of trains to visit a number of stations and hence transport people
  * 
- * Passengers can check in in a Station. Then the Train Operator will make sure they are picked
- * up by the next train and travel to the next train stop. 
+ * Passengers can check in in a station via the StationsManager. If an operator has a train arriving
+ * in a station it can pick up passengers by calling the board method of the StationManager. 
  * 
  * The Train Operator will also post Arrival and Departure events when trains arrive/depart in/from a station
  * 
- * The Train Operator is responsible for choosing the scheme in which trains visit stations. 
+ * The Train Operator is responsible for choosing the schedule in which trains visit stations. 
  * It uses the Command events to interact with the TrackManager 
  *  
  * @author tverbele
@@ -21,17 +21,16 @@ import org.osgi.util.promise.Promise;
 public interface TrainOperator {
 
 	/**
-	 * List all passengers of this operator
+	 * Get information about this train operator
 	 * @return
 	 */
-	List<Passenger> getPassengers();
-	
+	TrainOperatorInfo getInfo();
+
 	/**
-	 * List all passengers currently waiting in a station
-	 * @param station
+	 * List all trains of this operator
 	 * @return
 	 */
-	List<Passenger> getWaitingPassengers(String station);
+	List<String> getTrains();
 	
 	/**
 	 * List all passengers currently traveling on the train
@@ -47,16 +46,16 @@ public interface TrainOperator {
 	List<String> getStations();
 	
 	/**
-	 * A passenger checks in at a station and starts waiting for a train
-	 * 
-	 * The promise gets resolved when a train picks up the passenger. The promise 
-	 * is resolved with the id of the train
-	 * @param p
-	 * @param station
+	 * Get the schedule planned for a train
+	 * @param train
 	 * @return
 	 */
-	// TODO use a passenger ID instead?
-	Promise<String> checkIn(Passenger p, String station);
+	Schedule getSchedule(String train);
 	
-	
+	/**
+	 * Get schedules for all trains
+	 * @return
+	 */
+	List<Schedule> getSchedules();
+
 }
