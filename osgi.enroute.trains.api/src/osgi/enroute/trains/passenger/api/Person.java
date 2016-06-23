@@ -14,6 +14,4 @@ public class Person extends DTO {
 	public String email;
 	public String phone;
 	
-	public PassengerStatistics statistics;
-	
 }
