@@ -8,6 +8,7 @@ The existing architecture is described at  [enroute.osgi.org/trains/200-architec
 In November 2015, the original RFID readers did not work and we were forced to use micro-switches instead.
 
 For CeBIT 2016 we used a different RFID reader, which we mounted on the train.
+
 It uses bluetooth to transmit the RFID tag ids to a bluetooth reader (running on a Pi).
 
 #### Software changes
@@ -18,9 +19,23 @@ All changes have been made to a new **cebit** branch of the osgi.iot.contest.sdk
 **Going forward, we need to agree where future changes should be made.**
 
 
-Walt wrote a new bluetooth reader to run on the Pi (using facilities provided in Kura).
-This pairs with the bluetooth dongle on the train, receives and decodes each RFID tag id
-and publishes it to MQTT.
+We added a new bluetooth reader to run on the Pi. It is an OSGi Bundle that leverages the Kura Bluetooth and MQTT services. The bundle interfaces with a Bluetooth USB dongle on the Pi and pairs with the bluetooth dongle on the train.  It then receives and decodes each RFID tag id and publishes it to MQTT.
+
+The topics are created using the name of the train and the senor tagID
+TrainDemo/trainName/location/TagID – example TrainDemo/OSGi1/location/010E9CE7DB
+
+The attributes reported are:
+- Train Name (e.g. OSGi1, OSGi2)
+- time (time since last read)
+- location (e.g. tagID: 010E9CE7DB )
+
+The bundle also reports when it connects and disconnects from the Bluetooth on the train using the following topic:
+TrainDemo/trainName/connection – Example TrainDemo/OSGi1/connection
+
+Attribiutes reported are:
+- TrainID (e.g. OSGI1, OSGi2)
+- Connection (e.g. Connected or Disconnected)
+
 
 At CeBIT, we used Eurotech's Everywhere Device Cloud as the MQTT server, although we had a fallback of using a local MQTT server.
 
@@ -96,7 +111,7 @@ We left the original LOCATOR segment markers, as these are shown in the UI as de
 
 #### Deployment
 
-Walt's bluetooth bundle was deployed to kura/ESF from Eurotech's Everywhere Device Cloud.
+The bluetooth bundle was deployed to kura/ESF from Eurotech's Everywhere Device Cloud.
 
 The rest of the demo was deployed using bnd-exported jars, as it requires OSGi R6.
 The .bndrun files are all in the ``trains.application`` project.
