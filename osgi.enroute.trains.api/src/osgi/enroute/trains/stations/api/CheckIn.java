@@ -8,6 +8,7 @@ import org.osgi.dto.DTO;
 public class CheckIn extends DTO {
 	public final static String TOPIC = "osgi/trains/checkin";
 
+	public long timestamp = System.currentTimeMillis();
 	public String personId;
 	public String station;
 	
