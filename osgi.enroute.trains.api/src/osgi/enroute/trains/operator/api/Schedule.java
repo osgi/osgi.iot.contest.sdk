@@ -1,6 +1,5 @@
 package osgi.enroute.trains.operator.api;
 
-import java.util.Date;
 import java.util.List;
 
 import org.osgi.dto.DTO;
@@ -11,8 +10,6 @@ import org.osgi.dto.DTO;
 public class Schedule extends DTO {
 	
 	public String train;
-	public List<String> stations;
-	public List<Date> arrivalTimes;
-	public List<Date> departureTimes;
+	public List<ScheduleEntry> entries;
 	
 }
