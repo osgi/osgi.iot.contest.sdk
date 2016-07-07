@@ -19,6 +19,10 @@ public class Observation extends DTO {
 		 */
 		ASSIGNMENT, 
 		/**
+		 * Assignment reached
+		 */
+		ASSIGNMENT_REACHED,
+		/**
 		 * Signal changed color
 		 */
 		SIGNAL,

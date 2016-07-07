@@ -149,6 +149,16 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
         o.assignment = segmentId;
         observation(o);
     }
+    
+	@Override
+	public void assignmentReached(String train, String assignment) {
+		Observation o = new Observation();
+		o.time = System.currentTimeMillis();
+		o.type = Type.ASSIGNMENT_REACHED;
+		o.segment = assignment;
+		o.train = train;
+		observation(o);
+	}
 
     @Override
     public Map<String, Segment> getSegments() {
@@ -507,4 +517,5 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
     private static void info(String fmt, Object... args) {
         System.out.printf("TrackMgr: " + fmt.replaceAll("\\{}", "%s") + "\n", args);
     }
+
 }

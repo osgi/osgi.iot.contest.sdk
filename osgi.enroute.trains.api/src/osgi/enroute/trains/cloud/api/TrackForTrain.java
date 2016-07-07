@@ -21,6 +21,16 @@ public interface TrackForTrain extends TrackInfo {
 	boolean requestAccessTo(String train, String fromSegment, String toSegment);
 
 	/**
+	 * Notify a train has reached his assignment
+	 * 
+	 * @param train
+	 * 			the train id
+	 * @param assignment
+	 * 			the assignment that is reached
+	 */
+	void assignmentReached(String train, String assignment);
+	
+	/**
 	 * Tell the track about this train
 	 * 
 	 * @param name

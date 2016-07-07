@@ -17,6 +17,7 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import osgi.enroute.dto.api.DTOs;
 import osgi.enroute.scheduler.api.Scheduler;
 import osgi.enroute.trains.cloud.api.Observation;
 import osgi.enroute.trains.cloud.api.TrackForTrain;
@@ -209,6 +210,7 @@ public class ExampleTrainManagerImpl {
                             currentAssignment = null;
                             stop();
                             blink(3);
+        					trackManager.assignmentReached(name, currentAssignment);
                         } else {
                             blocked = followRoute();
                         }
