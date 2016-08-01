@@ -4,27 +4,15 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
-import osgi.enroute.trains.stations.api.CheckIn;
-import osgi.enroute.trains.stations.api.CheckOut;
+import osgi.enroute.trains.stations.api.StationObservation;
 
-@Component(property={"event.topics="+CheckIn.TOPIC,
-		"event.topics="+CheckOut.TOPIC})
+@Component(property={"event.topics="+StationObservation.TOPIC})
 public class PassengersLogger implements EventHandler {
 
 	@Override
 	public void handleEvent(Event event) {
-		try {
-			switch(event.getTopic()){
-			case CheckIn.TOPIC:
-				// TODO use Object Converter
-				System.out.println("Person "+event.getProperty("personId")+" checked in at "+event.getProperty("station"));
-				break;
-			case CheckOut.TOPIC:
-				// TODO use Object Converter
-				System.out.println("Person "+event.getProperty("personId")+" checked out at "+event.getProperty("station"));
-				break;
-			}
-		
+		try {			
+			System.out.println("Person "+event.getProperty("personId")+" "+event.getProperty("type").toString().toLowerCase().replace('_', ' ')+" at "+event.getProperty("station"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

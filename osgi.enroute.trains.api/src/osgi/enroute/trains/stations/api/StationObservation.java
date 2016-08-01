@@ -5,11 +5,18 @@ import org.osgi.dto.DTO;
 /**
  * Event class for notifying person check in at a station
  */
-public class CheckIn extends DTO {
-	public final static String TOPIC = "osgi/trains/checkin";
+public class StationObservation extends DTO {
+
+	public final static String TOPIC = "osgi/trains/station";
+
+	public enum Type {
+		CHECK_IN, CHECK_OUT
+	}
 
 	public long timestamp = System.currentTimeMillis();
-	public String personId;
+
+	public Type type;
 	public String station;
+	public String personId;
 	
 }

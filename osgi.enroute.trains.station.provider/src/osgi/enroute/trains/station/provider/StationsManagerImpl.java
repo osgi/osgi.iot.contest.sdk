@@ -21,9 +21,9 @@ import osgi.enroute.trains.operator.api.TrainOperator;
 import osgi.enroute.trains.passenger.api.Passenger;
 import osgi.enroute.trains.passenger.api.Person;
 import osgi.enroute.trains.passenger.api.PersonDatabase;
-import osgi.enroute.trains.stations.api.CheckIn;
-import osgi.enroute.trains.stations.api.CheckOut;
 import osgi.enroute.trains.stations.api.Station;
+import osgi.enroute.trains.stations.api.StationObservation;
+import osgi.enroute.trains.stations.api.StationObservation.Type;
 import osgi.enroute.trains.stations.api.StationsManager;
 
 /**
@@ -157,12 +157,13 @@ public class StationsManagerImpl implements StationsManager{
 	}
 	
 	private void checkIn(String personId, String station){
-		CheckIn checkIn = new CheckIn();
+		StationObservation checkIn = new StationObservation();
+		checkIn.type = Type.CHECK_IN;
 		checkIn.personId = personId;
 		checkIn.station = station;
 		
 		try {
-			Event event = new Event(CheckIn.TOPIC, dtos.asMap(checkIn));
+			Event event = new Event(StationObservation.TOPIC, dtos.asMap(checkIn));
 			ea.postEvent(event);
 		} catch(Exception e){
 			System.err.println("Error sending CheckIn Event: "+e.getMessage());
@@ -250,11 +251,12 @@ public class StationsManagerImpl implements StationsManager{
 	}
 	
 	private void checkOut(String personId, String station){
-		CheckOut checkOut = new CheckOut();
+		StationObservation checkOut = new StationObservation();
+		checkOut.type = Type.CHECK_OUT;
 		checkOut.personId = personId;
 		checkOut.station = station;
 		try {
-			Event event = new Event(CheckIn.TOPIC, dtos.asMap(checkOut));
+			Event event = new Event(StationObservation.TOPIC, dtos.asMap(checkOut));
 			ea.postEvent(event);
 		} catch(Exception e){
 			System.err.println("Error sending CheckOut Event: "+e.getMessage());
