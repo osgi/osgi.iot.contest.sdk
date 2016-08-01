@@ -49,7 +49,15 @@ public interface StationsManager {
 	 * @param station
 	 * @param destination
 	 */
-	void checkIn(String personId, String station, String destination);
+	Passenger checkIn(String personId, String station, String destination);
+
+	/**
+	 * Train calls unboard to let people hop off the train
+	 * @param train
+	 * @param station
+	 */
+	// rename to arrive
+	void arrive(String train, String station);
 	
 	/**
 	 * Train boards passengers at a given station
@@ -57,14 +65,6 @@ public interface StationsManager {
 	 * @param station
 	 * @return the list of passengers that boarded the train (includes passengers that are still on the train)
 	 */
-	// TODO can the station manager check whether this train is actually in the station?
-	List<Passenger> board(String train, String station);
-	
-	/**
-	 * Train calls unboard to let people hop off the train
-	 * @param train
-	 * @param station
-	 */
-	void unboard(String train, String station);
+	List<Passenger> leave(String train, String station);
 	
 }

@@ -106,11 +106,11 @@ public class OperatorImpl implements TrainOperator, EventHandler {
 				System.out.println("TRAIN REACHED ASSIGNMENT");
 				Schedule schedule = schedules.get(train);
 				ScheduleEntry s = schedule.entries.get(0);
-				stationsMgr.unboard(train, s.start);
+				stationsMgr.arrive(train, s.start);
 				
 				// TODO wait for start time?!
 				
-				List<Passenger> onBoard = stationsMgr.board(train, s.start);
+				List<Passenger> onBoard = stationsMgr.leave(train, s.start);
 				passengersOnTrains.put(train, onBoard);
 				String segment = stationsMgr.getStationSegment(s.destination);
 				System.out.println("TRAIN NOW HAS "+onBoard.size()+" PASSENGERS ON BOARD");

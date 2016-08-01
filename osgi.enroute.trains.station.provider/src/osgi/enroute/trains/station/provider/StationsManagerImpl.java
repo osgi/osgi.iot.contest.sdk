@@ -112,28 +112,28 @@ public class StationsManagerImpl implements StationsManager{
 	}
 
 	@Override
-	public void checkIn(String personId, String station, String destination) {
-		// TODO throw exceptions instead of void return?
+	public Passenger checkIn(String personId, String station, String destination) {
+		// TODO throw exceptions instead of null return?
 
 		Person person = personDB.getPerson(personId);
 		if(person == null){
 			System.err.println("Non-existent person tried to check in");
-			return;
+			return null;
 		}
 
 		if(!passengersInStation.containsKey(station)){
 			System.err.println("Station "+station+" is not managed by this StationsManager");
-			return;
+			return null;
 		}
 		
 		if(!passengersInStation.containsKey(destination)){
 			System.err.println("Station "+station+" is not managed by this StationsManager");
-			return;
+			return null;
 		}
 		
 		if(!checkValidPersonLocation(personId, station)){
 			System.err.println("Person "+personId+" cannot be at "+station);
-			return;
+			return null;
 		}
 		
 		
@@ -152,6 +152,8 @@ public class StationsManagerImpl implements StationsManager{
 			lock.writeLock().unlock();
 		}
 		checkIn(personId, station);
+		
+		return p;
 	}
 	
 	private void checkIn(String personId, String station){
@@ -168,7 +170,7 @@ public class StationsManagerImpl implements StationsManager{
 	}
 
 	@Override
-	public List<Passenger> board(String train, String station) {
+	public List<Passenger> leave(String train, String station) {
 		// TODO throw exceptions instead of null return?
 		
 		if(!checkValidTrainLocation(train, station)){
@@ -209,7 +211,7 @@ public class StationsManagerImpl implements StationsManager{
 	}
 
 	@Override
-	public void unboard(String train, String station) {
+	public void arrive(String train, String station) {
 		// TODO throw exceptions?
 
 		if(!checkValidTrainLocation(train, station)){
