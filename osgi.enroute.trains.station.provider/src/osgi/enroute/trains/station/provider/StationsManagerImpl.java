@@ -129,11 +129,12 @@ public class StationsManagerImpl implements StationsManager{
 		}
 		
 		
-		Passenger p = new Passenger(person);
+		Passenger p = new Passenger();
+		p.person = person;
 		p.inStation = station;
 		p.destination = destination;
 		
-		System.out.println(p.firstName+" "+p.lastName+" checked in at "+station+" to travel to "+destination);
+		System.out.println(p.person.firstName+" "+p.person.lastName+" checked in at "+station+" to travel to "+destination);
 		
 		try {
 			lock.writeLock().lock();
@@ -191,7 +192,7 @@ public class StationsManagerImpl implements StationsManager{
 				Passenger p = it.next();
 				// TODO should we check with operator whether this train stops at destination station?! 
 
-				System.out.println(p.firstName+" "+p.lastName+" boards train "+train+" at station "+station);
+				System.out.println(p.person.firstName+" "+p.person.lastName+" boards train "+train+" at station "+station);
 
 				onTrain.add(p);
 				it.remove();
@@ -231,9 +232,9 @@ public class StationsManagerImpl implements StationsManager{
 				Passenger p = it.next();
 				
 				if(p.destination.equals(station)){
-					System.out.println(p.firstName+" "+p.lastName+" checked out "+station);
+					System.out.println(p.person.firstName+" "+p.person.lastName+" checked out "+station);
 					
-					checkOut(p.id, station);
+					checkOut(p.person.id, station);
 					it.remove();
 				}
 			}
@@ -259,11 +260,11 @@ public class StationsManagerImpl implements StationsManager{
 		try {
 			lock.readLock().lock();
 			for(List<Passenger> p : passengersInStation.values()){
-				if(p.stream().filter(passenger -> passenger.id.equals(personId)).findFirst().isPresent())
+				if(p.stream().filter(passenger -> passenger.person.id.equals(personId)).findFirst().isPresent())
 					return false;
 			}
 			for(List<Passenger> p : passengersOnTrain.values()){
-				if(p.stream().filter(passenger -> passenger.id.equals(personId)).findFirst().isPresent())
+				if(p.stream().filter(passenger -> passenger.person.id.equals(personId)).findFirst().isPresent())
 					return false;
 			}			
 		} finally {
