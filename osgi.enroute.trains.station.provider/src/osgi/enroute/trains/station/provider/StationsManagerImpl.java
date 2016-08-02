@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -21,7 +22,7 @@ import osgi.enroute.trains.operator.api.TrainOperator;
 import osgi.enroute.trains.passenger.api.Passenger;
 import osgi.enroute.trains.passenger.api.Person;
 import osgi.enroute.trains.passenger.api.PersonDatabase;
-import osgi.enroute.trains.stations.api.Station;
+import osgi.enroute.trains.stations.api.StationConfiguration;
 import osgi.enroute.trains.stations.api.StationObservation;
 import osgi.enroute.trains.stations.api.StationObservation.Type;
 import osgi.enroute.trains.stations.api.StationsManager;
@@ -29,27 +30,11 @@ import osgi.enroute.trains.stations.api.StationsManager;
 /**
  * 
  */
-@Component(name = "osgi.enroute.trains.station")
+@Component(name = "osgi.enroute.trains.station.manager")
 public class StationsManagerImpl implements StationsManager{
 
 	@Reference
 	private PersonDatabase personDB;
-	
-	private Map<String, Station> stations = new ConcurrentHashMap<>();
-	
-	@Reference(policy=ReferencePolicy.DYNAMIC,
-			cardinality=ReferenceCardinality.MULTIPLE)
-	void addStation(Station station, Map<String, Object> properties){
-		String name = (String)properties.get("name");
-		passengersInStation.put(name, new ArrayList<>());
-		stations.put(name, station);
-	}
-	
-	void removeStation(Station learner, Map<String, Object> properties){
-		String name = (String)properties.get("name");
-		passengersInStation.remove(name);
-		stations.remove(name);
-	}
 	
 	private Map<String, List<String>> operators = new ConcurrentHashMap<>();
 	
@@ -82,9 +67,20 @@ public class StationsManagerImpl implements StationsManager{
 	@Reference
 	private DTOs dtos;
 	
+	private Map<String, String> stations = new HashMap<>();
+	
 	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
 	private Map<String, List<Passenger>> passengersInStation = new HashMap<>();
 	private Map<String, List<Passenger>> passengersOnTrain = new HashMap<>();
+	
+	@Activate
+	public void activate(StationConfiguration c){
+		for(String s : c.stations()){
+			String[] split = s.split(":");
+			stations.put(split[0], split[1]);
+			passengersInStation.put(split[0], new ArrayList<>());
+		}
+	}
 	
 	@Override
 	public List<String> getStations() {
@@ -93,11 +89,7 @@ public class StationsManagerImpl implements StationsManager{
 	
 	@Override
 	public String getStationSegment(String station) {
-		Station s = stations.get(station);
-		if(s!=null)
-			return s.getSegment();
-		
-		return null;
+		return stations.get(station);
 	}
 
 

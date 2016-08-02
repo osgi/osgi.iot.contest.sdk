@@ -142,17 +142,9 @@
     },
     
     {
-        "service.factoryPid":"osgi.enroute.trains.stations.station",
+        "service.factoryPid":"osgi.enroute.trains.station.manager",
         "service.pid":"1",
-        "name": "Station1",
-        "segment": "E06_L"
-    },
-
-    {
-        "service.factoryPid":"osgi.enroute.trains.stations.station",
-        "service.pid":"2",
-        "name": "Station2",
-        "segment": "B16_L"
+        "stations": ["Station1:E06_L","Station2:B16_L"]
     },
 
     {

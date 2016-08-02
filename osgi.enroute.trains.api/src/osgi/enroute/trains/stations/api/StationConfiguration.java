@@ -5,17 +5,11 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 @ObjectClassDefinition
 public @interface StationConfiguration {
 
-	final static public String STATION_CONFIGURATION_PID = "osgi.enroute.trains.stations.station";
+	final static public String STATION_CONFIGURATION_PID = "osgi.enroute.trains.station.manager";
 
 	/**
-	 * The nice name for the station.
+	 * Comma-separated list with station1:segment,station2:segment,...
 	 */
-	String name();
-	
-	/**
-	 * The segment id this station is located at
-	 */
-	String segment();
-
+	String[] stations();
 
 }
