@@ -166,7 +166,7 @@ public class StationsManagerImpl implements StationsManager{
 	@Override
 	public List<Passenger> leave(String train, String station) {
 		// TODO throw exceptions instead of null return?
-		
+
 		if(!checkValidTrainLocation(train, station)){
 			System.err.println("Cannot board the train as it is not in the station");
 			return null;
@@ -201,13 +201,22 @@ public class StationsManagerImpl implements StationsManager{
 			return onTrain;
 		} finally {
 			lock.writeLock().unlock();
+			
+			try {
+				StationObservation o = new StationObservation();
+				o.type = Type.DEPARTURE;
+				o.train = train;
+				o.station = station;
+				ea.postEvent(new Event(StationObservation.TOPIC, dtos.asMap(o)));
+			} catch (Exception e) {
+				System.err.println("Error sending departure event");
+			}
 		}
 	}
 
 	@Override
 	public void arrive(String train, String station) {
 		// TODO throw exceptions?
-
 		if(!checkValidTrainLocation(train, station)){
 			System.err.println("Cannot unboard the train as it is not in the station");
 			return;
@@ -221,6 +230,16 @@ public class StationsManagerImpl implements StationsManager{
 		if(!passengersOnTrain.containsKey(train)){
 			System.err.println("Train "+train+" is not operated in any of the stations managed by this StationsManager");
 			return;
+		}
+
+		try {
+			StationObservation o = new StationObservation();
+			o.type = Type.ARRIVAL;
+			o.train = train;
+			o.station = station;
+			ea.postEvent(new Event(StationObservation.TOPIC, dtos.asMap(o)));
+		} catch (Exception e) {
+			System.err.println("Error sending arrival event");
 		}
 		
 		try {
