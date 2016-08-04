@@ -53,7 +53,7 @@ public class PassengersSimulator {
 	}
 
 	void tick() throws Exception {
-		System.out.println("RANDOM PASSENGER CHECKIN!");
+		// randomly try to check in a passenger at a station
 		try {
 			Person p = personDB.getPersons().get(r.nextInt(personDB.getPersons().size()));
 			
