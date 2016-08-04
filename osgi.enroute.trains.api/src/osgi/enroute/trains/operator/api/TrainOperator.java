@@ -21,12 +21,6 @@ import osgi.enroute.trains.passenger.api.Passenger;
 public interface TrainOperator {
 
 	/**
-	 * Get information about this train operator
-	 * @return
-	 */
-	TrainOperatorInfo getInfo();
-
-	/**
 	 * List all trains of this operator
 	 * @return
 	 */
@@ -38,12 +32,6 @@ public interface TrainOperator {
 	 * @return
 	 */
 	List<Passenger> getPassengersOnTrain(String train);
-	
-	/**
-	 * List all stations this operator is operating
-	 * @return
-	 */
-	List<String> getStations();
 	
 	/**
 	 * Get the schedule planned for a train

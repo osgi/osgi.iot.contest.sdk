@@ -144,7 +144,15 @@
     {
         "service.factoryPid":"osgi.enroute.trains.station.manager",
         "service.pid":"1",
-        "stations": ["Station1:E06_L","Station2:B16_L"]
+        "stations": ["Station1:D07_L","Station2:E07_L"]
+    },
+
+    {
+        "service.factoryPid":"osgi.enroute.trains.operator",
+        "service.pid":"1",
+        "name" : "OSGiOperator",
+        "trains" : ["White","Red"],
+        "stations": ["Station1","Station2"]
     },
 
     {
