@@ -27,6 +27,7 @@
 	org.eclipse.equinox.metatype;version='[1.4.100,1.4.101)',\
 	org.osgi.service.event;version='[1.3.1,1.3.2)',\
 	org.osgi.service.metatype;version='[1.3.0,1.3.1)',\
+	org.eclipse.paho.client.mqttv3;version='[1.1.0,1.1.1)',\
 	osgi.enroute.base.debug.provider;version='[1.1.0,1.1.1)',\
 	osgi.enroute.bostock.d3.webresource;version='[3.5.6,3.5.7)',\
 	osgi.enroute.configurer.simple.provider;version='[1.2.2,1.2.3)',\
@@ -51,4 +52,5 @@
 	osgi.enroute.trains.station.provider;version=snapshot,\
 	osgi.enroute.trains.person.provider;version=snapshot,\
 	osgi.enroute.trains.operator.provider;version=snapshot,\
-	osgi.enroute.trains.passengers.provider;version=snapshot
+	osgi.enroute.trains.passengers.provider;version=snapshot,\
+	osgi.enroute.trains.mqtt.provider;version=snapshot
