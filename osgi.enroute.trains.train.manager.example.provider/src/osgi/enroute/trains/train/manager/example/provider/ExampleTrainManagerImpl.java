@@ -210,7 +210,7 @@ public class ExampleTrainManagerImpl {
                             currentAssignment = null;
                             stop();
                             blink(3);
-        					trackManager.assignmentReached(name, currentAssignment);
+        					trackManager.assignmentReached(name, currentLocation);
                         } else {
                             blocked = followRoute();
                         }
