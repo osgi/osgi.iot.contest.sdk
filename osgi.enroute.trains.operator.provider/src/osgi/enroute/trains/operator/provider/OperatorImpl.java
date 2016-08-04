@@ -16,6 +16,7 @@ import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 import osgi.enroute.dto.api.DTOs;
+import osgi.enroute.scheduler.api.Scheduler;
 import osgi.enroute.trains.cloud.api.Observation;
 import osgi.enroute.trains.cloud.api.Observation.Type;
 import osgi.enroute.trains.cloud.api.TrackForCommand;
@@ -28,7 +29,7 @@ import osgi.enroute.trains.passenger.api.Passenger;
 import osgi.enroute.trains.stations.api.StationsManager;
 
 /**
- * This simple operator will cycle through the stations every 2 minutes
+ * This simple operator will cycle through all stations.
  * 
  * This component will also run in the cloud so it can just listen to the Events from EventAdmin
  */
@@ -39,6 +40,9 @@ import osgi.enroute.trains.stations.api.StationsManager;
 		immediate=true)
 public class OperatorImpl implements TrainOperator, EventHandler {
 
+	private static int BOARD_TIME = 30000;
+	private static int TRAVEL_TIME = 120000;
+	
     @ObjectClassDefinition
     @interface Config {
         final static public String TRAIN_OPERATOR_PID = "osgi.enroute.trains.operator";
@@ -61,6 +65,9 @@ public class OperatorImpl implements TrainOperator, EventHandler {
 	
 	@Reference
 	private DTOs dtos;
+	
+	@Reference
+	private Scheduler scheduler;
 	
 	private String name;
 	private List<String> trains = new ArrayList<>();
@@ -85,27 +92,38 @@ public class OperatorImpl implements TrainOperator, EventHandler {
 		}
 		
 		// create schedule
-		for(String train : trains){
+		for(int i=0;i<trains.size();i++){
+			String train = trains.get(i);
+
 			Schedule schedule = new Schedule();
 			schedule.train = train;
 			schedule.entries = new ArrayList<>();
-			// TODO create schedule entries...
+			
+			// don't start all the trains at same instant...
+			long time = System.currentTimeMillis()+BOARD_TIME*i;
 			ScheduleEntry e = new ScheduleEntry();
-			e.start = stations.get(0);
-			e.destination = stations.get(1);
+			// also mixup initial stations for each train
+			int k = i % stations.size();
+			e.start = stations.get(k);
+			e.departureTime = time;
+			e.destination = k+1 < stations.size() ? stations.get(k+1) : stations.get(0);
+			e.arrivalTime = time + TRAVEL_TIME; 
+				
 			schedule.entries.add(e);
 			schedules.put(train, schedule);
+			
+			// schedule train start
+			scheduler.at(time).then(
+					p -> {
+						String dest = schedules.get(train).entries.get(0).start;
+						String segment = stationsMgr.getStationSegment(dest);
+						System.out.println("Assign train "+train+" to station "+dest+" (segment "+segment+")");
+						tc.assign(train, segment);
+						return null;
+					},
+					p -> p.getFailure().printStackTrace()
+			);
 		}
-		
-		
-		// send trains to first scheduled start location
-		for(String train : trains){
-			String dest = schedules.get(train).entries.get(0).start;
-			String segment = stationsMgr.getStationSegment(dest);
-			System.out.println("Assign train "+train+" to station "+dest+" (segment "+segment+")");
-			tc.assign(train, segment);
-		}
-		
 	}
 	
 	@Override
@@ -114,32 +132,43 @@ public class OperatorImpl implements TrainOperator, EventHandler {
 			Observation o = EventToObservation.eventToObservation(event, dtos);
 			
 			if(o.type == Type.ASSIGNMENT_REACHED){
+				// notify arrival
 				String train = o.train;
+				String station = stationsMgr.getStation(o.assignment);
+				System.out.println("Train "+train+" arrived at "+station);
+				stationsMgr.arrive(train, station);
+
+				// schedule next departure
+				final Schedule schedule = schedules.get(train);
+				final ScheduleEntry s = schedule.entries.get(0);
 				
-				System.out.println("TRAIN REACHED ASSIGNMENT");
-				Schedule schedule = schedules.get(train);
-				ScheduleEntry s = schedule.entries.get(0);
-				stationsMgr.arrive(train, s.start);
+				scheduler.at(s.departureTime).then(p -> {
+					
+					List<Passenger> onBoard = stationsMgr.leave(train, s.start);
+					passengersOnTrains.put(train, onBoard);
+					String segment = stationsMgr.getStationSegment(s.destination);
+					
+					System.out.println("Train "+train+" now has "+onBoard.size()+" passengers on board, leaving for "+s.destination);
+					tc.assign(train, segment);
+					
+					// Add new schedule entry
+					ScheduleEntry last = schedule.entries.get(schedule.entries.size()-1);
+					ScheduleEntry extra = new ScheduleEntry();
+
+					extra.start = last.destination;
+					extra.departureTime = s.arrivalTime + BOARD_TIME;
+					int index = stations.indexOf(last.destination);
+					extra.destination = index+1 < stations.size() ? stations.get(index+1) : stations.get(0);
+					extra.arrivalTime = s.arrivalTime + TRAVEL_TIME;
+					schedule.entries.add(extra);
+					
+					// Remove first entry
+					schedule.entries.remove(0);
+					
+					
+					return null;
+				}, p -> p.getFailure().printStackTrace());
 				
-				// TODO wait for start time?!
-				
-				List<Passenger> onBoard = stationsMgr.leave(train, s.start);
-				passengersOnTrains.put(train, onBoard);
-				String segment = stationsMgr.getStationSegment(s.destination);
-				System.out.println("TRAIN NOW HAS "+onBoard.size()+" PASSENGERS ON BOARD");
-				System.out.println("ASSIGN TRAIN TO GO TO "+s.destination+" ("+segment+")");
-				tc.assign(train, segment);
-				
-				// Add new schedule entry
-				ScheduleEntry last = schedule.entries.get(schedule.entries.size()-1);
-				ScheduleEntry extra = new ScheduleEntry();
-				// TODO for now just two stations hard coded ... make more generic for n stations
-				extra.start = last.destination;
-				extra.destination = last.start;
-				schedule.entries.add(extra);
-				
-				// Remove first entry
-				schedule.entries.remove(0);
 			}
 			
 		} catch (Exception e) {

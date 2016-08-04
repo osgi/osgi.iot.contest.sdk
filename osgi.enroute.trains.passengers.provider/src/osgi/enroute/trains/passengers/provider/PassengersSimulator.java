@@ -16,7 +16,10 @@ import osgi.enroute.trains.passenger.api.PersonDatabase;
 import osgi.enroute.trains.stations.api.StationsManager;
 
 /**
+ * This component randomly selects a persons to check in at a certain station
  * 
+ * A person might be selected twice to check in at different stations ... in this case
+ * the StationsManager should detect this and refuse these check-ins
  */
 @Component(name = "osgi.enroute.trains.passengers", immediate=true)
 public class PassengersSimulator {
