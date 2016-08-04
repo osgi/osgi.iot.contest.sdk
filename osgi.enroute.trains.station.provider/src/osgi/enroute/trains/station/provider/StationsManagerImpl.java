@@ -107,6 +107,11 @@ public class StationsManagerImpl implements StationsManager{
 	public String getStationSegment(String station) {
 		return stations.get(station);
 	}
+	
+	@Override
+	public String getStation(String segment){
+		return stations.entrySet().stream().filter(e -> e.getValue().equals(segment)).map(e -> e.getKey()).findFirst().get();
+	}
 
 	@Override
 	public List<Passenger> getPassengersWaiting(String station) {

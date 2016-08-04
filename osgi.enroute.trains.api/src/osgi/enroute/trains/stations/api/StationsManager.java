@@ -33,8 +33,12 @@ public interface StationsManager {
 	 * @param station
 	 * @return
 	 */
-	// TODO should one rather track Station service themselves?
 	String getStationSegment(String station);
+
+	/**
+	 * Return the station for this segment
+	 */
+	String getStation(String segment);
 	
 	/**
 	 * List the passengers currently waiting in a station
