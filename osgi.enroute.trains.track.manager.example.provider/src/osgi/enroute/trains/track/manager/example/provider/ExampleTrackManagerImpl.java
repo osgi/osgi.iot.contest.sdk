@@ -155,7 +155,7 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
 		Observation o = new Observation();
 		o.time = System.currentTimeMillis();
 		o.type = Type.ASSIGNMENT_REACHED;
-		o.segment = assignment;
+		o.assignment = assignment;
 		o.train = train;
 		observation(o);
 	}
