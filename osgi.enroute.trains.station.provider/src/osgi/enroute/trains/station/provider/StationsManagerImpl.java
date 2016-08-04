@@ -16,23 +16,39 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 import osgi.enroute.dto.api.DTOs;
 import osgi.enroute.trains.operator.api.TrainOperator;
 import osgi.enroute.trains.passenger.api.Passenger;
 import osgi.enroute.trains.passenger.api.Person;
 import osgi.enroute.trains.passenger.api.PersonDatabase;
-import osgi.enroute.trains.stations.api.StationConfiguration;
+import osgi.enroute.trains.station.provider.StationsManagerImpl.Config;
 import osgi.enroute.trains.stations.api.StationObservation;
 import osgi.enroute.trains.stations.api.StationObservation.Type;
 import osgi.enroute.trains.stations.api.StationsManager;
 
 /**
+ * The StationsManager handles the checking in/out of passengers 
+ * and the arriving/leaving of trains in stations.
+ * 
  * 
  */
-@Component(name = "osgi.enroute.trains.station.manager")
+@Designate(ocd = Config.class, factory = true)
+@Component(name = Config.STATION_CONFIGURATION_PID)
 public class StationsManagerImpl implements StationsManager{
 
+    @ObjectClassDefinition
+    @interface Config {
+    	final static public String STATION_CONFIGURATION_PID = "osgi.enroute.trains.station.manager";
+
+    	/**
+    	 * Comma-separated list with station1:segment,station2:segment,...
+    	 */
+    	String[] stations();
+    }
+	
 	@Reference
 	private PersonDatabase personDB;
 	
@@ -74,7 +90,7 @@ public class StationsManagerImpl implements StationsManager{
 	private Map<String, List<Passenger>> passengersOnTrain = new HashMap<>();
 	
 	@Activate
-	public void activate(StationConfiguration c){
+	public void activate(Config c){
 		for(String s : c.stations()){
 			String[] split = s.split(":");
 			stations.put(split[0], split[1]);
@@ -91,7 +107,6 @@ public class StationsManagerImpl implements StationsManager{
 	public String getStationSegment(String station) {
 		return stations.get(station);
 	}
-
 
 	@Override
 	public List<Passenger> getPassengersWaiting(String station) {
