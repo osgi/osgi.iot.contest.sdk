@@ -159,9 +159,8 @@
     {
         "service.factoryPid":"osgi.enroute.trains.mqtt",
         "service.pid":"1",
-        "id" : "OSGiMQTT",
         "broker" : "tcp://iot.eclipse.org:1883",
-        "event.topics" : ["osgi/trains/station"]
+        "event.topics" : ["osgi/trains/station","osgi/trains/observation"]
     },
 
     {

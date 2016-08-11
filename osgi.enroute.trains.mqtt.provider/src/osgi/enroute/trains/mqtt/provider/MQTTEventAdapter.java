@@ -8,6 +8,8 @@ import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
@@ -38,13 +40,12 @@ public class MQTTEventAdapter implements EventHandler, MqttCallback {
 		String[] event_topics() default {};
 
 		String broker();
-		
-		String id();
-	}
+	
+	}		
 	
 	@Activate	
-	void activate(Config config) throws Exception {
-		id = config.id();
+	void activate(Config config, BundleContext context) throws Exception {
+		id = context.getProperty(Constants.FRAMEWORK_UUID).toString();
 		try {
 			mqtt = new MqttClient(config.broker(), id);
 			mqtt.connect();
@@ -68,8 +69,14 @@ public class MQTTEventAdapter implements EventHandler, MqttCallback {
 		for(String k : event.getPropertyNames()){
 			eventMap.put(k, event.getProperty(k));
 		}
+
 		// tag with the sender id to filter out on receiving messages
-		eventMap.put("_sender", id);
+		String sender = (String)eventMap.get("_sender");
+		if(sender != null && sender.equals(id)){
+			return;
+		} else {
+			eventMap.put("_sender", id);
+		}
 		
 		try {
 			String json = dtos.encoder(eventMap).ignoreNull().put();
@@ -98,10 +105,13 @@ public class MQTTEventAdapter implements EventHandler, MqttCallback {
 		// parse message payload as JSON object and send as OSGi event
 		try {
 			Map<String, Object> eventMap = dtos.decoder(Map.class).get(new ByteArrayInputStream(message.getPayload()));
-			// filter out messages we sent ourselves
+
+			// tag with the sender id to filter out on receiving messages
 			String sender = (String)eventMap.get("_sender");
 			if(sender != null && sender.equals(id)){
 				return;
+			} else {
+				eventMap.put("_sender", id);
 			}
 			
 			Event event = new Event(topic, eventMap);
