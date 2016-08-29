@@ -26,7 +26,7 @@ public interface StationsManager {
 	 * List all known stations
 	 * @return
 	 */
-	List<String> getStations();
+	List<Station> getStations();
 	
 	/**
 	 * Return the segment for this station

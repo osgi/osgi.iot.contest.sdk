@@ -144,13 +144,19 @@
 			trains.ep = ep;
 			trains.ep.getPositions().then( function(pos) {
 				angular.copy(pos, track);
-				for ( var i in track ) {
-					var s = track[i];
-					if ( s.segment.type == 'LOCATOR' ) {
-						trains.destinations.push( i );
-					}
-				}
-				trains.destinations.sort();
+				//for ( var i in track ) {
+				//	var s = track[i];
+				//	if ( s.segment.type == 'LOCATOR' ) {
+				//		trains.destinations.push( i );
+				//	}
+				//}
+				//trains.destinations.sort();
+			});
+			
+			trains.ep.getStations().then( function(s) {
+				s.forEach( function(station) {
+					trains.destinations.push(station);
+				});
 			});
 			
 			trains.ep.getTrains().then( function(t) {

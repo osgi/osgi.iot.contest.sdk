@@ -24,6 +24,8 @@ import osgi.enroute.trains.cloud.api.TrackForCommand;
 import osgi.enroute.trains.cloud.api.TrackForSegment;
 import osgi.enroute.trains.passenger.api.Person;
 import osgi.enroute.trains.passenger.api.PersonDatabase;
+import osgi.enroute.trains.stations.api.Station;
+import osgi.enroute.trains.stations.api.StationsManager;
 import osgi.enroute.trains.track.util.Tracks;
 import osgi.enroute.trains.track.util.Tracks.SegmentHandler;
 import osgi.enroute.trains.train.api.TrainController;
@@ -45,6 +47,9 @@ public class TrainsApplication implements JSONRPC {
 	private TrackForCommand ti;
 	@Reference
 	private TrackForSegment ts;
+	
+	@Reference
+	private StationsManager stations;
 	
 	@Reference
 	private PersonDatabase pdb;
@@ -74,12 +79,18 @@ public class TrainsApplication implements JSONRPC {
 		return ti.getSegments();
 	}
 
+	public List<Station> getStations(){
+		security();
+		return stations.getStations();
+	}
+	
 	public List<String> getTrains() {
 		security();
 		return ti.getTrains();
 	}
 	
 	public Person getPerson(String id){
+		security();
 		return pdb.getPerson(id);
 	}
 	
@@ -89,10 +100,12 @@ public class TrainsApplication implements JSONRPC {
 	}
 	
 	public Map<String,SegmentPosition> getPositions() {
+		security();
 		return positions;
 	}
 	
 	public void setPosition( String train, String segment) {
+		security();
 		ts.locatedTrainAt(name2rfid.get(train), segment);
 	}
 

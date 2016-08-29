@@ -151,7 +151,7 @@
 								<td>{{t.speed}}</td>
 								<td>
 									<select ng-model=t.assignment  ng-change=assign(t.train,t.assignment)>
-										<option  ng-repeat="o in trains.destinations track by $index" value={{o}}>{{o}}</option>
+										<option  ng-repeat="s in trains.destinations track by $index" value={{s.segment}}>{{s.name}}</option>
 									</select>
 								</td>
 							</tr>

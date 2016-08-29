@@ -13,6 +13,7 @@ import org.osgi.service.component.annotations.Reference;
 import osgi.enroute.scheduler.api.Scheduler;
 import osgi.enroute.trains.passenger.api.Person;
 import osgi.enroute.trains.passenger.api.PersonDatabase;
+import osgi.enroute.trains.stations.api.Station;
 import osgi.enroute.trains.stations.api.StationsManager;
 
 /**
@@ -64,12 +65,12 @@ public class PassengersSimulator {
 		try {
 			Person p = personDB.getPersons().get(r.nextInt(personDB.getPersons().size()));
 			
-			List<String> s = stations.getStations();
+			List<Station> s = stations.getStations();
 			int i = r.nextInt(s.size());
-			String station = s.get(i);
+			String station = s.get(i).name;
 			s.remove(i);
 			i = r.nextInt(s.size());
-			String destination = s.get(i);
+			String destination = s.get(i).name;
 			
 			stations.checkIn(p.id, station , destination);
 		} catch(Exception e){

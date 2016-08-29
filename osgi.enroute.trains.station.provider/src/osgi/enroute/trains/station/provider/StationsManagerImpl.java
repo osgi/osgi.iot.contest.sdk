@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -25,6 +26,7 @@ import osgi.enroute.trains.passenger.api.Passenger;
 import osgi.enroute.trains.passenger.api.Person;
 import osgi.enroute.trains.passenger.api.PersonDatabase;
 import osgi.enroute.trains.station.provider.StationsManagerImpl.Config;
+import osgi.enroute.trains.stations.api.Station;
 import osgi.enroute.trains.stations.api.StationObservation;
 import osgi.enroute.trains.stations.api.StationObservation.Type;
 import osgi.enroute.trains.stations.api.StationsManager;
@@ -99,8 +101,13 @@ public class StationsManagerImpl implements StationsManager{
 	}
 	
 	@Override
-	public List<String> getStations() {
-		return new ArrayList<>(stations.keySet());
+	public List<Station> getStations() {
+		return stations.entrySet().stream().map(e -> {
+			Station s = new Station();
+			s.name = e.getKey();
+			s.segment = e.getValue();
+			return s;
+		}).collect(Collectors.toList());
 	}
 	
 	@Override
