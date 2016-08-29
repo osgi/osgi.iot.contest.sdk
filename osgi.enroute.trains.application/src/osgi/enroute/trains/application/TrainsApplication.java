@@ -22,6 +22,8 @@ import osgi.enroute.trains.application.LayoutAdapter.Layout;
 import osgi.enroute.trains.cloud.api.Segment;
 import osgi.enroute.trains.cloud.api.TrackForCommand;
 import osgi.enroute.trains.cloud.api.TrackForSegment;
+import osgi.enroute.trains.passenger.api.Person;
+import osgi.enroute.trains.passenger.api.PersonDatabase;
 import osgi.enroute.trains.track.util.Tracks;
 import osgi.enroute.trains.track.util.Tracks.SegmentHandler;
 import osgi.enroute.trains.train.api.TrainController;
@@ -43,6 +45,9 @@ public class TrainsApplication implements JSONRPC {
 	private TrackForCommand ti;
 	@Reference
 	private TrackForSegment ts;
+	
+	@Reference
+	private PersonDatabase pdb;
 	
 	private Tracks<Layout> track;
 	private Map<String,SegmentPosition> positions;
@@ -72,6 +77,10 @@ public class TrainsApplication implements JSONRPC {
 	public List<String> getTrains() {
 		security();
 		return ti.getTrains();
+	}
+	
+	public Person getPerson(String id){
+		return pdb.getPerson(id);
 	}
 	
 	public void assign(String train, String segment) {

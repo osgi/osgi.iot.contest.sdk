@@ -154,15 +154,7 @@
         "trains" : ["White","Red"],
         "stations": ["Station1","Station2"]
     },
-
-
-    {
-        "service.factoryPid":"osgi.enroute.trains.mqtt",
-        "service.pid":"1",
-        "broker" : "tcp://iot.eclipse.org:1883",
-        "event.topics" : ["osgi/trains/station","osgi/trains/observation"]
-    },
-
+    
     {
         "service.pid": "com.paremus.net.encode"
     },

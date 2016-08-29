@@ -40,13 +40,17 @@ public class PassengersSimulator {
 	void activate() throws Exception{
 		this.tick = scheduler.schedule(this::tick, 1000, 10000);
 		
-		personDB.register("Peter", "Kriens", "aQute", "peter.kriens@aqute.biz", null);
-		personDB.register("Tim", "Verbelen", "iMinds", "tim.verbelen@intec.ugent.be", null);
-		personDB.register("Dereck", "Baum", "Paremus", "dereck.baum@paremus.com", null);
-		personDB.register("Tim", "Ward", "Paremus", "tim.ward@paremus.com", null);
-		personDB.register("Mike", "Francis", "Paremus", "mike.francis@paremus.com", null);
-		personDB.register("Venelin", "Arnaudov", "ProSyst", "v.arnaudov@prosyst.com", null);
-		personDB.register("Walt", "Bowers", "Eurotech", "walt.bowers@eurotech.com", null);
+		personDB.register("peter.kriens@aqute.biz", "Peter", "Kriens", "aQute", null, null, null);
+		personDB.register("tim.verbelen@intec.ugent.be", "Tim", "Verbelen", "iMinds", null,
+				"https://secure.gravatar.com/avatar/87f6eb735322e742b15dc1c42e05805f.jpg?d=mm&s=85&r=G",
+				"https://www.eclipsecon.org/europe2016/user/2040");
+		personDB.register("dereck.baum@paremus.com", "Dereck", "Baum", "Paremus", null,
+				"https://www.eclipsecon.org/europe2016/sites/default/files/styles/site_login_profile_thumbnail/public/profile_pictures/picture-3459-1468826823.jpg?itok=L8KEn6tp",
+				"https://www.eclipsecon.org/europe2016/user/3459");
+		personDB.register("tim.ward@paremus.com", "Tim", "Ward", "Paremus", null, null, null);
+		personDB.register("mike.francis@paremus.com", "Mike", "Francis", "Paremus", null, null, null);
+		personDB.register("v.arnaudov@prosyst.com", "Venelin", "Arnaudov", "ProSyst", null, null, null);
+		personDB.register("walt.bowers@eurotech.com", "Walt", "Bowers", "Eurotech", null, null, null);
 
 	}
 

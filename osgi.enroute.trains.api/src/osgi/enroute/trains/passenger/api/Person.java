@@ -9,9 +9,14 @@ public class Person extends DTO {
 	public String firstName;
 	public String lastName;
 	
+	public String email;
+
+	// urls to picture/website
+	public String picture;
+	public String website;
+	
 	// for "networking" applications?
 	public String company;
-	public String email;
 	public String phone;
 	
 }

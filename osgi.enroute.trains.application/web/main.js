@@ -15,6 +15,9 @@
 		ep : null,
 		destinations : []
 	};
+	var stations = {
+		events : []
+	}
 
 	function error(msg) {
 		alerts.push({
@@ -50,6 +53,7 @@
 		$rootScope.alerts = alerts;
 		$rootScope.trains = trains;
 		$rootScope.track = track;
+		$rootScope.stations = stations;
 
 		en$easse.handle("osgi/trains/observation", function(e) {
 			$rootScope.$applyAsync(function() {
@@ -98,6 +102,44 @@
 			});
 		});
 
+		en$easse.handle("osgi/trains/station", function(e) {
+			$rootScope.$applyAsync(function() {
+				
+				switch(e.type) {
+				case "CHECK_IN":
+					trains.ep.getPerson(e.personId).then( function(person) {
+						e.message = person.firstName+" "+person.lastName+" checked in at "+e.station;
+						e.profilepic = person.picture ? person.picture : "img/user.jpg";
+						e.website = person.website;
+						stations.events.push(e);
+						if ( stations.events.length > 13)
+							stations.events.splice(0,1);
+					});
+					break;
+				case "CHECK_OUT":
+					trains.ep.getPerson(e.personId).then( function(person) {
+						e.message = person.firstName+" "+person.lastName+" checked out at "+e.station;
+						e.profilepic = person.picture ? person.picture : "img/user.jpg";
+						e.website = person.website;
+						stations.events.push(e);
+						if ( stations.events.length > 13)
+							stations.events.splice(0,1);
+					});
+					break;
+				default:
+					return;
+				}
+				
+				
+			});
+		}, function(e) {
+			alerts.push({
+				type : 'error',
+				msg : e
+			});
+		});
+		
+		
 		resolveBefore.trainsEndpoint().then(function(ep) {
 			trains.ep = ep;
 			trains.ep.getPositions().then( function(pos) {

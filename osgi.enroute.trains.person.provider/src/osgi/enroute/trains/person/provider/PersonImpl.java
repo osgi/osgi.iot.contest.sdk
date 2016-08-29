@@ -21,20 +21,30 @@ public class PersonImpl implements PersonDatabase {
 	private Map<String, Person> persons = new ConcurrentHashMap<>();
 	
 	@Override
-	public Person register(String firstName, String lastName, String company, String email, String phone) {
+	public Person register(String email, String firstName, String lastName) {
+		return register(email, firstName, lastName, null, null, null, null);
+	}
+	
+	@Override
+	public Person register(String email, String firstName, String lastName, 
+			String company, String phone,
+			String picture, String website) {
 		Person p = new Person();
 		p.firstName = firstName;
 		p.lastName = lastName;
-		p.company = company;
 		p.email = email;
-		p.phone = phone;
+		
+		p.company = company;
+		p.phone  = phone;
+		
+		p.website = website;
+		p.picture = picture;
 		
 		// TODO what kind of id?
 		p.id = ""+persons.size();
 		
 		persons.put(p.id, p);
-		return p;
-	}
+		return p;	}
 
 	@Override
 	public List<Person> getPersons() {
