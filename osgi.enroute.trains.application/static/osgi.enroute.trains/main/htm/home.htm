@@ -84,33 +84,6 @@
 								<circle cx=-2 cy=12 r=5  style="stroke:black;stroke-width:1px;" class={{p.color}}></circle>
 								<title>Signal {{p.segment.id}}</title>
 							</g>
-							<g ng-switch-when=LOCATOR>
-								<g ng:attr:transform="translate(0,{{$index*-20 - 45}})" ng-repeat='t in trains.rfids' >
-									<rect
-										x=-30 
-										y = -8
-										width=60
-										height=12
-										fill=lightgrey
-									/> 
-									<text 
-										
-										text-anchor=middle 
-										x=0 
-										y=0
-										fill="white" 
-										ng-click="rfid(p.segment.id,t.train)"
-										style="font-size:0.5em">
-										{{t.train}}
-									</text>
-								</g>
-								<path d="M 0 -18 l 0 17 m 0 -10 l 6 -6 m -6 6 l -6 -6" stroke-width=1 stroke=black></path>
-								<g ng-repeat="(train,seg) in trains.locations" >
-									<text text-anchor=middle x=0 y=-20 fill="black" ng-show=seg==p.segment.id style="font-size:0.9em;fill:darkred;">{{train}}</text>
-								</g>
-								<title>Locator {{p.segment.id}}</title>
-							</g>
-							
 							<g ng-show=p.title>
 								<circle cx=10 cy=0 r=9 fill=white stroke=black stroke-width=2></circle>
 								<text text-anchor=middle x=10 y=4 fill="black" style="font-size:0.7em" ng-show=p.title>{{p.title}}</text>
@@ -126,8 +99,24 @@
 						;""
 						}}
 						<g ng-switch=p.symbol ng:attr:transform="translate({{x}},{{y+30}})">
+							<g ng-repeat="station in trains.destinations" ng-show="station.segment==p.segment.id">
+								<path d="M 14 10 L 14 -10 L -10 -10 L -10 10 Z"  style="stroke:black;stroke-width:2px;fill:white"></path>
+								<text text-anchor=middle x=0 y=25 style="font-size:0.9em;fill:black;">{{station.name}}</text>
+								<title>Station {{station.name}}</title>
+							</g>
+						</g>
+					</g>					
+					<g ng-repeat="p in track" class={{p.segment.id}}>
+						{{
+							x = p.x * w;
+							y = p.y * h + h;
+							l = p.width * w;
+						;""
+						}}
+						<g ng-switch=p.symbol ng:attr:transform="translate({{x}},{{y+30}})">
 							<g ng-repeat="t in trains.rfids" ng-show="t.segment==p.segment.id">
 								<path d="M -6 0 l 8 -8 l 8 8 l -8 8 l -8 -8"  style="stroke:black;stroke-width:2px;fill:lightblue"></path>
+								<text text-anchor=middle x=0 y=-20 fill="black" style="font-size:0.9em;fill:black;">{{t.train}}</text>
 								<title>Train {{t.train}}</title>
 							</g>
 						</g>
