@@ -157,6 +157,32 @@
 			</div>	
 			<div class=row>
 				<div class="col-lg-12">
+					<h2>Stations</h2>
+					<table class="table table-small">
+						<colgroup>
+							<col style="width:20%">
+							<col style="width:60%">
+							<col style="width:20%">
+						</colgroup>
+						<tbody>
+							<tr ng-repeat='(station, passengers) in stations.passengers'>
+								<td>{{station}}</td>
+								<td>
+									<div class="inline-block" ng-repeat='p in passengers'>
+										<div ng-switch="p.person.picture">
+		    								<div ng-switch-default><img class="img-circle img-tiny" title="{{p.person.firstName}} {{p.person.lastName}}" src="{{p.person.picture}}"></div>
+		    								<div ng-switch-when="null"><img class="img-circle img-tiny" title="{{p.person.firstName}} {{p.person.lastName}}" src="img/user.jpg"></div>
+										</div>
+									</div>
+								</td>
+								<td> <button type="button" class="btn btn-default">Check In</button></td>
+							</tr>
+						</tbody>			
+					</table>
+				</div>		
+			</div>	
+			<div class=row>
+				<div class="col-lg-12">
 					<h2>Track Events</h2>
 					<table class="table table-small">
 						<colgroup>

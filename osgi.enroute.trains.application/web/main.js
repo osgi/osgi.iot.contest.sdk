@@ -17,7 +17,8 @@
 		destinations : []
 	};
 	var stations = {
-		events : []
+		events : [],
+		passengers: {}
 	}
 
 	function error(msg) {
@@ -105,7 +106,6 @@
 
 		en$easse.handle("osgi/trains/station", function(e) {
 			$rootScope.$applyAsync(function() {
-				
 				switch(e.type) {
 				case "CHECK_IN":
 					trains.ep.getPerson(e.personId).then( function(person) {
@@ -138,9 +138,12 @@
 					});
 					break;
 				default:
-					return;
+					break;
 				}
 				
+				trains.ep.getPassengersInStation(e.station).then( function(p) {
+					stations.passengers[e.station] = p;
+				});
 				
 			});
 		}, function(e) {
@@ -160,6 +163,10 @@
 			trains.ep.getStations().then( function(s) {
 				s.forEach( function(station) {
 					trains.destinations.push(station);
+					
+					trains.ep.getPassengersInStation(station.name).then( function(p) {
+						stations.passengers[station.name] = p;
+					});
 				});
 			});
 			
