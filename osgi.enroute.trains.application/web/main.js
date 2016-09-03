@@ -63,7 +63,7 @@
 				if ( trains.events.length > 10)
 					trains.events.splice(0,1);
 					
-				if ( e.train  ) {
+				if ( e.train && e.segment  ) {
 					var set = trains.rfids[ e.train ] || {};
 					set.train = e.train;
 					set.segment= e.segment;
