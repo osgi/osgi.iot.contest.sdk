@@ -128,16 +128,23 @@
 					<h2>Trains</h2>
 					<table class="table table-small">
 						<colgroup>
-							<col style="width:20%">
-							<col style="width:20%">
-							<col style="width:20%">
+							<col style="width:15%">
+							<col style="width:15%">
+							<col style="width:50%">
 							<col style="width:20%">
 						</colgroup>
 						<tbody>
 							<tr ng-repeat='t in trains.rfids' class="{{t.assignment.startsWith(t.segment)?'arrived':'chase'}}">
 								<td>{{t.train}}</td>
 								<td>{{t.segment}}</td>
-								<td>{{t.speed}}</td>
+								<td>
+									<div class="inline-block" ng-repeat='p in getPassengersOnTrain(t.train)'>
+										<div ng-switch="p.person.picture">
+		    								<div ng-switch-default><img class="img-circle img-tiny" title="{{p.person.firstName}} {{p.person.lastName}}" src="{{p.person.picture}}"></div>
+		    								<div ng-switch-when="null"><img class="img-circle img-tiny" title="{{p.person.firstName}} {{p.person.lastName}}" src="img/user.jpg"></div>
+										</div>
+									</div>
+								</td>
 								<td>
 									<select ng-model=t.assignment  ng-change=assign(t.train,t.assignment)>
 										<option  ng-repeat="s in trains.destinations track by $index" value={{s.segment}}>{{s.name}}</option>

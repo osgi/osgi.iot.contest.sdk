@@ -17,6 +17,15 @@ body {
   padding-left: 15px;
 }
 
+.inline-block {
+	display: inline-block;
+	padding: 2px;
+}
+
+.img-tiny {
+	height: 35px;
+}
+
 /* Custom page header */
 .header {
   border-bottom: 1px solid #e5e5e5;

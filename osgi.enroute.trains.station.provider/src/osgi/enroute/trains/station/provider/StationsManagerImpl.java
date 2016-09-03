@@ -131,6 +131,16 @@ public class StationsManagerImpl implements StationsManager{
 	}
 
 	@Override
+	public List<Passenger> getPassengersOnTrain(String train) {
+		try {
+			lock.readLock().lock();
+			return Collections.unmodifiableList(new ArrayList<Passenger>(passengersOnTrain.get(train)));
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+	
+	@Override
 	public Passenger checkIn(String personId, String station, String destination) {
 		// TODO throw exceptions instead of null return?
 

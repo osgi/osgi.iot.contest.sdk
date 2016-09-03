@@ -48,6 +48,13 @@ public interface StationsManager {
 	List<Passenger> getPassengersWaiting(String station);
 	
 	/**
+	 * List all passengers currently traveling on the train
+	 * @param train
+	 * @return
+	 */
+	List<Passenger> getPassengersOnTrain(String train);
+	
+	/**
 	 * Person checks in at a station with a certain destination
 	 * @param person
 	 * @param station

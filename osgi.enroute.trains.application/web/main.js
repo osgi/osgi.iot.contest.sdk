@@ -11,6 +11,7 @@
 		events : [],
 		segments : {},
 		locations: {},
+		passengers: {},
 		rfids: {},
 		ep : null,
 		destinations : []
@@ -126,6 +127,16 @@
 							stations.events.splice(0,1);
 					});
 					break;
+				case "ARRIVAL":
+				case "DEPARTURE":
+					trains.ep.getTrains().then( function(t) {
+						t.forEach( function(d) {
+							trains.ep.getPassengersOnTrain(d).then( function(p) {
+								trains.passengers[d] = p;
+							});
+						});
+					});
+					break;
 				default:
 					return;
 				}
@@ -144,13 +155,6 @@
 			trains.ep = ep;
 			trains.ep.getPositions().then( function(pos) {
 				angular.copy(pos, track);
-				//for ( var i in track ) {
-				//	var s = track[i];
-				//	if ( s.segment.type == 'LOCATOR' ) {
-				//		trains.destinations.push( i );
-				//	}
-				//}
-				//trains.destinations.sort();
 			});
 			
 			trains.ep.getStations().then( function(s) {
@@ -162,6 +166,10 @@
 			trains.ep.getTrains().then( function(t) {
 				t.forEach( function(d) {
 					trains.rfids[d] = { train: d };
+					
+					trains.ep.getPassengersOnTrain(d).then( function(p) {
+						trains.passengers[d] = p;
+					});
 				});
 			});
 		});
@@ -173,6 +181,9 @@
 			return $location.path();
 		}
 
+		$rootScope.getPassengersOnTrain = function(train){
+			return trains.passengers[train];
+		}
 	});
 
 	var mainProvider = function($scope) {
