@@ -231,7 +231,17 @@
 		  $scope.destination;
 		  $scope.firstName;
 		  $scope.lastName;
-	
+		  $scope.persons;
+		  
+		  
+		  $scope.getFirstNames = function(firstName, lastName){
+			  return endpoint.getFirstNames(firstName, lastName);
+		  };
+
+		  $scope.getLastNames = function(firstName, lastName){
+			  return endpoint.getLastNames(firstName, lastName);
+		  };
+		  
 		  $scope.checkin = function () {
 			  endpoint.checkIn($scope.firstName, $scope.lastName, $scope.station, $scope.destination);
 			  $modalInstance.dismiss('close');

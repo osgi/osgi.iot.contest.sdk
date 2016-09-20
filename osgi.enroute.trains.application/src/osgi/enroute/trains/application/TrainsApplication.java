@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -117,14 +118,18 @@ public class TrainsApplication implements JSONRPC {
 		}
 	}
 	
-	public List<Person> getPersonsByFirstName(String firstName){
-		return pdb.getPersons().stream().filter(p -> p.firstName.equals(firstName)).collect(Collectors.toList());
-	}
-	
-	public List<Person> getPersonsByLastName(String lastName){
-		return pdb.getPersons().stream().filter(p -> p.lastName.equals(lastName)).collect(Collectors.toList());
+	public List<String> getFirstNames(String firstName, String lastName){
+		security();
+		return pdb.getPersons().stream().filter(p -> (firstName == null || p.firstName.startsWith(firstName)) 
+												&& (lastName==null || p.lastName.startsWith(lastName))).map(p -> p.firstName).distinct().limit(10).collect(Collectors.toList());
 	}
 
+	public List<String> getLastNames(String firstName, String lastName){
+		security();
+		return pdb.getPersons().stream().filter(p -> (firstName == null || p.firstName.startsWith(firstName)) 
+												&& (lastName==null || p.lastName.startsWith(lastName))).map(p -> p.lastName).distinct().limit(10).collect(Collectors.toList());
+	}
+	
 	public void assign(String train, String segment) {
 		security();
 		ti.assign(train, segment);;
