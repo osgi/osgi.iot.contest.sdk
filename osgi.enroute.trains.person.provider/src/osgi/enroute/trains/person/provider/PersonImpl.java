@@ -44,7 +44,8 @@ public class PersonImpl implements PersonDatabase {
 		p.id = ""+persons.size();
 		
 		persons.put(p.id, p);
-		return p;	}
+		return p;	
+	}
 
 	@Override
 	public List<Person> getPersons() {

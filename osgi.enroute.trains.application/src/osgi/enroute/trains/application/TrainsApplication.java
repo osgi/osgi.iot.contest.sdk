@@ -3,6 +3,7 @@ package osgi.enroute.trains.application;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 
 import osgi.enroute.configurer.api.RequireConfigurerExtender;
 import osgi.enroute.eventadminserversentevents.capabilities.RequireEventAdminServerSentEventsWebResource;
+import osgi.enroute.github.angular_ui.capabilities.RequireAngularUIWebResource;
 import osgi.enroute.google.angular.capabilities.RequireAngularWebResource;
 import osgi.enroute.jsonrpc.api.JSONRPC;
 import osgi.enroute.jsonrpc.api.RequireJsonrpcWebResource;
@@ -35,6 +37,7 @@ import osgi.enroute.webserver.capabilities.RequireWebServerExtender;
 
 @RequireAngularWebResource(resource = { "angular.js", "angular-resource.js", "angular-route.js" }, priority = 1000)
 @RequireBootstrapWebResource(resource = "css/bootstrap.css")
+@RequireAngularUIWebResource(resource="ui-bootstrap-tpls.js")
 @RequireWebServerExtender
 @RequireConfigurerExtender
 @RequireEventAdminServerSentEventsWebResource
@@ -105,9 +108,37 @@ public class TrainsApplication implements JSONRPC {
 		return pdb.getPerson(id);
 	}
 	
+	public Person getPerson(String firstName, String lastName){
+		security();
+		try {
+			return pdb.getPersons().stream().filter(p -> p.firstName.equals(firstName) && p.lastName.equals(lastName)).findFirst().get();
+		} catch(NoSuchElementException e){
+			return pdb.register(null, firstName, lastName);
+		}
+	}
+	
+	public List<Person> getPersonsByFirstName(String firstName){
+		return pdb.getPersons().stream().filter(p -> p.firstName.equals(firstName)).collect(Collectors.toList());
+	}
+	
+	public List<Person> getPersonsByLastName(String lastName){
+		return pdb.getPersons().stream().filter(p -> p.lastName.equals(lastName)).collect(Collectors.toList());
+	}
+
 	public void assign(String train, String segment) {
 		security();
 		ti.assign(train, segment);;
+	}
+
+	public void checkIn(String firstName, String lastName, String station, String destination){
+		security();
+		Person p = getPerson(firstName, lastName);
+		stations.checkIn(p.id, station, destination);
+	}
+	
+	public void checkIn(String personId, String station, String destination){
+		security();
+		stations.checkIn(personId, station, destination);
 	}
 	
 	public Map<String,SegmentPosition> getPositions() {

@@ -3,7 +3,7 @@
 (function() {
 
 	var MODULE = angular.module('osgi.enroute.trains', [ 'ngRoute',
-			'ngResource', 'enJsonrpc', 'enEasse', 'enMarkdown' ]);
+			'ngResource', 'enJsonrpc', 'enEasse', 'enMarkdown', 'ui.bootstrap']);
 
 	var resolveBefore;
 	var alerts = [];
@@ -49,7 +49,7 @@
 
 	});
 
-	MODULE.run(function($rootScope, $location, en$easse, en$jsonrpc) {
+	MODULE.run(function($rootScope, $location, en$easse, en$jsonrpc, $modal) {
 		var track = {};
 		
 		$rootScope.alerts = alerts;
@@ -191,6 +191,28 @@
 		$rootScope.getPassengersOnTrain = function(train){
 			return trains.passengers[train];
 		}
+		
+		var $ctrl = this;
+		$rootScope.showCheckInDialog = function(station){
+			$modal.open({
+				templateUrl: 'main/htm/checkin.htm',
+				controller: 'checkinCtrl',
+				resolve: {
+					endpoint: function(){
+						return trains.ep;
+					},
+					station: function () {
+						return station;
+					},
+					destinations: function(){
+						var destinations = Object.keys($rootScope.stations.passengers);
+						console.log(destinations+" "+station+" "+destinations.indexOf(station));
+						destinations.splice(destinations.indexOf(station), 1);
+						return destinations;
+					}
+				}
+			});
+		}
 	});
 
 	var mainProvider = function($scope) {
@@ -201,5 +223,23 @@
 
 		}
 	}
+	
+	angular.module('osgi.enroute.trains').controller('checkinCtrl', function ($scope, $modalInstance, endpoint, station, destinations) {
+		
+		  $scope.station = station;
+		  $scope.destinations = destinations;
+		  $scope.destination;
+		  $scope.firstName;
+		  $scope.lastName;
+	
+		  $scope.checkin = function () {
+			  endpoint.checkIn($scope.firstName, $scope.lastName, $scope.station, $scope.destination);
+			  $modalInstance.dismiss('close');
+		  };
+	
+		  $scope.cancel = function () {
+			  $modalInstance.dismiss('cancel');
+		  };
+	});
 
 })();
