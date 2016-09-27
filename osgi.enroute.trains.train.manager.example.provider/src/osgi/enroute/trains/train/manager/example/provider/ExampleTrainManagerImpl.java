@@ -1,6 +1,5 @@
 package osgi.enroute.trains.train.manager.example.provider;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -10,14 +9,11 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import osgi.enroute.dto.api.DTOs;
 import osgi.enroute.scheduler.api.Scheduler;
 import osgi.enroute.trains.cloud.api.Observation;
 import osgi.enroute.trains.cloud.api.TrackForTrain;
@@ -49,18 +45,12 @@ public class ExampleTrainManagerImpl {
 
     static Logger logger = LoggerFactory.getLogger(ExampleTrainManagerImpl.class);
 
-    List<TrainController> trainControllers = new ArrayList<>();
+    TrainController trainController;
 
     // TrainController.target is set in config
-    @Reference(name = "TrainController",
-            cardinality = ReferenceCardinality.AT_LEAST_ONE,
-            policy = ReferencePolicy.DYNAMIC)
-    void addTrainController(TrainController trainCtrl) {
-        trainControllers.add(trainCtrl);
-    }
-
-    void removeTrainController(TrainController trainCtrl) {
-        trainControllers.remove(trainCtrl);
+    @Reference(name = "TrainController")
+    void setTrainController(TrainController trainCtrl) {
+        trainController = trainCtrl;
     }
 
     @Reference
@@ -111,7 +101,7 @@ public class ExampleTrainManagerImpl {
             info("move({})", moveSpeed);
             lastMove = moveSpeed;
 
-            trainControllers.forEach(c -> c.move(moveSpeed));
+            trainController.move(moveSpeed);
         }
     }
 
@@ -121,7 +111,7 @@ public class ExampleTrainManagerImpl {
     }
 
     private void light(boolean on) {
-        trainControllers.forEach(c -> c.light(on));
+        trainController.light(on);
     }
 
     private class TrainMgmtLoop implements Runnable {
