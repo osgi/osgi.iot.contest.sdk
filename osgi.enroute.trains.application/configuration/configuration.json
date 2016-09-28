@@ -148,6 +148,13 @@
     },
 
     {
+        "service.factoryPid":"osgi.enroute.trains.mqtt",
+        "service.pid":"1",
+        "broker" : "tcp://iot.eclipse.org:1883",
+        "event.topics" : ["osgi/trains/station","osgi/trains/observation","osgi/trains/trainlight","osgi/trains/blocksegment"]
+    },
+    
+    {
         "service.factoryPid":"osgi.enroute.trains.operator",
         "service.pid":"1",
         "name" : "OSGiOperator",
