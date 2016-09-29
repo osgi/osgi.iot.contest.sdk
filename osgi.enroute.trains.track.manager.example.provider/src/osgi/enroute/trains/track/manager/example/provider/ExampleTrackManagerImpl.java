@@ -27,7 +27,7 @@ import osgi.enroute.dto.api.DTOs;
 import osgi.enroute.dto.api.TypeReference;
 import osgi.enroute.scheduler.api.Scheduler;
 import osgi.enroute.trains.cloud.api.Color;
-import osgi.enroute.trains.cloud.api.Command;
+import osgi.enroute.trains.cloud.api.TrackCommand;
 import osgi.enroute.trains.cloud.api.Observation;
 import osgi.enroute.trains.cloud.api.Observation.Type;
 import osgi.enroute.trains.cloud.api.Segment;
@@ -102,16 +102,16 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
     }
 
     private void setSignal(String segmentId, Color color) {
-        Command c = new Command();
-        c.type = Command.Type.SIGNAL;
+        TrackCommand c = new TrackCommand();
+        c.type = TrackCommand.Type.SIGNAL;
         c.segment = segmentId;
         c.signal = color;
         command(c);
     }
 
     private void doSwitch(String segmentId, boolean alt) {
-        Command c = new Command();
-        c.type = Command.Type.SWITCH;
+        TrackCommand c = new TrackCommand();
+        c.type = TrackCommand.Type.SWITCH;
         c.segment = segmentId;
         c.alternate = alt;
         command(c);
@@ -467,9 +467,9 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
         }
     }
 
-    void command(Command c) {
+    void command(TrackCommand c) {
         try {
-            Event event = new Event(Command.TOPIC, dtos.asMap(c));
+            Event event = new Event(TrackCommand.TOPIC, dtos.asMap(c));
             ea.postEvent(event);
         } catch (Exception e) {
             logger.error("Error posting command " + c, e);

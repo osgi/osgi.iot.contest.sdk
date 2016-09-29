@@ -15,8 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import osgi.enroute.trains.cloud.api.Color;
-import osgi.enroute.trains.cloud.api.Command;
-import osgi.enroute.trains.cloud.api.Command.Type;
+import osgi.enroute.trains.cloud.api.TrackCommand;
+import osgi.enroute.trains.cloud.api.TrackCommand.Type;
 import osgi.enroute.trains.cloud.api.Segment;
 import osgi.enroute.trains.cloud.api.TrackForSegment;
 import osgi.enroute.trains.controller.api.RFIDSegmentController;
@@ -30,7 +30,7 @@ import osgi.enroute.trains.controller.api.TrainLocator;
  * right Segment Controller
  */
 @Component(name = "osgi.enroute.trains.track.controller",
-        property = { "event.topics=" + Command.TOPIC },
+        property = { "event.topics=" + TrackCommand.TOPIC },
         immediate = true)
 public class TrackControllerImpl implements EventHandler {
     static Logger logger = LoggerFactory.getLogger(TrackControllerImpl.class);
