@@ -1,8 +1,10 @@
 package osgi.enroute.trains.train.manager.example.provider;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -16,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import osgi.enroute.scheduler.api.Scheduler;
 import osgi.enroute.trains.cloud.api.Observation;
+import osgi.enroute.trains.cloud.api.Observation.Type;
 import osgi.enroute.trains.cloud.api.TrackForTrain;
 import osgi.enroute.trains.track.util.Tracks;
 import osgi.enroute.trains.track.util.Tracks.SegmentHandler;
@@ -65,7 +68,11 @@ public class ExampleTrainManagerImpl {
     private int speed;
     private int lastMove = 0;
 
+    private Set<String> darkSegments = new HashSet<>();
+    
     private Thread mgmtThread;
+    private boolean waiting = false;
+    private boolean emergency = false;
 
     @Activate
     public void activate(Config config) throws Exception {
@@ -152,6 +159,14 @@ public class ExampleTrainManagerImpl {
 
                     tracks.event(o);
 
+                    if(o.type == Type.DARK){
+                    	if(o.dark){
+                    		darkSegments.add(o.segment);
+                    	} else {
+                    		darkSegments.remove(o.segment);
+                    	}
+                    }
+                    
                     if (name == null || !name.equals(o.train)) {
                         continue;
                     }
@@ -202,15 +217,22 @@ public class ExampleTrainManagerImpl {
                         }
 
                         break;
-
-                    case BLOCKED:
-                    case CHANGE:
-                    case SIGNAL:
-                    case SWITCH:
-                    case TIMEOUT:
+                    case EMERGENCY:
+                    	emergency = o.emergency;
+                    	if(emergency){
+                    		stop();
+                    		blink(3);
+                    	} else {
+                    		followRoute();
+                    	}
+                    	break;
                     default:
                         break;
                     }
+                }
+                
+                if(!emergency && waiting){
+                	followRoute();
                 }
             }
             info("management loop terminated.");
@@ -240,10 +262,8 @@ public class ExampleTrainManagerImpl {
         }
 
         private boolean followRoute() {
-            if (route == null || route.isEmpty())
+            if (route == null || route.isEmpty() || emergency)
                 return true;
-
-            light(true);
 
             Optional<SegmentHandler<Object>> mySegment = route.stream()
                     .filter(sh -> sh.segment.id.equals(currentLocation))
@@ -269,13 +289,26 @@ public class ExampleTrainManagerImpl {
                 return true;
             }
             
+            boolean dark = false;
+            
             // figure out where to go to next - check next segments
             for(int i=0; i < 6 ;i++){
             	if(route.size() > i){
             		if(!(route.get(i).isSwitch() || route.get(i).isMerge())){ // switches don't have a track
             			toTrack = route.get(i).getTrack();
             		}
+            		
+            		if(darkSegments.contains(route.get(i).segment.id)){
+            			dark = true;
+            		}
             	}
+            }
+            
+            // if there is a dark segment upcoming, turn the lights on
+            if(dark){
+            	light(true);
+            } else {
+            	light(false);
             }
             
             // if we have to go to other track, request access
@@ -283,16 +316,12 @@ public class ExampleTrainManagerImpl {
                 info("stop and request access to track<{}> from <{}>", toTrack, currentLocation);
                 move(0);
 
-                boolean granted = false;
-
-                // simply keep on trying until access is given
-                while (!granted && isActive()) {
-                    granted = requestAccess(fromTrack, toTrack);
-
-                    if (!granted) {
-                        // allow mgmt loop to process other events
-                        //return true;
-                    }
+                if(!requestAccess(fromTrack, toTrack)){
+                	// don't wait in a loop here, this allows other events to be processed meanwhile
+                	waiting = true;
+                	return true;
+                } else {
+                	waiting = false;
                 }
             }
 

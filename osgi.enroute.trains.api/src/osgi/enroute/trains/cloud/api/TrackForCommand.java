@@ -19,16 +19,41 @@ public interface TrackForCommand extends TrackInfo {
 	 */
 	void assign(String train, String toSegment);
 
+	
+	/**
+	 * Notify a train of an emergency
+	 * 
+	 * @param train
+	 * 			the train id
+	 * @param reason
+	 * 			cause of the emergency 
+	 * @param emergency 
+	 * 			whether the emergency is still applying
+	 */
+	void emergency(String train, String reason, boolean emergency);
+	
+	
 	/**
 	 * External indication that a segment is broken
 	 * 
 	 * @param Segment
-	 *            The segment that is blocked
+	 *            The segment that is blocked/unblocked
 	 * @param The
 	 *            reason the segment is blocked
 	 * @param blocked
 	 *            true if blocked, false is free
 	 */
-
 	void blocked(String segment, String reason, boolean blocked);
+	
+
+	/**
+	 * External indication that a segment is dark
+	 * 
+	 * @param Segment
+	 *            The segment  that is dark/light
+	 * @param blocked
+	 *            true if dark, false is light
+	 */
+	void dark(String segment, boolean dark);
+	
 }

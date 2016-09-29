@@ -34,6 +34,14 @@ public class Observation extends DTO {
 		 * A segment is blocked 
 		 */
 		BLOCKED,
+		/**
+		 * A segment is dark
+		 */
+		DARK,
+		/**
+		 * A train emergency occurs
+		 */
+		EMERGENCY,
 		
 		/**
 		 * Following events are defined for the emulator only. They are not sent in the real world.
@@ -75,5 +83,7 @@ public class Observation extends DTO {
 	public String message;
 	public boolean alternate;
 	public boolean blocked;
+	public boolean dark;
+	public boolean emergency;
 	public double speed;
 }
