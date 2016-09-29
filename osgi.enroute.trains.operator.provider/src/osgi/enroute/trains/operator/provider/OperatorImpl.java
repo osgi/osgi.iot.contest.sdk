@@ -22,7 +22,7 @@ import osgi.enroute.scheduler.api.Scheduler;
 import osgi.enroute.trains.cloud.api.Observation;
 import osgi.enroute.trains.cloud.api.Observation.Type;
 import osgi.enroute.trains.cloud.api.TrackForCommand;
-import osgi.enroute.trains.event.util.EventToObservation;
+import osgi.enroute.trains.event.util.EventConvertor;
 import osgi.enroute.trains.operator.api.Schedule;
 import osgi.enroute.trains.operator.api.ScheduleEntry;
 import osgi.enroute.trains.operator.api.TrainOperator;
@@ -141,7 +141,7 @@ public class OperatorImpl implements TrainOperator, EventHandler {
 	@Override
 	public void handleEvent(Event event) {
 		try {
-			Observation o = EventToObservation.eventToObservation(event, dtos);
+			Observation o = EventConvertor.eventToObservation(event, dtos);
 			
 			if(o.type == Type.ASSIGNMENT_REACHED){
 				String train = o.train;

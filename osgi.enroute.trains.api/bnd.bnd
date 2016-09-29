@@ -9,6 +9,7 @@ Bundle-Description: 				\
 	
 Export-Package: \
 	osgi.enroute.trains.cloud.api;provide:=true,\
+	osgi.enroute.trains.sensor.api,\
 	osgi.enroute.trains.controller.api,\
 	osgi.enroute.trains.train.api,\
 	osgi.enroute.trains.hardware.api,\
