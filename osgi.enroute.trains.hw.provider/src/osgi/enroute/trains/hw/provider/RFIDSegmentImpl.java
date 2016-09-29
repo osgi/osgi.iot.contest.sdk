@@ -18,6 +18,16 @@ import org.osgi.util.promise.Promise;
 import osgi.enroute.debug.api.Debug;
 import osgi.enroute.trains.controller.api.RFIDSegmentController;
 
+/**
+ * The RFID segment controller connects an RFID reader to a segment and reads out an rfid tag connected
+ * to the train.
+ * 
+ * @deprecated As of CeBit 2016 we have changed to an inverse model where the RFID reader is mounted 
+ * on the train and RFID tags are spread around the track.
+ * 
+ * @author tverbele
+ *
+ */
 @Designate(ocd = RFIDSegmentImpl.Config.class, factory = true)
 @Component(name = "osgi.enroute.trains.hw.rfid", immediate = true, property = { "service.exported.interfaces=*", //
 		Debug.COMMAND_SCOPE + "=rfid", //
