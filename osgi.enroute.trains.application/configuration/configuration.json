@@ -2,7 +2,7 @@
     {
         "service.pid":"osgi.enroute.trains.emulator",
         "name.rfids":[ "White:OSGi1:CH1", "Red:OSGi2:CH2" ],
-        "rfid.probability": 500,
+        "rfid.probability": 0.9,
         "play.speed":0.5
     },
     {

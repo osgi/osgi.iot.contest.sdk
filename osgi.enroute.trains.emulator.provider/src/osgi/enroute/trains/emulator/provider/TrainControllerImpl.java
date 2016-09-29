@@ -6,12 +6,16 @@ import java.util.Random;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.util.promise.Deferred;
+import org.osgi.util.promise.Promise;
 
 import osgi.enroute.trains.cloud.api.Observation;
+import osgi.enroute.trains.cloud.api.Segment.Type;
+import osgi.enroute.trains.controller.api.TrainLocator;
 import osgi.enroute.trains.track.util.Tracks.SegmentHandler;
 import osgi.enroute.trains.train.api.TrainController;
 
-public class TrainControllerImpl implements TrainController {
+public class TrainControllerImpl implements TrainController, TrainLocator {
 
 	private double distance;
 	private int desiredSpeed;
@@ -19,13 +23,15 @@ public class TrainControllerImpl implements TrainController {
 	private int lastSpeed;
 	private Traverse current;
 	private String rfid;
-	private ServiceRegistration<TrainController> registration;
+	private ServiceRegistration<?> registration;
 	private EmulatorImpl emulatorImpl;
 	private String name;
 	private final Random random = new Random();
 
 	private double rfidProb;
+    private Deferred<String> nextLocation = new Deferred<String>();
 
+	
 	private double playSpeed;
 
 	public TrainControllerImpl(String name, String rfid, double rfidProb, double playSpeed, SegmentHandler<Traverse> start, EmulatorImpl emulatorImpl) {
@@ -61,8 +67,7 @@ public class TrainControllerImpl implements TrainController {
 
 			String rfid = this.rfid;
 			
-			double chance = (rfidProb - actualSpeed)/100D;
-			if ( random.nextDouble() > chance ) {
+			if ( random.nextDouble() > rfidProb ) {
 				rfid = null;
 			}
 			
@@ -76,11 +81,18 @@ public class TrainControllerImpl implements TrainController {
 				emulatorImpl.observation(Observation.Type.EMULATOR_TRAIN_MOVES, name, current.getSegment().id,
 						actualSpeed);
 
+				if(rfid != null && current.getSegment().type != Type.SWITCH){
+					trigger(rfid, current.getSegment().id);
+				}
 			} else if (distance < 0) {
 				current = current.prev(rfid);
 				distance = 0;
 				emulatorImpl.observation(Observation.Type.EMULATOR_TRAIN_MOVES, name, current.getSegment().id,
 						actualSpeed);
+				
+				if(rfid != null && current.getSegment().type != Type.SWITCH){
+					trigger(rfid, current.getSegment().id);
+				}
 			} else {
 				// System.out.println("->" + current + " " + l + " " +
 				// distance);
@@ -100,7 +112,18 @@ public class TrainControllerImpl implements TrainController {
 		properties.put("train.rfid", rfid);
 		properties.put("train.name", name);
 		properties.put("channel", channel);
-		registration = context.registerService(TrainController.class, this, properties);
+		registration = context.registerService(new String[]{TrainController.class.getName(), TrainLocator.class.getName()}, this, properties);
 	}
+
+    @Override
+    public synchronized Promise<String> nextLocation() {
+        return nextLocation.getPromise();
+    }
+
+    private synchronized void trigger(String trainId, String segment) {
+        Deferred<String> currentLocation = nextLocation;
+        nextLocation = new Deferred<String>();
+        currentLocation.resolve(trainId + ":" + segment);
+    }
 
 }

@@ -54,9 +54,8 @@ public class EmulatorImpl {
 	@interface Config {
 		String[]name_rfids() default {};
 
-		@AttributeDefinition(description="Increasing this value will decrease the probability of the RFID check failing. The 90 "
-				+ "value has an 80% change of success at speed 1, 70% at speed 2, and 60% at speed 3")
-		double rfid_probability() default 90;
+		@AttributeDefinition(description="Probability that a Locator will fire (1=always, 0=never)")
+		double rfid_probability() default 1;
 		
 		double play_speed() default 0.5;
 	}
