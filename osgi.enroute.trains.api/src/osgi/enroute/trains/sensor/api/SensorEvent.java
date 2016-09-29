@@ -4,7 +4,7 @@ import org.osgi.dto.DTO;
 
 public class SensorEvent extends DTO{
 
-	public final static String TOPIC = "osgi/trains/sensor/*";
+	public final static String TOPIC = "osgi/trains/sensor";
 
 	public enum Type {
 		WATER, 

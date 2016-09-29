@@ -54,4 +54,5 @@
 	osgi.enroute.trains.person.provider;version=snapshot,\
 	osgi.enroute.trains.operator.provider;version=snapshot,\
 	osgi.enroute.trains.passengers.provider;version=snapshot,\
-	osgi.enroute.trains.mqtt.provider;version=snapshot
+	osgi.enroute.trains.mqtt.provider;version=snapshot,\
+	osgi.enroute.trains.sensors.provider;version=snapshot
