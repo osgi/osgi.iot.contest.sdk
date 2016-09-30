@@ -1,12 +1,18 @@
 package osgi.enroute.trains.person.provider;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
+import osgi.enroute.dto.api.DTOs;
+import osgi.enroute.dto.api.TypeReference;
 import osgi.enroute.trains.passenger.api.Person;
 import osgi.enroute.trains.passenger.api.PersonDatabase;
 
@@ -19,6 +25,21 @@ public class PersonImpl implements PersonDatabase {
 	// for now just keep in memory
 	// TODO persist this?
 	private Map<String, Person> persons = new ConcurrentHashMap<>();
+	
+	@Reference
+	DTOs dtos;
+	
+	@Activate
+	void activate(BundleContext context){
+		try {
+			URL url = context.getBundle().getResource("persons.json");
+			if(url != null){
+				persons = dtos.decoder(new TypeReference<Map<String, Person>>(){}).get(url.openStream());
+			}
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+	}
 	
 	@Override
 	public Person register(String email, String firstName, String lastName) {
