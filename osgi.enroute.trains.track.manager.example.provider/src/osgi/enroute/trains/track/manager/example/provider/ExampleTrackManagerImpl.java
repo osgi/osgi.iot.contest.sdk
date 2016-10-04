@@ -20,6 +20,8 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventHandler;
+import org.osgi.service.event.EventConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,13 +47,16 @@ import osgi.enroute.trains.track.util.Tracks.SwitchHandler;
  * 
  */
 @Component(name = TrackConfiguration.TRACK_CONFIGURATION_PID,
-        property = { "osgi.command.scope=trains",
-                "osgi.command.function=assign",
-                "osgi.command.function=blocked",
-                "osgi.command.function=emergency",
-                "osgi.command.function=dark",
-        		"service.exported.interfaces=*" })
-public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, TrackForCommand {
+    property = {
+        "osgi.command.scope=trains",
+        "osgi.command.function=assign",
+        "osgi.command.function=blocked",
+        "osgi.command.function=emergency",
+        "osgi.command.function=dark",
+        EventConstants.EVENT_TOPIC + "=" + "osgi/trains/blocksegment",
+        "service.exported.interfaces=*"
+    })
+public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, TrackForCommand, EventHandler {
     static Logger logger = LoggerFactory.getLogger(ExampleTrackManagerImpl.class);
     static Random random = new Random();
 
@@ -557,5 +562,16 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
     private static void info(String fmt, Object... args) {
         System.out.printf("TrackMgr: " + fmt.replaceAll("\\{}", "%s") + "\n", args);
     }
+
+  @Override
+  public void handleEvent(Event event) {
+    if ((event.getProperty("state")).equals("true")) {
+      System.out.println("Blocking segment according to event!" + event.getProperty("segment"));
+      blocked((String) event.getProperty("segment"), null, true);
+    } else if ((event.getProperty("state")).equals("false")) {
+      System.out.println("Unblocking segment according to event!" + event.getProperty("segment"));
+      blocked((String) event.getProperty("segment"), null, false);
+    }
+  }
 
 }

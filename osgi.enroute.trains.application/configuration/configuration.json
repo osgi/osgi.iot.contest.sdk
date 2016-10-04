@@ -160,7 +160,7 @@
         "service.pid":"1",
         "broker" : "tcp://iot.eclipse.org:1883",
         "event.topics" : ["osgi/trains/station","osgi/trains/observation"],
-        "mqtt.topics" : ["osgi/trains/sensor"]
+        "mqtt.topics" : ["osgi/trains/sensor","osgi/trains/trainlight","osgi/trains/blocksegment"]
     },
     
     {
