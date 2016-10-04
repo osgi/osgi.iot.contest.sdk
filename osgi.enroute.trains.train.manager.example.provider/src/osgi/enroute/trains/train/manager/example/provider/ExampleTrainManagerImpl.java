@@ -1,25 +1,24 @@
 package osgi.enroute.trains.train.manager.example.provider;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import osgi.enroute.dto.api.DTOs;
 import osgi.enroute.scheduler.api.Scheduler;
 import osgi.enroute.trains.cloud.api.Observation;
+import osgi.enroute.trains.cloud.api.Observation.Type;
 import osgi.enroute.trains.cloud.api.TrackForTrain;
 import osgi.enroute.trains.track.util.Tracks;
 import osgi.enroute.trains.track.util.Tracks.SegmentHandler;
@@ -49,18 +48,12 @@ public class ExampleTrainManagerImpl {
 
     static Logger logger = LoggerFactory.getLogger(ExampleTrainManagerImpl.class);
 
-    List<TrainController> trainControllers = new ArrayList<>();
+    TrainController trainController;
 
     // TrainController.target is set in config
-    @Reference(name = "TrainController",
-            cardinality = ReferenceCardinality.AT_LEAST_ONE,
-            policy = ReferencePolicy.DYNAMIC)
-    void addTrainController(TrainController trainCtrl) {
-        trainControllers.add(trainCtrl);
-    }
-
-    void removeTrainController(TrainController trainCtrl) {
-        trainControllers.remove(trainCtrl);
+    @Reference(name = "TrainController")
+    void setTrainController(TrainController trainCtrl) {
+        trainController = trainCtrl;
     }
 
     @Reference
@@ -75,7 +68,11 @@ public class ExampleTrainManagerImpl {
     private int speed;
     private int lastMove = 0;
 
+    private Set<String> darkSegments = new HashSet<>();
+    
     private Thread mgmtThread;
+    private boolean waiting = false;
+    private boolean emergency = false;
 
     @Activate
     public void activate(Config config) throws Exception {
@@ -111,7 +108,7 @@ public class ExampleTrainManagerImpl {
             info("move({})", moveSpeed);
             lastMove = moveSpeed;
 
-            trainControllers.forEach(c -> c.move(moveSpeed));
+            trainController.move(moveSpeed);
         }
     }
 
@@ -121,7 +118,7 @@ public class ExampleTrainManagerImpl {
     }
 
     private void light(boolean on) {
-        trainControllers.forEach(c -> c.light(on));
+        trainController.light(on);
     }
 
     private class TrainMgmtLoop implements Runnable {
@@ -143,7 +140,6 @@ public class ExampleTrainManagerImpl {
             // and to avoid re-processing same observations on restart
             List<Observation> observations = trackManager.getRecentObservations(-2);
             long lastObsId = -1;
-            boolean blocked = false;
 
             if (!observations.isEmpty()) {
                 Observation lastObs = observations.get(observations.size() - 1);
@@ -156,21 +152,21 @@ public class ExampleTrainManagerImpl {
             while (isActive()) {
 
                 observations = trackManager
-                        .getRecentObservations(lastObsId - (blocked ? 1 : 0));
-
-                if (blocked && observations.size() > 1) {
-                    // remove the observation that caused block and process next
-                    // otherwise re-process previous observation, which should
-                    // drop back to followRoute()
-                    observations.remove(0);
-                    blocked = false;
-                }
+                        .getRecentObservations(lastObsId);
 
                 for (Observation o : observations) {
                     lastObsId = o.id;
 
                     tracks.event(o);
 
+                    if(o.type == Type.DARK){
+                    	if(o.dark){
+                    		darkSegments.add(o.segment);
+                    	} else {
+                    		darkSegments.remove(o.segment);
+                    	}
+                    }
+                    
                     if (name == null || !name.equals(o.train)) {
                         continue;
                     }
@@ -186,17 +182,18 @@ public class ExampleTrainManagerImpl {
                             move(speed);
                         } else {
                             planRoute();
-                            blocked = followRoute();
+                            followRoute();
                         }
                         break;
 
                     case LOCATED:
-                        info("Located @ {}", o.segment);
+                        //info("Located @ {}", o.segment);
 
                         if (currentLocation == null && currentAssignment != null) {
                             currentLocation = o.segment;
                             move(0);
                             planRoute();
+                            followRoute();
                         } else {
                             currentLocation = o.segment;
                         }
@@ -212,19 +209,30 @@ public class ExampleTrainManagerImpl {
                             blink(3);
         					trackManager.assignmentReached(name, currentLocation);
                         } else {
-                            blocked = followRoute();
+                            if(!followRoute()){
+                            	// if cannot follow (e.g. got off route), plan new route
+                            	planRoute();
+                            	followRoute();
+                            }
                         }
 
                         break;
-
-                    case BLOCKED:
-                    case CHANGE:
-                    case SIGNAL:
-                    case SWITCH:
-                    case TIMEOUT:
+                    case EMERGENCY:
+                    	emergency = o.emergency;
+                    	if(emergency){
+                    		stop();
+                    		blink(3);
+                    	} else {
+                    		followRoute();
+                    	}
+                    	break;
                     default:
                         break;
                     }
+                }
+                
+                if(!emergency && waiting){
+                	followRoute();
                 }
             }
             info("management loop terminated.");
@@ -254,80 +262,72 @@ public class ExampleTrainManagerImpl {
         }
 
         private boolean followRoute() {
-            if (route == null || route.isEmpty())
-                return false;
-
-            light(true);
+            if (route == null || route.isEmpty() || emergency)
+                return true;
 
             Optional<SegmentHandler<Object>> mySegment = route.stream()
                     .filter(sh -> sh.segment.id.equals(currentLocation))
                     .findFirst();
 
             if (!mySegment.isPresent()) {
-                error("location<{}> is not on route. stop.", currentLocation);
-                abort();
+                info("location<{}> is not on route?", currentLocation);
+                move(0);
                 return false;
             }
 
-            Optional<SegmentHandler<Object>> nextLocator;
-            String fromTrack;
-            String toTrack;
+            String fromTrack = mySegment.get().getTrack();
+            String toTrack = null;
 
-            // update the remaining part of the current route
+            // remove the part of the route we have covered
             while (route.size() > 0 && !route.getFirst().segment.id.equals(currentLocation)) {
                 SegmentHandler<Object> removed = route.removeFirst();
-                if (removed.isLocator()) {
-                    info("eek! missed locator <{}>", removed.segment.id);
-                    nextLocator = route.stream().filter(sh -> sh.isLocator()).findFirst();
-
-                    if (nextLocator.isPresent()) {
-                        fromTrack = removed.getTrack();
-                        toTrack = nextLocator.get().getTrack();
-                        if (!fromTrack.equals(toTrack)) {
-                            info("retrospectively request access to <{}> from <{}>", toTrack, fromTrack);
-                            move(0);
-                            requestAccess(fromTrack, toTrack);
-                        }
-                    }
-                }
             }
 
-            // figure out where to go to next
-            fromTrack = route.removeFirst().getTrack();
-
-            // check if we have to go to a new track before we have a new
-            // Locator
-            nextLocator = route.stream().filter(sh -> sh.isLocator()).findFirst();
-
-            if (!nextLocator.isPresent()) {
-                error("no locator to go to, stop now");
+            if(route.size() <= 1){
+            	info("location<{}> is end of the route?", currentLocation);
                 abort();
-                return false;
+                return true;
             }
-
-            toTrack = nextLocator.get().getTrack();
-
+            
+            boolean dark = false;
+            
+            // figure out where to go to next - check next segments
+            for(int i=0; i < 6 ;i++){
+            	if(route.size() > i){
+            		if(!(route.get(i).isSwitch() || route.get(i).isMerge())){ // switches don't have a track
+            			toTrack = route.get(i).getTrack();
+            		}
+            		
+            		if(darkSegments.contains(route.get(i).segment.id)){
+            			dark = true;
+            		}
+            	}
+            }
+            
+            // if there is a dark segment upcoming, turn the lights on
+            if(dark){
+            	light(true);
+            } else {
+            	light(false);
+            }
+            
             // if we have to go to other track, request access
             if (!fromTrack.equals(toTrack) && !toTrack.equals(currentAccess)) {
                 info("stop and request access to track<{}> from <{}>", toTrack, currentLocation);
                 move(0);
 
-                boolean granted = false;
-
-                // simply keep on trying until access is given
-                while (!granted && isActive()) {
-                    granted = requestAccess(fromTrack, toTrack);
-
-                    if (!granted) {
-                        // allow mgmt loop to process other events
-                        // return true;
-                    }
+                if(!requestAccess(fromTrack, toTrack)){
+                	// don't wait in a loop here, this allows other events to be processed meanwhile
+                	waiting = true;
+                	return true;
+                } else {
+                	waiting = false;
                 }
             }
 
             // just go forward
             move(speed);
-            return false;
+            return true;
         }
 
         private boolean requestAccess(String fromTrack, String toTrack) {

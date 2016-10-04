@@ -5,8 +5,8 @@ import org.osgi.dto.DTO;
 /**
  * Event class for sending out commands to control signals / switches
  */
-public class Command extends DTO {
-	public final static String TOPIC = "osgi/trains/command";
+public class TrackCommand extends DTO {
+	public final static String TOPIC = "osgi/trains/track/command";
 
 	public enum Type {
 		SIGNAL, SWITCH

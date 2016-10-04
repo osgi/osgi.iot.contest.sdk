@@ -47,6 +47,13 @@ public interface TrackInfo {
 	Set<String> getBlocked();
 
 	/**
+	 * Get the dark segments
+	 * 
+	 * @return
+	 */
+	Set<String> getDark();
+	
+	/**
 	 * Get the current locators and their last seen RFID
 	 * 
 	 * @return

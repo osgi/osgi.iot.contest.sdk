@@ -23,6 +23,16 @@ import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import osgi.enroute.debug.api.Debug;
 import osgi.enroute.trains.controller.api.RFIDSegmentController;
 
+/**
+ * The MicroSwitch segment controller listens for microswitches to be triggered when a train
+ * moves over them...
+ * 
+ * @deprecated As of CeBit 2016 we have changed to another locator system where an RFID reader is mounted 
+ * on the train and RFID tags are spread around the track.
+ *
+ * @author tverbele
+ *
+ */
 @Designate(ocd = MicroSwitchSegmentImpl.Config.class, factory = true)
 @Component(name = "osgi.enroute.trains.hw.microswitch", immediate = true, property = { "service.exported.interfaces=*", //
 		Debug.COMMAND_SCOPE + "=rfid", //
@@ -32,9 +42,6 @@ public class MicroSwitchSegmentImpl implements RFIDSegmentController {
 
 	@Reference
 	private GpioController gpio;
-	
-	//@Reference
-	//private TrackForSegment trackManager;
 	
 	private String lastRFID = null;
 	private Deferred<String> nextRFID = new Deferred<String>();
@@ -47,6 +54,8 @@ public class MicroSwitchSegmentImpl implements RFIDSegmentController {
 		int controller_id();
 
 		String pin();
+		
+		String rfid();
 	}
 
 	@Activate
@@ -72,7 +81,7 @@ public class MicroSwitchSegmentImpl implements RFIDSegmentController {
             		if (System.currentTimeMillis() > debounce) {
             		    System.out.println("RFID triggered at controller "+config.controller_id());
             			debounce = System.currentTimeMillis() + 1000L;
-            		    trigger("rfid1111");
+            		    trigger(config.rfid());
             		}
             		else {
             		    System.out.println("ignored RFID triggered at controller "+config.controller_id());
@@ -99,9 +108,6 @@ public class MicroSwitchSegmentImpl implements RFIDSegmentController {
 
 	// This method is called when an RFID tag detected
 	private synchronized void trigger(String rfid) {
-		// bypass TrackController and immediately call locatedAt to avoid promise timeouts
-		//trackManager.locatedTrainAt(rfid, config.segment());
-		
 		Deferred<String> toResolve = nextRFID;
 		nextRFID = new Deferred<String>();
 		toResolve.resolve(rfid);

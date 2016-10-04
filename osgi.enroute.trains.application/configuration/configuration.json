@@ -2,7 +2,7 @@
     {
         "service.pid":"osgi.enroute.trains.emulator",
         "name.rfids":[ "White:OSGi1:CH1", "Red:OSGi2:CH2" ],
-        "rfid.probability": 500,
+        "rfid.probability": 0.9,
         "play.speed":0.5
     },
     {
@@ -153,6 +153,14 @@
         "name" : "OSGiOperator",
         "trains" : ["White","Red"],
         "stations": ["Station1","Station2"]
+    },
+    
+    {
+        "service.factoryPid":"osgi.enroute.trains.mqtt",
+        "service.pid":"1",
+        "broker" : "tcp://iot.eclipse.org:1883",
+        "event.topics" : ["osgi/trains/station","osgi/trains/observation"],
+        "mqtt.topics" : ["osgi/trains/sensor"]
     },
     
     {

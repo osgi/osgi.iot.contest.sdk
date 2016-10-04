@@ -15,8 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import osgi.enroute.trains.cloud.api.Color;
-import osgi.enroute.trains.cloud.api.Command;
-import osgi.enroute.trains.cloud.api.Command.Type;
+import osgi.enroute.trains.cloud.api.TrackCommand;
+import osgi.enroute.trains.cloud.api.TrackCommand.Type;
 import osgi.enroute.trains.cloud.api.Segment;
 import osgi.enroute.trains.cloud.api.TrackForSegment;
 import osgi.enroute.trains.controller.api.RFIDSegmentController;
@@ -30,7 +30,7 @@ import osgi.enroute.trains.controller.api.TrainLocator;
  * right Segment Controller
  */
 @Component(name = "osgi.enroute.trains.track.controller",
-        property = { "event.topics=" + Command.TOPIC },
+        property = { "event.topics=" + TrackCommand.TOPIC },
         immediate = true)
 public class TrackControllerImpl implements EventHandler {
     static Logger logger = LoggerFactory.getLogger(TrackControllerImpl.class);
@@ -91,13 +91,13 @@ public class TrackControllerImpl implements EventHandler {
     }
 
     // use RFID/bluetooth TrainLocator service
-    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
-    void setTrainLocator(TrainLocator locator) {
+    @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
+    void addTrainLocator(TrainLocator locator) {
         info("Found TrainLocator {}", locator);
         locateTrain(locator);
     }
 
-    void unsetTrainLocator(TrainLocator locator) {
+    void removeTrainLocator(TrainLocator locator) {
         info("Lost TrainLocator {}", locator);
     }
 
@@ -106,7 +106,7 @@ public class TrackControllerImpl implements EventHandler {
             String[] split = p.getValue().split("\\s*:\\s*", 2);
             String trainId = split[0];
             String segment = split[1];
-            // info("Located trainId<{}> at segment<{}>", trainId, segment);
+            //info("Located trainId<{}> at segment<{}>", trainId, segment);
             try {
                 trackManager.locatedTrainAt(trainId, segment);
             } catch (IllegalArgumentException e) {

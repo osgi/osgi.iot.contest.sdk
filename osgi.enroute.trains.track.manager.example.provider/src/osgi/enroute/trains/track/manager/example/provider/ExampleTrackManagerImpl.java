@@ -27,7 +27,7 @@ import osgi.enroute.dto.api.DTOs;
 import osgi.enroute.dto.api.TypeReference;
 import osgi.enroute.scheduler.api.Scheduler;
 import osgi.enroute.trains.cloud.api.Color;
-import osgi.enroute.trains.cloud.api.Command;
+import osgi.enroute.trains.cloud.api.TrackCommand;
 import osgi.enroute.trains.cloud.api.Observation;
 import osgi.enroute.trains.cloud.api.Observation.Type;
 import osgi.enroute.trains.cloud.api.Segment;
@@ -46,7 +46,11 @@ import osgi.enroute.trains.track.util.Tracks.SwitchHandler;
  */
 @Component(name = TrackConfiguration.TRACK_CONFIGURATION_PID,
         property = { "osgi.command.scope=trains",
-                "osgi.command.function=assign", "service.exported.interfaces=*" })
+                "osgi.command.function=assign",
+                "osgi.command.function=blocked",
+                "osgi.command.function=emergency",
+                "osgi.command.function=dark",
+        		"service.exported.interfaces=*" })
 public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, TrackForCommand {
     static Logger logger = LoggerFactory.getLogger(ExampleTrackManagerImpl.class);
     static Random random = new Random();
@@ -66,6 +70,9 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
 
     // blocked segments
     private Set<String> blocked = new HashSet<>();
+    
+    // dark segments
+    private Set<String> dark = new HashSet<>();
 
     private volatile boolean quit = false;
 
@@ -102,16 +109,16 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
     }
 
     private void setSignal(String segmentId, Color color) {
-        Command c = new Command();
-        c.type = Command.Type.SIGNAL;
+        TrackCommand c = new TrackCommand();
+        c.type = TrackCommand.Type.SIGNAL;
         c.segment = segmentId;
         c.signal = color;
         command(c);
     }
 
     private void doSwitch(String segmentId, boolean alt) {
-        Command c = new Command();
-        c.type = Command.Type.SWITCH;
+        TrackCommand c = new TrackCommand();
+        c.type = TrackCommand.Type.SWITCH;
         c.segment = segmentId;
         c.alternate = alt;
         command(c);
@@ -467,9 +474,9 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
         }
     }
 
-    void command(Command c) {
+    void command(TrackCommand c) {
         try {
-            Event event = new Event(Command.TOPIC, dtos.asMap(c));
+            Event event = new Event(TrackCommand.TOPIC, dtos.asMap(c));
             ea.postEvent(event);
         } catch (Exception e) {
             logger.error("Error posting command " + c, e);
@@ -493,10 +500,43 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
         }
         Observation o = new Observation();
         o.type = Type.BLOCKED;
+        o.message = reason;
         o.segment = segment;
         o.blocked = b;
         observation(o);
     }
+    
+	@Override
+	public void emergency(String train, String reason, boolean emergency) {
+        Observation o = new Observation();
+        o.type = Type.EMERGENCY;
+        o.message = reason;
+        o.train = train;
+        o.emergency = emergency;
+        observation(o);
+	}
+
+	@Override
+	public Set<String> getDark() {
+		return dark;
+	}
+	
+	@Override
+	public void dark(String segment, boolean d) {
+        synchronized (access) {
+            if (d) {
+                dark.add(segment);
+            } else {
+                dark.remove(segment);
+            }
+            access.notifyAll();
+        }
+        Observation o = new Observation();
+        o.type = Type.BLOCKED;
+        o.segment = segment;
+        o.dark = d;
+        observation(o);
+	}
 
     public String getNameForRfid(String rfid) {
         return rfid2Name.get(rfid);

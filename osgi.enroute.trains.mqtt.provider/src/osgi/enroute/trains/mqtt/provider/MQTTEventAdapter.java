@@ -37,7 +37,17 @@ public class MQTTEventAdapter implements EventHandler, MqttCallback {
 	
 	@ObjectClassDefinition
 	@interface Config {
+		/**
+		 * OSGi events that have to be published to MQTT
+		 * @return
+		 */
 		String[] event_topics() default {};
+		
+		/**
+		 * MQTT events that have to be published to OSGi
+		 * @return
+		 */
+		String[] mqtt_topics() default {};
 
 		String broker();
 	
@@ -50,7 +60,7 @@ public class MQTTEventAdapter implements EventHandler, MqttCallback {
 			mqtt = new MqttClient(config.broker(), id);
 			mqtt.connect();
 			mqtt.setCallback(this);
-			for(String topic : config.event_topics()){
+			for(String topic : config.mqtt_topics()){
 				mqtt.subscribe(topic.replaceAll("\\*", "#"));
 			}
 		} catch(Exception e){
@@ -115,7 +125,7 @@ public class MQTTEventAdapter implements EventHandler, MqttCallback {
 			}
 			
 			Event event = new Event(topic, eventMap);
-			ea.postEvent(event);
+			ea.sendEvent(event);
 		} catch(Exception e){
 			e.printStackTrace();
 		}
