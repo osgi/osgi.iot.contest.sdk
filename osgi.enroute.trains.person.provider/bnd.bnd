@@ -15,12 +15,13 @@ Private-Package:  \
 	
 -buildpath: \
 	osgi.enroute.base.api;version=1.0,\
-	osgi.enroute.trains.api;version=latest
+	osgi.enroute.trains.api;version=latest,\
+	org.jsoup
 	
 -testpath: \
 	osgi.enroute.junit.wrapper;version=4.12
 
--includeresource: {readme.md},resources/persons.json
+-includeresource: {readme.md},resources/persons.json, pictures=pictures
 
 
 -runrequires:  \
