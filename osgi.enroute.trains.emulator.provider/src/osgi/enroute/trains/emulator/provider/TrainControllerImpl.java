@@ -24,7 +24,6 @@ public class TrainControllerImpl implements TrainController, TrainLocator {
 	private Traverse current;
 	private String rfid;
 	private ServiceRegistration<?> registration;
-	private EmulatorImpl emulatorImpl;
 	private String name;
 	private final Random random = new Random();
 
@@ -34,12 +33,11 @@ public class TrainControllerImpl implements TrainController, TrainLocator {
 	
 	private double playSpeed;
 
-	public TrainControllerImpl(String name, String rfid, double rfidProb, double playSpeed, SegmentHandler<Traverse> start, EmulatorImpl emulatorImpl) {
+	public TrainControllerImpl(String name, String rfid, double rfidProb, double playSpeed, SegmentHandler<Traverse> start) {
 		this.rfid = rfid;
 		this.playSpeed = playSpeed/10;
 		this.name = name;
 		this.rfidProb = rfidProb;
-		this.emulatorImpl = emulatorImpl;
 		this.current = start.get();
 	}
 
@@ -60,8 +58,6 @@ public class TrainControllerImpl implements TrainController, TrainLocator {
 			actualSpeed = desiredSpeed + (desiredSpeed - actualSpeed + 2) / 4;
 
 			if (actualSpeed != lastSpeed) {
-				emulatorImpl.observation(Observation.Type.EMULATOR_TRAIN_SPEED, name, current.getSegment().id,
-						actualSpeed);
 				lastSpeed = actualSpeed;
 			}
 
@@ -78,17 +74,12 @@ public class TrainControllerImpl implements TrainController, TrainLocator {
 				current = current.next(rfid);
 				distance -= l;
 
-				emulatorImpl.observation(Observation.Type.EMULATOR_TRAIN_MOVES, name, current.getSegment().id,
-						actualSpeed);
-
 				if(rfid != null && current.getSegment().type != Type.SWITCH){
 					trigger(rfid, current.getSegment().id);
 				}
 			} else if (distance < 0) {
 				current = current.prev(rfid);
 				distance = 0;
-				emulatorImpl.observation(Observation.Type.EMULATOR_TRAIN_MOVES, name, current.getSegment().id,
-						actualSpeed);
 				
 				if(rfid != null && current.getSegment().type != Type.SWITCH){
 					trigger(rfid, current.getSegment().id);

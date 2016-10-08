@@ -11,7 +11,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.Designate;
@@ -21,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import osgi.enroute.dto.api.DTOs;
 import osgi.enroute.scheduler.api.Scheduler;
-import osgi.enroute.trains.cloud.api.Observation;
 import osgi.enroute.trains.cloud.api.TrackForSegment;
 import osgi.enroute.trains.cloud.api.TrackForTrain;
 import osgi.enroute.trains.track.util.Tracks;
@@ -71,7 +69,7 @@ public class EmulatorImpl {
 			String[] parts = name_rfid.split("\\s*:\\s*");
 			if (parts.length == 3) {
 				TrainControllerImpl trainControllerImpl = new TrainControllerImpl(parts[0], parts[1],
-						config.rfid_probability(), config.play_speed(), track.getRoot(), this);
+						config.rfid_probability(), config.play_speed(), track.getRoot());
 				trainControllers.add(trainControllerImpl);
 				trainControllerImpl.register(context, parts[2]);
 			} else
@@ -94,25 +92,6 @@ public class EmulatorImpl {
 	void tick() throws Exception {
 		for (TrainControllerImpl tc : trainControllers)
 			tc.tick();
-	}
-
-	void observation(Observation o) {
-		try {
-			o.time = System.currentTimeMillis();
-			Event event = new Event(Observation.TOPIC, dtos.asMap(o));
-			eventAdmin.postEvent(event);
-		} catch (Exception e) {
-			logger.error("Error posting observation " + o, e);
-		}
-	}
-
-	void observation(Observation.Type type, String train, String segment, double speed) {
-		Observation o = new Observation();
-		o.type = type;
-		o.train = train;
-		o.segment = segment;
-		o.speed = speed;
-		observation(o);
 	}
 
 }
