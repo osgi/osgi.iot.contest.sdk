@@ -72,7 +72,9 @@ public class ExampleTrainManagerImpl {
     
     private Thread mgmtThread;
     private boolean waiting = false;
+    
     private boolean emergency = false;
+    private Set<String> emergencies = new HashSet<>();
 
     @Activate
     public void activate(Config config) throws Exception {
@@ -220,10 +222,17 @@ public class ExampleTrainManagerImpl {
                     case EMERGENCY:
                     	emergency = o.emergency;
                     	if(emergency){
+                    		emergencies.add(o.message);
+                    	} else {
+                    		emergencies.remove(o.message);
+                    	}
+                    	
+                    	if(emergencies.size() == 0){
+                    		// no more emergencies, follow route
+                    		followRoute();
+                    	} else {
                     		stop();
                     		blink(3);
-                    	} else {
-                    		followRoute();
                     	}
                     	break;
                     default:
