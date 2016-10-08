@@ -9,6 +9,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventHandler;
 
 import osgi.enroute.scheduler.api.Scheduler;
 import osgi.enroute.trains.passenger.api.Person;
@@ -17,13 +19,17 @@ import osgi.enroute.trains.stations.api.Station;
 import osgi.enroute.trains.stations.api.StationsManager;
 
 /**
- * This component randomly selects a persons to check in at a certain station
+ * Listens for checkins from events
+ * 
+ * Also randomly selects a persons to check in at a certain station
  * 
  * A person might be selected twice to check in at different stations ... in this case
  * the StationsManager should detect this and refuse these check-ins
  */
-@Component(name = "osgi.enroute.trains.passengers", immediate=true)
-public class PassengersSimulator {
+@Component(name = "osgi.enroute.trains.passengers", 
+	property={"event.topics=osgi/trains/passengers/checkin"},
+	immediate=true)
+public class PassengersSimulator implements EventHandler {
 
 	@Reference
 	private Scheduler scheduler;
@@ -63,5 +69,14 @@ public class PassengersSimulator {
 		} catch(Exception e){
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void handleEvent(Event event) {
+		String personId = event.getProperty("personId").toString();
+		String station = event.getProperty("station").toString();
+		String destination = event.getProperty("destination").toString();
+		
+		stations.checkIn(personId, station, destination);
 	}
 }
