@@ -93,11 +93,15 @@
 							trains.rfids[ e.train  ].assignment = e.assignment;
 					}
 					break;
-					
 				case "BLOCKED": {
 						var s = track[ e.segment ];
 						if ( angular.isDefined(s) )
 							s.symbol = e.blocked ? "BLOCKED" : "PLAIN";
+					}
+					break;
+				case "EMERGENCY": {
+						if ( trains.rfids[ e.train ] )
+							trains.rfids[ e.train ].emergency = e.emergency;
 					}
 					break;
 				}

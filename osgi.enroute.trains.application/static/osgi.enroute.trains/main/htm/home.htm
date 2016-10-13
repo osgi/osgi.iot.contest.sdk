@@ -115,7 +115,15 @@
 						}}
 						<g ng-switch=p.symbol ng:attr:transform="translate({{x}},{{y+30}})">
 							<g ng-repeat="t in trains.rfids" ng-show="t.segment==p.segment.id">
-								<path d="M -6 0 l 8 -8 l 8 8 l -8 8 l -8 -8"  style="stroke:black;stroke-width:2px;fill:lightblue"></path>
+								<g ng-switch=t.emergency>
+									<g ng-switch-when=true>
+										<path d="M -6 0 l 8 -8 l 8 8 l -8 8 l -8 -8"  style="stroke:black;stroke-width:2px;fill:red"></path>
+										<image x="-10" y="10" width="20" height="20" xlink:href="img/alert.png">
+									</g>
+									<g ng-switch-default>
+										<path d="M -6 0 l 8 -8 l 8 8 l -8 8 l -8 -8"  style="stroke:black;stroke-width:2px;fill:lightblue"></path>
+									</g>
+								</g>
 								<text text-anchor=middle x=0 y=-20 fill="black" style="font-size:0.9em;fill:black;">{{t.train}}</text>
 								<title>Train {{t.train}}</title>
 							</g>
