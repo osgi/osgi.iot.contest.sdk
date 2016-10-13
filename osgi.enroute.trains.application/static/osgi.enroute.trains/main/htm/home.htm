@@ -160,6 +160,14 @@
 							<col style="width:50%">
 							<col style="width:20%">
 						</colgroup>
+						<thead>
+							<tr>
+								<th>Train</th>
+								<th>Segment</th>
+								<th>Passengers on train</th>
+								<th>Destination</th>
+							</tr>
+						</thead>
 						<tbody>
 							<tr ng-repeat='t in trains.rfids' class="{{t.assignment.startsWith(t.segment)?'arrived':'chase'}}">
 								<td>{{t.train}}</td>
@@ -191,6 +199,13 @@
 							<col style="width:60%">
 							<col style="width:20%">
 						</colgroup>
+						<thead>
+							<tr>
+								<th>Station</th>
+								<th>Passengers waiting in station</th>
+								<th></th>
+							</tr>
+						</thead>
 						<tbody>
 							<tr ng-repeat='(station, passengers) in stations.passengers'>
 								<td>{{station}}</td>
