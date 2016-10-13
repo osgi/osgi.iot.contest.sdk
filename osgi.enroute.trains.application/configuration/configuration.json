@@ -43,8 +43,7 @@
             "A16        : STRAIGHT   : 50      : -1     : A17",
             "A17        : CURVED     : 41      : -1     : A18",
             "A18        : CURVED     : 43      : -1     : A19",
-            "A19        : CURVED     : 0      : -1     : A19_L",
-            "A19_L      : LOCATOR    : 1      : 2      : A20",
+            "A19        : CURVED     : 0      : -1     : A20",
             "#A20        : CURVED     : 45      : -1     : A20_S",
             "A20        : CURVED     : 45      : -1     : A20_S",
             "A20_S      : SIGNAL     : 0      : 3      : A21",
@@ -71,8 +70,7 @@
             "B15        : CURVED     : 23      : -1     : B16",
             "B16        : CURVED     : 25      : -1     : B17",
             "B17        : CURVED     : 27      : -1     : B18",
-            "B18        : CURVED     : 0      : -1     : B18_L",
-            "B18_L      : LOCATOR    : 7      : 6      : B19",
+            "B18        : CURVED     : 0      : -1     : B19",
             "#B19        : CURVED     : 29      : -1     : B20",
             "B19        : CURVED     : 29      : -1     : B20",
             "#B20        : CURVED     : 31      : -1     : B20_S",
@@ -84,8 +82,7 @@
             "C01        : CURVED     : 47      : -1     : C02",
             "C02        : CURVED     : 49      : -1     : C03",
             "C03        : CURVED     : 51      : -1     : C04",
-            "C04        : CURVED     : 0      : -1     : C04_L",
-            "C04_L      : LOCATOR    : 3      : 8      : C05",
+            "C04        : CURVED     : 0      : -1     : C05",
             "#C05        : CURVED     : 53      : -1     : C05_S",
             "C05        : CURVED     : 53      : -1     : C05_S",
             "C05_S      : SIGNAL     : 0      : 9      : C06",
@@ -101,8 +98,7 @@
             "E04        : STRAIGHT   : 62      : -1     : E05",
             "E05        : STRAIGHT   : 64      : -1     : E06",
             "E06        : STRAIGHT   : 66      : -1     : E07",
-            "E07        : STRAIGHT   : 0      : -1     : E07_L",
-            "E07_L      : LOCATOR    : 4      : 11     : E08",
+            "E07        : STRAIGHT   : 0      : -1     : E08",
             "#E08        : STRAIGHT   : 68      : -1     : E09",
             "E08        : STRAIGHT   : 68      : -1     : E09",
             "#E09        : STRAIGHT   : 70      : -1     : E09_S",
@@ -117,8 +113,7 @@
             "D04        : STRAIGHT   : 76      : -1     : D05",
             "D05        : STRAIGHT   : 78      : -1     : D06",
             "D06        : STRAIGHT   : 80      : -1     : D07",
-            "D07        : STRAIGHT   : 0      : -1     : D07_L",
-            "D07_L      : LOCATOR    : 2      : 13     : D08",
+            "D07        : STRAIGHT   : 0      : -1     : D08",
             "#D08        : STRAIGHT   : 82      : -1     : D09",
             "D08        : STRAIGHT   : 82      : -1     : D09",
             "#D09        : CURVED     : 65      : -1     : D09_S",
@@ -130,8 +125,7 @@
 
             "F00        : CURVED     : 55      : -1     : F01",
             "F01        : CURVED     : 57      : -1     : F02",
-            "F02        : CURVED     : 59      : -1     : F02_L",
-            "F02_L      : LOCATOR    : 5      : 16     : F03",
+            "F02        : CURVED     : 59      : -1     : F03",
             "#F03        : CURVED     : 61      : -1     : F03_S",
             "F03        : CURVED     : 61      : -1     : F03_S",
             "F03_S      : SIGNAL     : 0      : 17     : F04",
@@ -144,7 +138,7 @@
     {
         "service.factoryPid":"osgi.enroute.trains.station.manager",
         "service.pid":"1",
-        "stations": ["Station1:D07_L","Station2:E07_L"]
+        "stations": ["Station1:D06","Station2:E06","Station3:B10"]
     },
 
     {
@@ -152,7 +146,7 @@
         "service.pid":"1",
         "name" : "OSGiOperator",
         "trains" : ["White","Red"],
-        "stations": ["Station1","Station2"]
+        "stations": ["Station1","Station2","Station3"]
     },
     
     {

@@ -136,11 +136,6 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
             return;
         }
 
-        if (!sh.isLocator()) {
-            error("Only locator segments can be used for assignments.");
-            return;
-        }
-
         if (assignments.isEmpty()) {
             // first assignment - ensure all signals are RED
             getSignals().keySet().forEach(seg -> {

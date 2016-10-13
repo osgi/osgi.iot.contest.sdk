@@ -43,8 +43,9 @@ import osgi.enroute.trains.stations.api.StationsManager;
 		immediate=true)
 public class OperatorImpl implements TrainOperator, EventHandler {
 
-	private static int BOARD_TIME = 30000;
-	private static int TRAVEL_TIME = 80000;
+	private static int BOARD_TIME = 15000;
+	private static int MINIMAL_BOARD_TIME = 5000;
+	private static int TRAVEL_TIME = 60000;
 	
     @ObjectClassDefinition
     @interface Config {
@@ -161,7 +162,14 @@ public class OperatorImpl implements TrainOperator, EventHandler {
 				final Schedule schedule = schedules.get(train);
 				final ScheduleEntry s = schedule.entries.get(0);
 				
-				scheduler.at(s.departureTime).then(p -> {
+				long departure = s.departureTime;
+				if(s.departureTime-System.currentTimeMillis() < MINIMAL_BOARD_TIME){
+					// if delayed, still wait for minimal board time
+					departure = System.currentTimeMillis() + MINIMAL_BOARD_TIME;
+				}
+				
+				System.out.println("Train "+train+" will depart to "+s.destination+" in "+(departure-System.currentTimeMillis())/1000+" s.");
+				scheduler.at(departure).then(p -> {
 					
 					List<Passenger> onBoard = stationsMgr.leave(train, s.start);
 					passengersOnTrains.put(train, onBoard);
