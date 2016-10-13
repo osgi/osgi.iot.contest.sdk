@@ -94,7 +94,12 @@
 					}
 					break;
 					
-					
+				case "BLOCKED": {
+						var s = track[ e.segment ];
+						if ( angular.isDefined(s) )
+							s.symbol = e.blocked ? "BLOCKED" : "PLAIN";
+					}
+					break;
 				}
 			});
 		}, function(e) {

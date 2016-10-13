@@ -121,6 +121,21 @@
 							</g>
 						</g>
 					</g>
+					<g ng-repeat="p in track" class={{p.segment.id}}>
+						{{
+							x = p.x * w;
+							y = p.y * h + h;
+							l = p.width * w;
+						;""
+						}}
+						<g ng-switch=p.symbol ng:attr:transform="translate({{x}},{{y+30}})">
+							<g ng-switch-when=BLOCKED>
+								<path d="M 5 5 L 5 -5 L -5 -5 L -5 5 Z"  style="stroke:white;stroke-width:2px;fill:white"></path>
+								<image x="-10" y="10" width="20" height="20" xlink:href="img/alert.png">
+								<title>Blocked {{p.segment.id}}</title>
+							</g>
+						</g>
+					</g>
 				</g>
 			</svg>
 		</div>
