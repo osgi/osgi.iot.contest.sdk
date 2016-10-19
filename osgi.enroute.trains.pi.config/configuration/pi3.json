@@ -1,27 +1,19 @@
 [
 	{
-		"service.pid":"Controller-12",
+		"service.pid":"Signal-5",
+		"controller.id":5,
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",
-		"controller.id":12,
 		"green":"GPIO 24",
 		"red":"GPIO 25"
-	},{
-		"service.pid":"Controller-14",
+	},
+	{
+		"service.pid":"Signal-6",
+		"controller.id":6,
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",
-		"controller.id":14,
 		"green":"GPIO 3",
 		"red":"GPIO 21"
-	},{
-        "service.pid":"Controller-11",
-        "service.factoryPid": "osgi.enroute.trains.hw.microswitch",
-        "controller.id":11,
-        "pin":"GPIO 10"
-	},{
-        "service.pid":"Controller-13",
-        "service.factoryPid": "osgi.enroute.trains.hw.microswitch",
-        "controller.id":13,
-        "pin":"GPIO 11"
 	},
+	
 	{
         "service.pid": "com.paremus.net.encode"
     },

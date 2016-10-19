@@ -43,13 +43,13 @@
             "A02        : STRAIGHT   : 48      : -1     : A03",
             "A03        : STRAIGHT   : 50      : -1     : A04",
             "A04        : CURVED     : 43      : -1     : A05",
-            "A05        : CURVED     : 47      : -1     : A06",
-            "A06        : CURVED     : 45      : -1     : A07",
-            "A07        : CURVED     : 49      : -1     : A07_S",
-            "A07_S      : SIGNAL     : 0       : 3      : A08",
+            "A05        : CURVED     : 45      : -1     : A06",
+            "A06        : CURVED     : 47      : -1     : A07",
+            "A07        : CURVED     : 49      : -1     : A_S1",
+            "A_S1       : SIGNAL     : 0       : 1      : A08",
             "A08        : STRAIGHT   : 52      : -1     : X01",
 
-            "X01        : SWITCH     : 0       : 4      : B00,C00",
+            "X01        : SWITCH     : 0       : 11     : B00,C00",
 
             "B00        : STRAIGHT   : 0       : -1     : B01",
             "B01        : CURVED     : 11      : -1     : B02",
@@ -72,18 +72,18 @@
             "B18        : CURVED     : 27      : -1     : B19",
             "B19        : CURVED     : 29      : -1     : B20",
             "B20        : CURVED     : 31      : -1     : B21",
-            "B21        : CURVED     : 33      : -1     : B21_S",
-            "B21_S      : SIGNAL     : 0       : 7      : B22",
+            "B21        : CURVED     : 33      : -1     : B_S6",
+            "B_S6       : SIGNAL     : 0       : 6      : B22",
             "B22        : STRAIGHT   : 0       : -1     : X04",
 
             "C00        : CURVED     : 1       : -1     : C01",
             "C01        : CURVED     : 3       : -1     : C02",
             "C02        : CURVED     : 5       : -1     : C03",
-            "C03        : CURVED     : 7       : -1     : C03_S",
-            "C03_S      : SIGNAL     : 0       : 9      : C05",
+            "C03        : CURVED     : 7       : -1     : C_S2",
+            "C_S2       : SIGNAL     : 0       : 2      : C05",
             "C05        : CURVED     : 51      : -1     : X02",
 
-            "X02        : SWITCH     : 0      : 10     : E00,D00",
+            "X02        : SWITCH     : 0      : 12     : E00,D00",
 
             "E00        : STRAIGHT   : 0       : -1     : E01",
             "E01        : STRAIGHT   : 54      : -1     : E02",
@@ -96,8 +96,8 @@
             "E08        : STRAIGHT   : 68      : -1     : E09",
             "E09        : STRAIGHT   : 70      : -1     : E10",
             "E10        : STRAIGHT   : 72      : -1     : E11",
-            "E11        : STRAIGHT   : 74      : -1     : E11_S",
-            "E11_S      : SIGNAL     : 0       : 12     : E12",
+            "E11        : STRAIGHT   : 74      : -1     : E_S3",
+            "E_S3       : SIGNAL     : 0       : 3      : E12",
             "E12        : STRAIGHT   : 0       : -1     : X03",
 
             "D00        : CURVED     : 0       : -1     : D01",
@@ -111,28 +111,28 @@
             "D08        : STRAIGHT   : 88      : -1     : D09",
             "D09        : STRAIGHT   : 90      : -1     : D10",
             "D10        : STRAIGHT   : 92      : -1     : D11",
-            "D11        : CURVED     : 55      : -1     : D11_S",
-            "D11_S      : SIGNAL     : 0       : 14     : D12",
+            "D11        : CURVED     : 55      : -1     : D_S4",
+            "D_S4       : SIGNAL     : 0       : 4      : D12",
             "D12        : CURVED     : 0       : -1     : X03!",
 
-            "X03        : SWITCH     : 0      : 15     : F00",
+            "X03        : SWITCH     : 0       : 13     : F00",
 
             "F00        : CURVED     : 57      : -1     : F01",
             "F01        : CURVED     : 59      : -1     : F02",
             "F02        : CURVED     : 61      : -1     : F03",
             "F03        : CURVED     : 63      : -1     : F04",
-            "F04        : CURVED     : 65      : -1     : F04_S",
-            "F04_S      : SIGNAL     : 0       : 17     : F05",
+            "F04        : CURVED     : 65      : -1     : F_S5",
+            "F_S5       : SIGNAL     : 0       : 5      : F05",
             "F05        : CURVED     : 0       : -1     : X04!",
 
-            "X04        : SWITCH     : 0      : 18     : G00",
+            "X04        : SWITCH     : 0      : 14     : G00",
         ]
     },
     
     {
         "service.factoryPid":"osgi.enroute.trains.station.manager",
         "service.pid":"1",
-        "stations": ["Station1:D06","Station2:E06","Station3:B10"]
+        "stations": ["Station1:D06","Station2:E06","Station3:B11"]
     },
 
     {
