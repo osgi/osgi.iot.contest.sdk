@@ -21,26 +21,26 @@ x-runremote: master; \
 		osgi.enroute.trains.application: \
 			capability:="osgi.service;objectClass:List<String>=osgi.enroute.trains.train.api.TrainController;effective:=active"
 
--runrequires.rest: \
-	osgi.identity;filter:='(osgi.identity=osgi.enroute.rest.simple.provider)',\
-	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.rest.provider.server)'
-
--runrequires.app: \
+-runrequires: \
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.application)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.track.controller.provider)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.track.manager.example.provider)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.train.manager.example.provider)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.location.provider)'
 
+-runrequires.rest: \
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.rest.simple.provider)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.rest.provider.server)'
+
 -runrequires.xtra: \
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.bostock.d3.webresource)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.executor.simple.provider)',\
 	osgi.identity;filter:='(osgi.identity=osgi.promise)',\
-	osgi.identity;filter:='(osgi.identity=osgi.enroute.gogo.extra.provider)'
 	
--runrequires.console: \
+-runrequires.debug: \
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.gogo.shell.provider)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.command)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.gogo.extra.provider)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.webconsole)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.webconsole.plugins.ds)'
 
