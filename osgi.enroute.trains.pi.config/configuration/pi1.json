@@ -1,41 +1,41 @@
 [
 
 	{
-        "service.pid":"Train-1",
+        "service.pid": "train-1",
         "service.factoryPid": "osgi.enroute.trains.hw.train",
         "channel":"CH1"
 	},
 	{
-        "service.pid":"Train-2",
+        "service.pid": "train-2",
         "service.factoryPid": "osgi.enroute.trains.hw.train",
         "channel":"CH2"
 	},
 
 	{
-		"service.pid":"Signal-1",
 		"controller.id":1,
+        "service.pid": "signal-1",
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",
 		"green":"GPIO 24",
 		"red":"GPIO 25"
 	},
 	{
-		"service.pid":"Signal-2",
-		"controller.id":1,
+		"controller.id":2,
+        "service.pid": "signal-2",
 		"service.factoryPid":"osgi.enroute.trains.hw.signal",
 		"green":"GPIO 3",
 		"red":"GPIO 21"
 	},
 
 	{
-		"service.pid":"Switch-11",
 		"controller.id":11,
+        "service.pid": "switch-1",
 		"service.factoryPid":"osgi.enroute.trains.hw.switch",
 		"fwd":"GPIO 8",
 		"rev":"GPIO 9"
 	},
 	{
-		"service.pid":"Switch-12",
 		"controller.id":12,
+        "service.pid": "switch-2",
 		"service.factoryPid":"osgi.enroute.trains.hw.switch",
 		"fwd":"GPIO 7",
 		"rev":"GPIO 2"

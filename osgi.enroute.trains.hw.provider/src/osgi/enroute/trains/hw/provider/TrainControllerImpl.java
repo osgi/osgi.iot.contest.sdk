@@ -23,7 +23,6 @@ public class TrainControllerImpl extends LegoRC implements TrainController {
 	@ObjectClassDefinition
 	@interface Config {
 		Channel channel() default Channel.CH1;
-
 		int divider() default 100;
 	}
 
