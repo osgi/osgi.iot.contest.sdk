@@ -34,7 +34,7 @@ import osgi.enroute.iot.gpio.util.Wave;
 
 public class LIRCImpl extends ICAdapter<Wave, Void> implements Wave {
 	private ByteOrder endianness = ByteOrder.nativeOrder();
-	private File file;
+	private final File file;
 
 	public LIRCImpl() throws Exception {
 		String path = "/dev/lirc0";
@@ -49,7 +49,7 @@ public class LIRCImpl extends ICAdapter<Wave, Void> implements Wave {
 
 
 	@Override
-	public void send(int[] times) throws Exception {
+	public synchronized void send(int[] times) throws Exception {
 		ByteBuffer pulses = ByteBuffer.allocate(times.length * 4);
 		pulses.order(endianness);
 
