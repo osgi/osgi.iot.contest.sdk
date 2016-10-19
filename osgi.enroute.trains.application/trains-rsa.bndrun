@@ -26,7 +26,11 @@ x-runremote: master; \
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.track.controller.provider)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.track.manager.example.provider)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.train.manager.example.provider)',\
-	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.location.provider)'
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.location.provider)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.operator.provider)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.passengers.provider)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.mqtt.provider)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.sensors.provider)'
 
 -runrequires.rest: \
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.rest.simple.provider)',\
@@ -103,4 +107,6 @@ x-runremote: master; \
 	osgi.enroute.trains.sensors.provider;version=snapshot,\
 	osgi.enroute.trains.station.provider;version=snapshot,\
 	org.apache.felix.inventory;version='[1.0.4,1.0.5)',\
-	org.apache.felix.webconsole.plugins.ds;version='[2.0.2,2.0.3)'
+	org.apache.felix.webconsole.plugins.ds;version='[2.0.2,2.0.3)',\
+	osgi.enroute.trains.mqtt.provider;version=snapshot,\
+	osgi.enroute.trains.passengers.provider;version=snapshot
