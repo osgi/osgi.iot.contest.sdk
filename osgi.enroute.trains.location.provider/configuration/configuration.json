@@ -1,13 +1,9 @@
 [
     {
         "service.pid" : "osgi.enroute.trains.location.provider",
-        "accountName" : "NetLogix-WB",
-        "XbrokerUrl" : "mqtts://broker-sandbox.everyware-cloud.com:8883",
-        "Xusername" : "osgiTrain",
-        "Xpassword" : "osg!TrainDem0",
-        "brokerUrl" : "mqtt://192.168.99.10:1883",
-        "username" : "none",
-        "password" : "none",
+        "brokerUrl" : "tcp://192.168.99.10:1883",
+        "username" : "",
+        "password" : "",
 
         ".comment" : "map RFID tag UUIDs to simple codes on stickers attached to tags",
         "code2tag" : [

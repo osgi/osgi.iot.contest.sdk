@@ -1,5 +1,6 @@
 package osgi.enroute.trains.location.provider;
 
+import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,7 @@ import org.osgi.util.promise.Promise;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+import osgi.enroute.dto.api.DTOs;
 import osgi.enroute.trains.cloud.api.Segment;
 import osgi.enroute.trains.cloud.api.TrackForSegment;
 import osgi.enroute.trains.controller.api.TrainLocator;
@@ -35,11 +36,9 @@ import osgi.enroute.trains.controller.api.TrainLocator;
 public class TrainLocationClient implements TrainLocator {
     static final Logger log = LoggerFactory.getLogger(TrainLocationClient.class);
 
-    private static final String ACCOUNT_NAME = "NetLogix-WB";
-    private static final String BROKER_URL = "mqtts://broker-sandbox.everyware-cloud.com:8883";
-    private static final String USERNAME = "osgiTrain";
-    private static final String PASSWORD = "osg!TrainDem0";
-
+    private static final String BROKER_URL = "tcp://192.168.99.10:1883";
+    private static final String USERNAME = "";
+    private static final String PASSWORD = "";
     private static final String CLIENT_ID = "TrainLocator";
 
     private MqttClient mqttClient = null;
@@ -49,6 +48,9 @@ public class TrainLocationClient implements TrainLocator {
 
     @Reference
     private TrackForSegment trackInfo;
+
+    @Reference
+    private DTOs dtos;
 
     //
     // Activate: create client configuration, and set its properties
@@ -60,21 +62,17 @@ public class TrainLocationClient implements TrainLocator {
 
         BiFunction<String, String, String> getOrDefault = (t, u) -> t != null ? t : u;
 
-        String accountName = getOrDefault.apply(config.accountName(), ACCOUNT_NAME);
-        String brokerUrl = getOrDefault.apply(config.brokerUrl(), BROKER_URL);
-        
-        // paho mqtt client impl uses different URL schemes to EDC client
-        // user should not be aware of impl, so map schemes
-        brokerUrl = brokerUrl.replaceFirst("^mqtt:", "tcp:").replaceFirst("^mqtts:", "ssl:");
-        
-        String username = getOrDefault.apply(config.username(), USERNAME);
-        String password = getOrDefault.apply(config.password(), PASSWORD);
-
-        MqttConnectOptions options = new MqttConnectOptions();
-        options.setUserName(username);
-        options.setPassword(password.toCharArray());
-
         try {
+            String brokerUrl = getOrDefault.apply(config.brokerUrl(), BROKER_URL);
+            String username = getOrDefault.apply(config.username(), USERNAME);
+            String password = getOrDefault.apply(config.password(), PASSWORD);
+
+            MqttConnectOptions options = new MqttConnectOptions();
+            if (!username.isEmpty()) {
+                options.setUserName(username);
+                options.setPassword(password.toCharArray());
+            }
+
             // Connect and start the session
             info("Connecting to MQTT broker <{}>", brokerUrl);
             mqttClient = new MqttClient(brokerUrl, CLIENT_ID);
@@ -82,9 +80,10 @@ public class TrainLocationClient implements TrainLocator {
             mqttClient.connect(options);
 
             // Subscribe
-            info("Subscribing to topic <{}>", "+/TrainDemo/#");
-            mqttClient.subscribe(new String[] {"+", "TrainDemo/#"});
-        } catch (MqttException e) {
+            String topic = "TrainDemo/#";
+            info("Subscribing to topic <{}>", topic);
+            mqttClient.subscribe(topic);
+        } catch (Exception e) {
             error(e.toString());
             throw new RuntimeException(e);
         }
@@ -155,7 +154,7 @@ public class TrainLocationClient implements TrainLocator {
                     if (dup != null) {
                         warn("duplicate segments [{}, {}] for code {}", dup, segment, code);
                     }
-                    
+
                     if (!tag2code.containsValue(code)) {
                         warn("no tag configured with code<{}> for segment<{}>", code, segment);
                     }
@@ -163,8 +162,8 @@ public class TrainLocationClient implements TrainLocator {
             }
         }
 
-//        info("tag2code=" + tag2code);
-//        info("code2segment=" + code2segment);
+        // info("tag2code=" + tag2code);
+        // info("code2segment=" + code2segment);
     }
 
     @Override
@@ -203,12 +202,25 @@ public class TrainLocationClient implements TrainLocator {
         // display data messages received from broker
         @Override
         public void messageArrived(String topic, MqttMessage msg) throws Exception {
-            info("messageArrived on topic=<{}>: {}", topic, msg);
+//            info("messageArrived on topic=<{}>: {}", topic, msg);
 
             byte[] payload = msg.getPayload();
+            String json = new String(payload);
 
-            String trainId = String.valueOf(getMetric("train", payload));
-            Object location = getMetric("location", payload);
+            if (!json.startsWith("{")) {
+                // json: TRAIN1=DisConnected
+                String[] split = json.split("=", 2);
+                info("connection: train={}, status={}", split[0], split[1]);
+                return;
+            }
+
+            // json: {"train":"TRAIN1","location":"010E9EF905","time":"432"}
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = dtos.decoder(Map.class).get(new ByteArrayInputStream(payload));
+            info("location: {}", map);
+
+            String trainId = (String) map.get("train");
+            String location = (String) map.get("location");
 
             if (location != null) {
                 String tag = location.toString();
@@ -223,10 +235,6 @@ public class TrainLocationClient implements TrainLocator {
                         trigger(trainId, segment);
                     }
                 }
-            } else if (getMetric("connection", payload) != null) {
-                info("trainId<{}>: {}", trainId, getMetric("connection", payload));
-            } else {
-                info("Data publish arrived on semantic topic: " + topic);
             }
         }
 
@@ -238,11 +246,6 @@ public class TrainLocationClient implements TrainLocator {
         @Override
         public void deliveryComplete(IMqttDeliveryToken token) {
             info("MQTT client delivery complete: " + token);
-        }
-        
-        
-        String getMetric(String metric, byte[] payload) {
-            return null;
         }
 
     }
