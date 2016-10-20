@@ -6,22 +6,18 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 import osgi.enroute.dto.api.DTOs;
-import osgi.enroute.trains.operator.api.TrainOperator;
 import osgi.enroute.trains.passenger.api.Passenger;
 import osgi.enroute.trains.passenger.api.Person;
 import osgi.enroute.trains.passenger.api.PersonDatabase;
@@ -53,31 +49,6 @@ public class StationsManagerImpl implements StationsManager{
 	
 	@Reference
 	private PersonDatabase personDB;
-	
-	private Map<String, List<String>> operators = new ConcurrentHashMap<>();
-	
-	@Reference(policy=ReferencePolicy.DYNAMIC,
-			cardinality=ReferenceCardinality.MULTIPLE)
-	void addOperator(TrainOperator operator, Map<String, Object> properties){
-		String id = (String)properties.get("id");
-		List<String> operatingTrains = operator.getTrains();
-		for(String train : operatingTrains){
-			// initially no passengers on this train
-			passengersOnTrain.put(train, new ArrayList<>());
-		}
-		operators.put(id, operatingTrains);
-	}
-	
-	void removeOperator(TrainOperator operator, Map<String, Object> properties){
-		String id = (String)properties.get("id");
-		List<String> trains = operators.remove(id);
-		if(trains != null){
-			for(String t : trains){
-				// TODO what with passengers on these trains?!
-				passengersOnTrain.remove(t);
-			}
-		}
-	}
 	
 	@Reference
 	private EventAdmin ea;
@@ -134,6 +105,9 @@ public class StationsManagerImpl implements StationsManager{
 	public List<Passenger> getPassengersOnTrain(String train) {
 		try {
 			lock.readLock().lock();
+			if(!passengersOnTrain.containsKey(train)){
+				passengersOnTrain.put(train,  new ArrayList<>());
+			}
 			return Collections.unmodifiableList(new ArrayList<Passenger>(passengersOnTrain.get(train)));
 		} finally {
 			lock.readLock().unlock();
@@ -214,11 +188,6 @@ public class StationsManagerImpl implements StationsManager{
 			return null;
 		}
 		
-		if(!passengersOnTrain.containsKey(train)){
-			System.err.println("Train "+train+" is not operated in any of the stations managed by this StationsManager");
-			return null;
-		}
-		
 		try {
 			lock.writeLock().lock();
 			List<Passenger> onTrain = passengersOnTrain.get(train);
@@ -264,11 +233,6 @@ public class StationsManagerImpl implements StationsManager{
 			return;
 		}
 		
-		if(!passengersOnTrain.containsKey(train)){
-			System.err.println("Train "+train+" is not operated in any of the stations managed by this StationsManager");
-			return;
-		}
-
 		try {
 			StationObservation o = new StationObservation();
 			o.type = Type.ARRIVAL;
@@ -281,8 +245,8 @@ public class StationsManagerImpl implements StationsManager{
 		
 		try {
 			lock.writeLock().lock();
-			List<Passenger> onTrain = passengersOnTrain.get(train); 
-					
+			List<Passenger> onTrain = getPassengersOnTrain(train);
+			
 			Iterator<Passenger> it = onTrain.iterator();
 			while(it.hasNext()){
 				Passenger p = it.next();
