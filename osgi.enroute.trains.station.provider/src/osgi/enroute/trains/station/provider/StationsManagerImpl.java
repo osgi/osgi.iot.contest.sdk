@@ -161,7 +161,7 @@ public class StationsManagerImpl implements StationsManager{
 		}
 		
 		if(!checkValidPersonLocation(personId, station)){
-			System.err.println("Person "+personId+" cannot be at "+station);
+//			System.err.println("Person "+personId+" cannot be at "+station);
 			return null;
 		}
 		
