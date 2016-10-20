@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -32,7 +31,6 @@ import osgi.enroute.trains.stations.api.Station;
 import osgi.enroute.trains.stations.api.StationsManager;
 import osgi.enroute.trains.track.util.Tracks;
 import osgi.enroute.trains.track.util.Tracks.SegmentHandler;
-import osgi.enroute.trains.train.api.TrainController;
 import osgi.enroute.twitter.bootstrap.capabilities.RequireBootstrapWebResource;
 import osgi.enroute.webserver.capabilities.RequireWebServerExtender;
 
@@ -166,12 +164,15 @@ public class TrainsApplication implements JSONRPC {
 		return null;
 	}
 	
-	@Reference(cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC)
-	void addTrain(TrainController tm, Map<String,Object> map) {
-		name2rfid.put( (String)map.get("train.name"), (String)map.get("train.rfid"));
+	@Reference(cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC,
+	        target = "(component.name=osgi.enroute.trains.train.manager)")
+	void addTrain(Object tm, Map<String,Object> map) {
+		String name = (String)map.get("name");
+		String rfid = (String)map.get("rfid");
+		name2rfid.put(name, rfid);
 	}
 	
-	void removeTrain(TrainController tm) {
+	void removeTrain(Object tm) {
 		
 	}
 
