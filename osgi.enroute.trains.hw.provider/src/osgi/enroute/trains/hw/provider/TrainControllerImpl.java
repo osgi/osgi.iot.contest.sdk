@@ -33,7 +33,7 @@ public class TrainControllerImpl extends LegoRC implements TrainController {
 	void start(Config config) throws Exception {
 		this.config = config;
 		System.out.println("activate: " + toString());
-		this.setWave(new LIRCImpl());
+		this.setWave(LIRCImpl.getInstance());
 		super.activate(config.channel());
 		this.divider = config.divider();
 	}
