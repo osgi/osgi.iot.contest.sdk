@@ -33,7 +33,6 @@ public class Command {
 
 	@Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
 	void addTrain(TrainController t, ServiceReference<?> ref) {
-
 		String ch = (String) ref.getProperty("channel");
 		trains.put(ch.toLowerCase(), t);
 	}
