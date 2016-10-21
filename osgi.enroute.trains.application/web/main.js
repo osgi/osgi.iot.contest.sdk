@@ -49,13 +49,14 @@
 
 	});
 
-	MODULE.run(function($rootScope, $location, en$easse, en$jsonrpc, $modal) {
+	MODULE.run(function($rootScope, $location, en$easse, en$jsonrpc, $modal, $timeout) {
 		var track = {};
 		
 		$rootScope.alerts = alerts;
 		$rootScope.trains = trains;
 		$rootScope.track = track;
 		$rootScope.stations = stations;
+		$rootScope.notification = null;
 
 		en$easse.handle("osgi/trains/observation", function(e) {
 			$rootScope.$applyAsync(function() {
@@ -145,6 +146,10 @@
 							});
 						});
 					});
+					break;
+				case "NOTIFICATION":
+					$rootScope.notification = e.message;
+					$timeout(function () { $rootScope.notification = null; }, 5000);
 					break;
 				default:
 					break;
