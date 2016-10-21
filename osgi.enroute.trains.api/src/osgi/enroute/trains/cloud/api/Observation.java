@@ -57,5 +57,4 @@ public class Observation extends DTO {
 	public boolean blocked;
 	public boolean dark;
 	public boolean emergency;
-	public double speed;
 }
