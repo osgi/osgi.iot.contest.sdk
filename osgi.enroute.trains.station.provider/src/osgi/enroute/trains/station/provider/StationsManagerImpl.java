@@ -1,7 +1,6 @@
 package osgi.enroute.trains.station.provider;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -95,7 +94,7 @@ public class StationsManagerImpl implements StationsManager{
 	public List<Passenger> getPassengersWaiting(String station) {
 		try {
 			lock.readLock().lock();
-			return Collections.unmodifiableList(new ArrayList<Passenger>(passengersInStation.get(station)));
+			return new ArrayList<Passenger>(passengersInStation.get(station));
 		} finally {
 			lock.readLock().unlock();
 		}
@@ -108,7 +107,7 @@ public class StationsManagerImpl implements StationsManager{
 			if(!passengersOnTrain.containsKey(train)){
 				passengersOnTrain.put(train,  new ArrayList<>());
 			}
-			return Collections.unmodifiableList(new ArrayList<Passenger>(passengersOnTrain.get(train)));
+			return new ArrayList<Passenger>(passengersOnTrain.get(train));
 		} finally {
 			lock.readLock().unlock();
 		}
