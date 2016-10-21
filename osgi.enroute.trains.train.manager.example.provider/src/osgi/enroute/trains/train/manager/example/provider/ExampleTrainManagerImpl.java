@@ -178,12 +178,12 @@ public class ExampleTrainManagerImpl {
                     
                     // populate myObs for our train, with last LOCATED observation first
                     if (name.equals(o.train)) {
-                        if (o.type == Type.LOCATED) {
-                           lastLocated = o; 
-                        }
-                        else {
+//                        if (o.type == Type.LOCATED) {
+//                           lastLocated = o; 
+//                        }
+//                        else {
                             myObs.add(o);
-                        }
+//                        }
                     }
                 }
                 
@@ -321,7 +321,7 @@ public class ExampleTrainManagerImpl {
             boolean dark = false;
             
             // figure out where to go to next - check next segments
-            for(int i=0; i < 6 ;i++){
+            for(int i=0; i < 8 ;i++){
             	if(route.size() > i){
             		if(!(route.get(i).isSwitch() || route.get(i).isMerge())){ // switches don't have a track
             			toTrack = route.get(i).getTrack();

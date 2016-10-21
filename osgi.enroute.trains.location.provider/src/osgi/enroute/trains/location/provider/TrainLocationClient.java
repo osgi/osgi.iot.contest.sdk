@@ -217,7 +217,7 @@ public class TrainLocationClient implements TrainLocator {
             // json: {"train":"TRAIN1","location":"010E9EF905","time":"432"}
             @SuppressWarnings("unchecked")
             Map<String, Object> map = dtos.decoder(Map.class).get(new ByteArrayInputStream(payload));
-            info("location: {}", map);
+//            info("location: {}", map);
 
             String trainId = (String) map.get("train");
             String location = (String) map.get("location");
