@@ -119,7 +119,9 @@ public class StationsManagerImpl implements StationsManager{
 
 		Person person = personDB.getPerson(personId);
 		if(person == null){
-			System.err.println("Non-existent person <" + personId + "> tried to check in at station <" + station + ">");
+			System.err.println("Non-existent person <" + personId +
+			        "> tried to check in at station <" + station +
+			        "> to destination <" + destination + ">");
 			return null;
 		}
 
