@@ -119,17 +119,17 @@ public class StationsManagerImpl implements StationsManager{
 
 		Person person = personDB.getPerson(personId);
 		if(person == null){
-			System.err.println("Non-existent person tried to check in");
+			System.err.println("Non-existent person <" + personId + "> tried to check in at station <" + station + ">");
 			return null;
 		}
 
 		if(!passengersInStation.containsKey(station)){
-			System.err.println("Station "+station+" is not managed by this StationsManager");
+			System.err.println("Station <" + station + "> is not managed by this StationsManager");
 			return null;
 		}
 		
 		if(!passengersInStation.containsKey(destination)){
-			System.err.println("Station "+station+" is not managed by this StationsManager");
+			System.err.println("Station <" + station + "> is not managed by this StationsManager");
 			return null;
 		}
 		
