@@ -18,9 +18,10 @@ import osgi.enroute.iot.gpio.util.ICAdapter;
 /**
  * http://www.nishioka.com/train/
  */
-@Component(service = IC.class, property = {
-		Debug.COMMAND_SCOPE + "=lego", Debug.COMMAND_FUNCTION + "=fwd",
-		Debug.COMMAND_FUNCTION + "=brake", Debug.COMMAND_FUNCTION + "=out" })
+// NOT USED/USEFUL?
+//@Component(service = IC.class, property = {
+//		Debug.COMMAND_SCOPE + "=lego", Debug.COMMAND_FUNCTION + "=fwd",
+//		Debug.COMMAND_FUNCTION + "=brake", Debug.COMMAND_FUNCTION + "=out" })
 public class Command extends ICAdapter<Void, Analog>{
 	final int PULSE_WIDTH = 13;
 	int toggle = 0;

@@ -7,7 +7,6 @@ import java.nio.ByteOrder;
 
 import javax.naming.ConfigurationException;
 
-import osgi.enroute.iot.gpio.api.CircuitBoard;
 import osgi.enroute.iot.gpio.util.ICAdapter;
 import osgi.enroute.iot.gpio.util.Wave;
 
@@ -33,47 +32,54 @@ import osgi.enroute.iot.gpio.util.Wave;
  */
 
 public class LIRCImpl extends ICAdapter<Wave, Void> implements Wave {
-	private ByteOrder endianness = ByteOrder.nativeOrder();
-	private File file;
+    private final ByteOrder endianness;
+    private final File file;
 
-	public LIRCImpl() throws Exception {
-		String path = "/dev/lirc0";
-		this.file = new File(path);
-		if (!file.exists())
-			throw new ConfigurationException(
-					path
-							+ " does not exist. LIRC requires device tree + dtoverlay=lirc-rpi,softcarrier=0 in /boot/config.txt");
-		
-		endianness = ByteOrder.LITTLE_ENDIAN;
-	}
+    private static class InstanceHolder {
+        private static final LIRCImpl INSTANCE = new LIRCImpl();
+    }
 
+    public static LIRCImpl getInstance() throws Exception {
+        LIRCImpl instance = InstanceHolder.INSTANCE;
+        if (!instance.file.exists()) {
+            throw new ConfigurationException(instance.file + " does not exist." +
+                    " LIRC requires: dtoverlay=lirc-rpi,softcarrier=0 in /boot/config.txt");
+        }
+        return instance;
+    }
 
-	@Override
-	public void send(int[] times) throws Exception {
-		ByteBuffer pulses = ByteBuffer.allocate(times.length * 4);
-		pulses.order(endianness);
+    private LIRCImpl() {
+        String path = "/dev/lirc0";
+        this.file = new File(path);
+        endianness = ByteOrder.LITTLE_ENDIAN;
+    }
 
-		int length = times.length;
+    @Override
+    public synchronized void send(int[] times) throws Exception {
+        ByteBuffer pulses = ByteBuffer.allocate(times.length * 4);
+        pulses.order(endianness);
 
-		// lirc_rpi doesn't want to see trailing space (requires count to be
-		// odd)
+        int length = times.length;
 
-		if ((times.length & 1) == 0)
-			length--;
+        // lirc_rpi doesn't want to see trailing space (requires count to be
+        // odd)
 
-		for (int i = 0; i < length; i++) {
-			pulses.putInt(times[i] & 0xFF_FF_FF);
-		}
+        if ((times.length & 1) == 0)
+            length--;
 
-		byte[] array = pulses.array();
+        for (int i = 0; i < length; i++) {
+            pulses.putInt(times[i] & 0xFF_FF_FF);
+        }
 
-		try (FileOutputStream fd = new FileOutputStream(file)) {
-			fd.write(array, 0, length * 4);
-		}
-	}
+        byte[] array = pulses.array();
 
-	@Override
-	public void setCircuitBoard(CircuitBoard board) {
-		super.setCircuitBoard(board);
-	}
+        try (FileOutputStream fd = new FileOutputStream(file)) {
+            fd.write(array, 0, length * 4);
+        }
+    }
+
+    // @Override
+    // public void setCircuitBoard(CircuitBoard board) {
+    // super.setCircuitBoard(board);
+    // }
 }

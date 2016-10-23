@@ -8,9 +8,6 @@ x-runremote: master; \
 	jdb=1044; \
 	shell=-1
 
--runproperties.posh: \
-	posh.home=${user.home}
-
 -runtrace: false
 
 -include: \
@@ -24,27 +21,32 @@ x-runremote: master; \
 		osgi.enroute.trains.application: \
 			capability:="osgi.service;objectClass:List<String>=osgi.enroute.trains.train.api.TrainController;effective:=active"
 
--runrequires.rest: \
-	osgi.identity;filter:='(osgi.identity=osgi.enroute.rest.simple.provider)',\
-	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.rest.provider.server)'
-
--runrequires.app: \
+-runrequires: \
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.application)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.track.controller.provider)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.track.manager.example.provider)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.train.manager.example.provider)',\
-	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.location.provider)'
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.location.provider)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.operator.provider)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.passengers.provider)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.mqtt.provider)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.sensors.provider)'
+
+-runrequires.rest: \
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.rest.simple.provider)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.rest.provider.server)'
 
 -runrequires.xtra: \
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.bostock.d3.webresource)',\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.executor.simple.provider)',\
 	osgi.identity;filter:='(osgi.identity=osgi.promise)',\
-	osgi.identity;filter:='(osgi.identity=osgi.enroute.gogo.extra.provider)'
 	
--runrequires.console: \
+-runrequires.debug: \
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.gogo.shell.provider)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.command)',\
-	osgi.identity;filter:='(osgi.identity=org.apache.felix.webconsole)'
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.gogo.extra.provider)',\
+	osgi.identity;filter:='(osgi.identity=org.apache.felix.webconsole)',\
+	osgi.identity;filter:='(osgi.identity=org.apache.felix.webconsole.plugins.ds)'
 
 -runblacklist:\
 	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.emulator.provider)',\
@@ -73,7 +75,6 @@ x-runremote: master; \
 	org.eclipse.equinox.coordinator;version='[1.3.100,1.3.101)',\
 	org.eclipse.equinox.event;version='[1.3.100,1.3.101)',\
 	org.eclipse.equinox.metatype;version='[1.4.100,1.4.101)',\
-	org.eclipse.paho.client.mqttv3;version='[1.0.2,1.0.3)',\
 	org.osgi.service.event;version='[1.3.1,1.3.2)',\
 	org.osgi.service.metatype;version='[1.3.0,1.3.1)',\
 	osgi.enroute.bostock.d3.webresource;version='[3.5.6,3.5.7)',\
@@ -83,7 +84,6 @@ x-runremote: master; \
 	osgi.enroute.executor.simple.provider;version='[1.0.0,1.0.1)',\
 	osgi.enroute.gogo.extra.provider;version=snapshot,\
 	osgi.enroute.gogo.shell.provider;version='[1.0.0,1.0.1)',\
-	osgi.enroute.google.angular.webresource;version='[1.4.4,1.4.5)',\
 	osgi.enroute.jsonrpc.simple.provider;version='[1.1.3,1.1.4)',\
 	osgi.enroute.logger.simple.provider;version='[1.2.1,1.2.2)',\
 	osgi.enroute.rest.simple.provider;version='[2.0.2,2.0.3)',\
@@ -98,4 +98,15 @@ x-runremote: master; \
 	osgi.enroute.trains.util;version=snapshot,\
 	osgi.enroute.twitter.bootstrap.webresource;version='[3.3.5,3.3.6)',\
 	osgi.enroute.web.simple.provider;version='[1.3.3,1.3.4)',\
-	osgi.promise;version='[6.0.0,6.0.1)'
+	osgi.promise;version='[6.0.0,6.0.1)',\
+	org.eclipse.paho.client.mqttv3;version='[1.1.0,1.1.1)',\
+	osgi.enroute.github.angular-ui.webresource;version='[0.13.3,0.13.4)',\
+	osgi.enroute.google.angular.webresource;version='[1.5.7,1.5.8)',\
+	osgi.enroute.trains.operator.provider;version=snapshot,\
+	osgi.enroute.trains.person.provider;version=snapshot,\
+	osgi.enroute.trains.sensors.provider;version=snapshot,\
+	osgi.enroute.trains.station.provider;version=snapshot,\
+	org.apache.felix.inventory;version='[1.0.4,1.0.5)',\
+	org.apache.felix.webconsole.plugins.ds;version='[2.0.2,2.0.3)',\
+	osgi.enroute.trains.mqtt.provider;version=snapshot,\
+	osgi.enroute.trains.passengers.provider;version=snapshot

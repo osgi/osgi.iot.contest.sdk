@@ -85,6 +85,11 @@ public class LayoutAdapter extends SegmentFactoryAdapter<LayoutAdapter.Layout> {
 
 		@Override
 		public void layout(int x, int y, Layout from) {
+			
+			if(!prev.getTrack().equals(segment.track)){
+				title();
+			}
+			
 			if (x > 0 && isRoot())
 				return;
 
@@ -93,6 +98,7 @@ public class LayoutAdapter extends SegmentFactoryAdapter<LayoutAdapter.Layout> {
 				this.segmentPosition.y = y;
 				next.get().layout(x + this.width, y, this);
 			}
+
 		}
 
 		@Override

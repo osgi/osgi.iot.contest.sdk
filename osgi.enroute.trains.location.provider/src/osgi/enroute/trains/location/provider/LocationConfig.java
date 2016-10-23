@@ -10,8 +10,6 @@ public @interface LocationConfig {
 
 	final static public String LOCATION_CONFIG_PID = "osgi.enroute.trains.location.provider";
 
-	String accountName();
-
 	String brokerUrl();
 
 	String username();

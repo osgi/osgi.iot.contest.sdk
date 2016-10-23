@@ -9,7 +9,8 @@ Bundle-Description: 				\
 
 Export-Package: \
 	osgi.enroute.trains.controller.api,\
-	osgi.enroute.trains.train.api
+	osgi.enroute.trains.train.api,\
+	osgi.enroute.trains.cloud.api
 	
 Private-Package:  \
 	osgi.enroute.trains.emulator.provider

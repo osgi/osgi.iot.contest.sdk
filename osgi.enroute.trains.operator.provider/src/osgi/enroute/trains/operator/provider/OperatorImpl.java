@@ -43,8 +43,9 @@ import osgi.enroute.trains.stations.api.StationsManager;
 		immediate=true)
 public class OperatorImpl implements TrainOperator, EventHandler {
 
-	private static int BOARD_TIME = 30000;
-	private static int TRAVEL_TIME = 80000;
+	private static int BOARD_TIME = 15000;
+	private static int MINIMAL_BOARD_TIME = 5000;
+	private static int TRAVEL_TIME = 60000;
 	
     @ObjectClassDefinition
     @interface Config {
@@ -153,15 +154,25 @@ public class OperatorImpl implements TrainOperator, EventHandler {
 					cp.cancel();
 				}
 				
-				// notify arrival
-				System.out.println("Train "+train+" arrived at "+station);
-				stationsMgr.arrive(train, station);
-
 				// schedule next departure
 				final Schedule schedule = schedules.get(train);
 				final ScheduleEntry s = schedule.entries.get(0);
 				
-				scheduler.at(s.departureTime).then(p -> {
+				long departure = s.departureTime;
+				if(s.departureTime-System.currentTimeMillis() < MINIMAL_BOARD_TIME){
+					// if delayed, still wait for minimal board time
+					departure = System.currentTimeMillis() + MINIMAL_BOARD_TIME;
+					s.departureTime = departure;
+				}
+				
+				// notify arrival
+				System.out.println("Train "+train+" arrived at "+station);
+				stationsMgr.arrive(train, station);
+				
+				long time = (departure-System.currentTimeMillis())/1000;
+				System.out.println("Train "+train+" will depart to "+s.destination+" in "+time+" s.");
+				announceDeparture(train, s.destination, time);
+				scheduler.at(departure).then(p -> {
 					
 					List<Passenger> onBoard = stationsMgr.leave(train, s.start);
 					passengersOnTrains.put(train, onBoard);
@@ -232,6 +243,20 @@ public class OperatorImpl implements TrainOperator, EventHandler {
 			ea.postEvent(event);
 		} catch(Exception e){
 			System.err.println("Error sending notification Event: "+e.getMessage());
+		}
+	}
+	
+	private void announceDeparture(String train, String destination, long time){
+		StationObservation announce = new StationObservation();
+		announce.type = StationObservation.Type.NOTIFICATION;
+		announce.station = destination;
+		announce.train = train;
+		announce.message = "Train "+train+" will depart to "+destination+" in "+time+" seconds.";
+		try {
+			Event event = new Event(StationObservation.TOPIC, dtos.asMap(announce));
+			ea.postEvent(event);
+		} catch(Exception e){
+			System.err.println("Error sending announce Event: "+e.getMessage());
 		}
 	}
 }

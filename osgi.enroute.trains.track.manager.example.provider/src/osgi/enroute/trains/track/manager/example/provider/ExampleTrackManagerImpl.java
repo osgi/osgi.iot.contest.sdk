@@ -136,11 +136,6 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
             return;
         }
 
-        if (!sh.isLocator()) {
-            error("Only locator segments can be used for assignments.");
-            return;
-        }
-
         if (assignments.isEmpty()) {
             // first assignment - ensure all signals are RED
             getSignals().keySet().forEach(seg -> {
@@ -249,8 +244,12 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
                     // check if switch is ok
                     Optional<SwitchHandler<Object>> optSwitch = getSwitch(fromTrack, toTrack);
                     if (!optSwitch.isPresent()) {
-                        error("No switch between " + fromTrack + " and " + toTrack);
+                    	// in case no switch, just set signal - if present - green
+                        info("No switch between " + fromTrack + " and " + toTrack);
+                        greenSignal(getSignal(fromTrack));
+                        granted = true;
                     } else {
+                    	// set switch in correct position
                         SwitchHandler<Object> switchHandler = optSwitch.get();
                         if (shouldSwitch(switchHandler, fromTrack, toTrack)) {
                             doSwitch(switchHandler.segment.id, !switchHandler.toAlternate);

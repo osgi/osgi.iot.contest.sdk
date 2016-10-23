@@ -33,7 +33,8 @@ public class Command {
 
 	@Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
 	void addTrain(TrainController t, ServiceReference<?> ref) {
-		trains.put((String) ref.getProperty("train.name"), t);
+		String ch = (String) ref.getProperty("channel");
+		trains.put(ch.toLowerCase(), t);
 	}
 
 	void removeTrain(TrainController t) {
@@ -62,12 +63,12 @@ public class Command {
 		switches.values().remove(s);
 	}
 
-	public void move(String train, int directionAndSpeed) {
-		trains.get(train).move(directionAndSpeed);
+	public void move(String ch, int directionAndSpeed) {
+		trains.get(ch).move(directionAndSpeed);
 	}
 
-	public void light(String train, boolean on) {
-		trains.get(train).light(on);
+	public void light(String ch, boolean on) {
+		trains.get(ch).light(on);
 	}
 
 	public String signal(int controller, String color) {
@@ -112,8 +113,8 @@ public class Command {
 		return switches.values();
 	}
 	
-	public Collection<TrainController> trains() {
-		return trains.values();
+	public Map<String, TrainController> trains() {
+	    return trains;
 	}
 	
 	public String trns() {
@@ -126,8 +127,8 @@ public class Command {
 				+ "switch <controller> <alt>         set the switch status\n"
 				+ "switch <controller>               get the switch status\n"
 				+ "trains                            show the trains\n"
-				+ "move <name> <speed %>             set the speed of the train\n"
-				+ "light <name> <on>                 set the light on or off\n"
+				+ "move <ch> <speed %>               set the speed of the train\n"
+				+ "light <ch> <on>                   set the light on or off\n"
 				;
 	}
 }

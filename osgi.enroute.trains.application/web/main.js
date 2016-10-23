@@ -49,13 +49,14 @@
 
 	});
 
-	MODULE.run(function($rootScope, $location, en$easse, en$jsonrpc, $modal) {
+	MODULE.run(function($rootScope, $location, en$easse, en$jsonrpc, $modal, $timeout) {
 		var track = {};
 		
 		$rootScope.alerts = alerts;
 		$rootScope.trains = trains;
 		$rootScope.track = track;
 		$rootScope.stations = stations;
+		$rootScope.notification = null;
 
 		en$easse.handle("osgi/trains/observation", function(e) {
 			$rootScope.$applyAsync(function() {
@@ -93,8 +94,17 @@
 							trains.rfids[ e.train  ].assignment = e.assignment;
 					}
 					break;
-					
-					
+				case "BLOCKED": {
+						var s = track[ e.segment ];
+						if ( angular.isDefined(s) )
+							s.symbol = e.blocked ? "BLOCKED" : "PLAIN";
+					}
+					break;
+				case "EMERGENCY": {
+						if ( trains.rfids[ e.train ] )
+							trains.rfids[ e.train ].emergency = e.emergency;
+					}
+					break;
 				}
 			});
 		}, function(e) {
@@ -136,6 +146,10 @@
 							});
 						});
 					});
+					break;
+				case "NOTIFICATION":
+					$rootScope.notification = e.message;
+					$timeout(function () { $rootScope.notification = null; }, 5000);
 					break;
 				default:
 					break;

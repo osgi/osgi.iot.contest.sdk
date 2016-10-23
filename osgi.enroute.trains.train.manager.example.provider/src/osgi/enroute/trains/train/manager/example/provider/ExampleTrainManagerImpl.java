@@ -1,5 +1,6 @@
 package osgi.enroute.trains.train.manager.example.provider;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -81,6 +82,11 @@ public class ExampleTrainManagerImpl {
         name = config.name();
         rfid = config.rfid();
         speed = config.speed();
+        
+        if (name ==  null || rfid == null) {
+            throw new IllegalArgumentException("name=" + name + " rfid=" + rfid);
+        }
+
         info("activate: speed<{}> rfid<{}>", speed, rfid);
 
         // register train with Track Manager
@@ -152,27 +158,40 @@ public class ExampleTrainManagerImpl {
             stop();
 
             while (isActive()) {
-
-                observations = trackManager
-                        .getRecentObservations(lastObsId);
-
-                for (Observation o : observations) {
+                List<Observation> myObs = new ArrayList<>();
+                Observation lastLocated = null;
+                observations = trackManager.getRecentObservations(lastObsId);
+                
+                for (int i = 0; i < observations.size(); i++) {
+                    Observation o = observations.get(i);
                     lastObsId = o.id;
 
                     tracks.event(o);
 
-                    if(o.type == Type.DARK){
-                    	if(o.dark){
+                    if (o.type == Type.DARK) {
+                    	if (o.dark) {
                     		darkSegments.add(o.segment);
                     	} else {
                     		darkSegments.remove(o.segment);
                     	}
                     }
                     
-                    if (name == null || !name.equals(o.train)) {
-                        continue;
+                    // populate myObs for our train, with last LOCATED observation first
+                    if (name.equals(o.train)) {
+//                        if (o.type == Type.LOCATED) {
+//                           lastLocated = o; 
+//                        }
+//                        else {
+                            myObs.add(o);
+//                        }
                     }
+                }
+                
+                if (lastLocated != null) {
+                    myObs.add(0, lastLocated);
+                }
 
+                for (Observation o : myObs) {
                     switch (o.type) {
                     case ASSIGNMENT:
                         // new assignment, plan and follow the route
@@ -217,8 +236,8 @@ public class ExampleTrainManagerImpl {
                             	followRoute();
                             }
                         }
-
                         break;
+
                     case EMERGENCY:
                     	emergency = o.emergency;
                     	info("emergency({}) - {}", o.emergency, o.message);
@@ -237,6 +256,7 @@ public class ExampleTrainManagerImpl {
                     		blink(3);
                     	}
                     	break;
+
                     default:
                         break;
                     }
@@ -303,7 +323,7 @@ public class ExampleTrainManagerImpl {
             boolean dark = false;
             
             // figure out where to go to next - check next segments
-            for(int i=0; i < 6 ;i++){
+            for(int i=0; i < 8 ;i++){
             	if(route.size() > i){
             		if(!(route.get(i).isSwitch() || route.get(i).isMerge())){ // switches don't have a track
             			toTrack = route.get(i).getTrack();
@@ -323,6 +343,7 @@ public class ExampleTrainManagerImpl {
             }
             
             // if we have to go to other track, request access
+            info("from={} to={} access={} location={}", fromTrack, toTrack, currentAccess, currentLocation);
             if (!fromTrack.equals(toTrack) && !toTrack.equals(currentAccess)) {
                 info("stop and request access to track<{}> from <{}>", toTrack, currentLocation);
                 move(0);

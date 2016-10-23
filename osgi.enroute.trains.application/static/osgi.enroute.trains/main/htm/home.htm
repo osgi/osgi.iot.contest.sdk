@@ -115,14 +115,42 @@
 						}}
 						<g ng-switch=p.symbol ng:attr:transform="translate({{x}},{{y+30}})">
 							<g ng-repeat="t in trains.rfids" ng-show="t.segment==p.segment.id">
-								<path d="M -6 0 l 8 -8 l 8 8 l -8 8 l -8 -8"  style="stroke:black;stroke-width:2px;fill:lightblue"></path>
+								<g ng-switch=t.emergency>
+									<g ng-switch-when=true>
+										<path d="M -6 0 l 8 -8 l 8 8 l -8 8 l -8 -8"  style="stroke:black;stroke-width:2px;fill:red"></path>
+										<image x="-10" y="10" width="20" height="20" xlink:href="img/alert.png">
+									</g>
+									<g ng-switch-default>
+										<path d="M -6 0 l 8 -8 l 8 8 l -8 8 l -8 -8"  style="stroke:black;stroke-width:2px;fill:lightblue"></path>
+									</g>
+								</g>
 								<text text-anchor=middle x=0 y=-20 fill="black" style="font-size:0.9em;fill:black;">{{t.train}}</text>
 								<title>Train {{t.train}}</title>
 							</g>
 						</g>
 					</g>
+					<g ng-repeat="p in track" class={{p.segment.id}}>
+						{{
+							x = p.x * w;
+							y = p.y * h + h;
+							l = p.width * w;
+						;""
+						}}
+						<g ng-switch=p.symbol ng:attr:transform="translate({{x}},{{y+30}})">
+							<g ng-switch-when=BLOCKED>
+								<path d="M 5 5 L 5 -5 L -5 -5 L -5 5 Z"  style="stroke:white;stroke-width:2px;fill:white"></path>
+								<image x="-10" y="10" width="20" height="20" xlink:href="img/alert.png">
+								<title>Blocked {{p.segment.id}}</title>
+							</g>
+						</g>
+					</g>
 				</g>
 			</svg>
+		</div>
+	</div>
+	<div class=row ng-show="notification != null">
+		<div class="alert alert-info">
+	  		<p>{{notification}}</p>
 		</div>
 	</div>
 	<div class=row>
@@ -137,6 +165,14 @@
 							<col style="width:50%">
 							<col style="width:20%">
 						</colgroup>
+						<thead>
+							<tr>
+								<th>Train</th>
+								<th>Segment</th>
+								<th>Passengers on train</th>
+								<th>Destination</th>
+							</tr>
+						</thead>
 						<tbody>
 							<tr ng-repeat='t in trains.rfids' class="{{t.assignment.startsWith(t.segment)?'arrived':'chase'}}">
 								<td>{{t.train}}</td>
@@ -168,6 +204,13 @@
 							<col style="width:60%">
 							<col style="width:20%">
 						</colgroup>
+						<thead>
+							<tr>
+								<th>Station</th>
+								<th>Passengers waiting in station</th>
+								<th></th>
+							</tr>
+						</thead>
 						<tbody>
 							<tr ng-repeat='(station, passengers) in stations.passengers'>
 								<td>{{station}}</td>
@@ -198,7 +241,6 @@
 							<col style="">
 							<col style="">
 							<col style="">
-							<col style="">
 						</colgroup>
 						<thead>
 							<tr>
@@ -210,7 +252,6 @@
 								<th>Blocked</th>
 								<th>Assign</th>
 								<th>Signal</th>
-								<th>Speed</th>
 							</tr>
 						</thead>
 						<tbody style="font-size:smaller">
@@ -223,7 +264,6 @@
 								<td>{{e.blocked}}</td>
 								<td>{{e.assignment}}</td>
 								<td>{{e.signal}}</td>
-								<td>{{e.speed}}</td>
 							</tr>
 						</tbody>
 					</table>
