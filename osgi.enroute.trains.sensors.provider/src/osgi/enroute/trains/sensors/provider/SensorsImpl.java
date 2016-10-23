@@ -42,6 +42,9 @@ public class SensorsImpl implements EventHandler {
 			case DOOR:
 				trains.emergency(e.train, "Open door", e.open);
 				break;
+			case PASSENGER:
+				// Brake the train
+				trains.emergency(e.train, "Passenger Emergency Brake", e.passenger);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
