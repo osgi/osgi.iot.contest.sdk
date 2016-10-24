@@ -10,7 +10,8 @@ public class SensorEvent extends DTO{
 		WATER, 
 		LIGHT,
 		MOTION,
-		DOOR
+		DOOR,
+		PASSENGER
 	}
 	
 	public Type type;
@@ -21,4 +22,5 @@ public class SensorEvent extends DTO{
 	public boolean dark;
 	public boolean motion;
 	public boolean open;
+	public boolean passenger;  // Passenger emergency brake
 }

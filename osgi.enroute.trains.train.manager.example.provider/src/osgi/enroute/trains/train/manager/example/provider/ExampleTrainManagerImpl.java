@@ -240,6 +240,7 @@ public class ExampleTrainManagerImpl {
 
                     case EMERGENCY:
                     	emergency = o.emergency;
+                    	info("emergency({}) - {}", o.emergency, o.message);
                     	if(emergency){
                     		emergencies.add(o.message);
                     	} else {
@@ -250,6 +251,7 @@ public class ExampleTrainManagerImpl {
                     		// no more emergencies, follow route
                     		followRoute();
                     	} else {
+                    		info("stop and blink 1 2 3 ...");
                     		stop();
                     		blink(3);
                     	}
