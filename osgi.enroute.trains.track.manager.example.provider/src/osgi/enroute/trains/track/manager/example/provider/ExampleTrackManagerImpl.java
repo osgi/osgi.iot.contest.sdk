@@ -389,7 +389,7 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
     public void locatedTrainAt(String rfid, String segment) {
         String train = rfid2Name.get(rfid);
         if (train == null) {
-            throw new IllegalArgumentException("Unknown train for rfid:" + rfid);
+            throw new IllegalArgumentException("Unknown train for rfid: " + rfid);
         }
 
         SegmentHandler<Object> handler = tracks.getHandler(segment);
@@ -467,7 +467,7 @@ public class ExampleTrackManagerImpl implements TrackForSegment, TrackForTrain, 
                 observations.notifyAll();
             }
             Event event = new Event(Observation.TOPIC, dtos.asMap(o));
-            ea.sendEvent(event);
+            ea.postEvent(event);
         } catch (Exception e) {
             logger.error("Error posting observation " + o, e);
         }

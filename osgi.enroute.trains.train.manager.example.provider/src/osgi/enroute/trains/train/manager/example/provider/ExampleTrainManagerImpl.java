@@ -166,7 +166,12 @@ public class ExampleTrainManagerImpl {
                     Observation o = observations.get(i);
                     lastObsId = o.id;
 
-                    tracks.event(o);
+                    try {
+                        tracks.event(o);
+                    } catch (Exception e) {
+                        error("Unable to update the track: {}", e.getMessage());
+                        continue;
+                    }
 
                     if (o.type == Type.DARK) {
                     	if (o.dark) {

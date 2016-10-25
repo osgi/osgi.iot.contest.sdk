@@ -105,6 +105,19 @@
 								<title>Station {{station.name}}</title>
 							</g>
 						</g>
+					</g>
+					<!-- hard coded station markers -->	
+					<g transform="translate(330,10)">
+						<path d="M 14 10 L 14 -10 L -10 -10 L -10 10 Z"  style="stroke:black;stroke-width:2px;fill:white"></path>
+						<text text-anchor=middle x=0 y=25 style="font-size:0.9em;fill:black;">Bosch_Boulevard</text>
+					</g>
+					<g transform="translate(60,120)">
+						<path d="M 14 10 L 14 -10 L -10 -10 L -10 10 Z"  style="stroke:black;stroke-width:2px;fill:white"></path>
+						<text text-anchor=middle x=0 y=25 style="font-size:0.9em;fill:black;">iMinds_Intersection</text>
+					</g>
+					<g transform="translate(540,210)">
+						<path d="M 14 10 L 14 -10 L -10 -10 L -10 10 Z"  style="stroke:black;stroke-width:2px;fill:white"></path>
+						<text text-anchor=middle x=0 y=25 style="font-size:0.9em;fill:black;">Paremus_Precinct</text>
 					</g>					
 					<g ng-repeat="p in track" class={{p.segment.id}}>
 						{{

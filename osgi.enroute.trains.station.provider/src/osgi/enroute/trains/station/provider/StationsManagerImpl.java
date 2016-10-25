@@ -146,13 +146,13 @@ public class StationsManagerImpl implements StationsManager{
 		p.inStation = station;
 		p.destination = destination;
 		
-		System.out.println(p.person.firstName+" "+p.person.lastName+" checked in at "+station+" to travel to "+destination);
+//		System.out.println(p.person.firstName+" "+p.person.lastName+" checked in at "+station+" to travel to "+destination);
 		
 		try {
 			lock.writeLock().lock();
 			List<Passenger> waiting = passengersInStation.get(station);
 			waiting.add(p);
-			System.out.println("Now "+waiting.size()+" passengers waiting in "+station);
+//			System.out.println("Now "+waiting.size()+" passengers waiting in "+station);
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -180,12 +180,12 @@ public class StationsManagerImpl implements StationsManager{
 		// TODO throw exceptions instead of null return?
 
 		if(!checkValidTrainLocation(train, station)){
-			System.err.println("Cannot board the train as it is not in the station");
+//			System.err.println("Cannot board the train as it is not in the station");
 			return null;
 		}
 
 		if(!passengersInStation.containsKey(station)){
-			System.err.println("Station "+station+" is not managed by this StationsManager");
+//			System.err.println("Station "+station+" is not managed by this StationsManager");
 			return null;
 		}
 		

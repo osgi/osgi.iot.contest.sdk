@@ -132,7 +132,7 @@
     {
         "service.factoryPid":"osgi.enroute.trains.station.manager",
         "service.pid":"1",
-        "stations": ["Station1:D06","Station2:E06","Station3:B11"]
+        "stations": ["Makewave_Mall:D06","Eurotech_Esplanade:E03","OSGi_Central:B11"]
     },
 
     {
@@ -140,7 +140,7 @@
         "service.pid":"1",
         "name" : "OSGiOperator",
         "trains" : ["White","Red"],
-        "stations": ["Station1","Station2","Station3"]
+        "stations": ["OSGi_Central","Eurotech_Esplanade","Makewave_Mall"]
     },
     
     {

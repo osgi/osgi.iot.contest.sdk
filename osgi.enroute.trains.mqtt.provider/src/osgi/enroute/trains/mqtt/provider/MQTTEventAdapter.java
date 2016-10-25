@@ -3,6 +3,8 @@ package osgi.enroute.trains.mqtt.provider;
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -26,6 +28,8 @@ import osgi.enroute.dto.api.DTOs;
 	configurationPolicy=ConfigurationPolicy.REQUIRE)
 public class MQTTEventAdapter implements EventHandler, MqttCallback {
 
+    private ExecutorService thread = Executors.newFixedThreadPool(4);
+    
 	private MqttClient mqtt;
 	private String id;
 	
@@ -74,27 +78,29 @@ public class MQTTEventAdapter implements EventHandler, MqttCallback {
 	 */
 	@Override
 	public void handleEvent(Event event) {
-		// serialize OSGi event to JSON object and send out as MQTT event
-		Map<String, Object> eventMap = new HashMap<>();
-		for(String k : event.getPropertyNames()){
-			eventMap.put(k, event.getProperty(k));
-		}
+	    thread.submit(()->{
+	        // serialize OSGi event to JSON object and send out as MQTT event
+	        Map<String, Object> eventMap = new HashMap<>();
+	        for(String k : event.getPropertyNames()){
+	            eventMap.put(k, event.getProperty(k));
+	        }
 
-		// tag with the sender id to filter out on receiving messages
-		String sender = (String)eventMap.get("_sender");
-		if(sender != null && sender.equals(id)){
-			return;
-		} else {
-			eventMap.put("_sender", id);
-		}
-		
-		try {
-			String json = dtos.encoder(eventMap).ignoreNull().put();
-			MqttMessage msg = new MqttMessage(json.getBytes());
-			mqtt.publish(event.getTopic(), msg);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	        // tag with the sender id to filter out on receiving messages
+	        String sender = (String)eventMap.get("_sender");
+	        if(sender != null && sender.equals(id)){
+	            return;
+	        } else {
+	            eventMap.put("_sender", id);
+	        }
+	        
+	        try {
+	            String json = dtos.encoder(eventMap).ignoreNull().put();
+	            MqttMessage msg = new MqttMessage(json.getBytes());
+	            mqtt.publish(event.getTopic(), msg);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    });
 	}
 
 	/**
@@ -113,22 +119,25 @@ public class MQTTEventAdapter implements EventHandler, MqttCallback {
 	@Override
 	public void messageArrived(String topic, MqttMessage message) throws Exception {
 		// parse message payload as JSON object and send as OSGi event
-		try {
-			Map<String, Object> eventMap = dtos.decoder(Map.class).get(new ByteArrayInputStream(message.getPayload()));
+	    thread.submit(()->{
+	        try {
+	            Map<String, Object> eventMap = dtos.decoder(Map.class).get(new ByteArrayInputStream(message.getPayload()));
 
-			// tag with the sender id to filter out on receiving messages
-			String sender = (String)eventMap.get("_sender");
-			if(sender != null && sender.equals(id)){
-				return;
-			} else {
-				eventMap.put("_sender", id);
-			}
-			
-			Event event = new Event(topic, eventMap);
-			ea.sendEvent(event);
-		} catch(Exception e){
-			e.printStackTrace();
-		}
+	            // tag with the sender id to filter out on receiving messages
+	            String sender = (String)eventMap.get("_sender");
+	            if(sender != null && sender.equals(id)){
+	                return;
+	            } else {
+	                eventMap.put("_sender", id);
+	            }
+	            
+	            Event event = new Event(topic, eventMap);
+	            ea.sendEvent(event);
+	        } catch(Exception e){
+	            e.printStackTrace();
+	        }
+	    });
+		
 	}
 
 }
