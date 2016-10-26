@@ -43,9 +43,9 @@ import osgi.enroute.trains.stations.api.StationsManager;
 		immediate=true)
 public class OperatorImpl implements TrainOperator, EventHandler {
 
-	private static int BOARD_TIME = 15000;
-	private static int MINIMAL_BOARD_TIME = 5000;
-	private static int TRAVEL_TIME = 60000;
+	private static int BOARD_TIME = 5000;
+	private static int MINIMAL_BOARD_TIME = 3000;
+	private static int TRAVEL_TIME = 30000;
 	
     @ObjectClassDefinition
     @interface Config {
@@ -106,7 +106,7 @@ public class OperatorImpl implements TrainOperator, EventHandler {
 			schedule.entries = new ArrayList<>();
 			
 			// don't start all the trains at same instant...
-			long time = System.currentTimeMillis()+BOARD_TIME*i;
+			long time = System.currentTimeMillis()+BOARD_TIME*(i+1);
 			ScheduleEntry e = new ScheduleEntry();
 			// also mixup initial stations for each train
 			int k = i % stations.size();

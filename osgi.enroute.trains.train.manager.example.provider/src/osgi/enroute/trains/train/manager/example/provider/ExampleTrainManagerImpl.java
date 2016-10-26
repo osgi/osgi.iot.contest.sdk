@@ -179,6 +179,7 @@ public class ExampleTrainManagerImpl {
                     	} else {
                     		darkSegments.remove(o.segment);
                     	}
+                    	info("DARK segment {} dark={}", o.segment, o.dark);
                     }
                     
                     // populate myObs for our train, with last LOCATED observation first
@@ -334,7 +335,7 @@ public class ExampleTrainManagerImpl {
             			toTrack = route.get(i).getTrack();
             		}
             		
-            		if(darkSegments.contains(route.get(i).segment.id)){
+            		if(!dark && darkSegments.contains(route.get(i).segment.id)){
             			dark = true;
             		}
             	}

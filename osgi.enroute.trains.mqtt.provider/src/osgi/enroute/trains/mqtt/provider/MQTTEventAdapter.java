@@ -122,6 +122,7 @@ public class MQTTEventAdapter implements EventHandler, MqttCallback {
 	    thread.submit(()->{
 	        try {
 	            Map<String, Object> eventMap = dtos.decoder(Map.class).get(new ByteArrayInputStream(message.getPayload()));
+	            System.out.println("MQTT EVENT: " + eventMap);
 
 	            // tag with the sender id to filter out on receiving messages
 	            String sender = (String)eventMap.get("_sender");

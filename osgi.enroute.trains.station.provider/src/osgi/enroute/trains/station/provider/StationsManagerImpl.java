@@ -146,7 +146,7 @@ public class StationsManagerImpl implements StationsManager{
 		p.inStation = station;
 		p.destination = destination;
 		
-//		System.out.println(p.person.firstName+" "+p.person.lastName+" checked in at "+station+" to travel to "+destination);
+		System.out.println(p.person.firstName+" "+p.person.lastName+" checked in at "+station+" to travel to "+destination);
 		
 		try {
 			lock.writeLock().lock();
@@ -192,6 +192,10 @@ public class StationsManagerImpl implements StationsManager{
 		try {
 			lock.writeLock().lock();
 			List<Passenger> onTrain = passengersOnTrain.get(train);
+			if(onTrain == null){
+			    onTrain = new ArrayList<>();
+			    passengersOnTrain.put(train, onTrain);
+			}
 			List<Passenger> inStation = passengersInStation.get(station);
 			
 			Iterator<Passenger> it = inStation.iterator();
@@ -246,7 +250,11 @@ public class StationsManagerImpl implements StationsManager{
 		
 		try {
 			lock.writeLock().lock();
-			List<Passenger> onTrain = getPassengersOnTrain(train);
+			List<Passenger> onTrain = passengersOnTrain.get(train);
+			if(onTrain == null){
+			    onTrain = new ArrayList<>();
+			    passengersOnTrain.put(train, onTrain);
+			}
 			
 			Iterator<Passenger> it = onTrain.iterator();
 			while(it.hasNext()){
@@ -254,11 +262,13 @@ public class StationsManagerImpl implements StationsManager{
 				
 				if(p.destination.equals(station)){
 					System.out.println(p.person.firstName+" "+p.person.lastName+" checked out "+station);
-					
+
+	                it.remove();
+
 					checkOut(p.person.id, station);
-					it.remove();
 				}
 			}
+			
 		} finally {
 			lock.writeLock().unlock();
 		}
