@@ -36,7 +36,7 @@ import osgi.enroute.trains.controller.api.TrainLocator;
 public class TrainLocationClient implements TrainLocator {
     static final Logger log = LoggerFactory.getLogger(TrainLocationClient.class);
 
-    private static final String BROKER_URL = "tcp://192.168.99.10:1883";
+    private static final String BROKER_URL = "tcp://iot.eclipse.org:1883";
     private static final String USERNAME = "";
     private static final String PASSWORD = "";
     private static final String CLIENT_ID = "TrainLocator";
