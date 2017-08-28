@@ -2,12 +2,9 @@ package osgi.enroute.gogo.extra.provider;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Formatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.felix.service.command.CommandSession;
 import org.apache.felix.service.command.Descriptor;
@@ -17,13 +14,9 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.runtime.ServiceComponentRuntime;
-import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
-import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
-import org.yaml.snakeyaml.Yaml;
 
 import aQute.libg.glob.Glob;
 import osgi.enroute.debug.api.Debug;
@@ -44,8 +37,8 @@ public class ExtraImpl {
 	@Reference
 	DTOs dtos;
 
-	@Reference
-	ServiceComponentRuntime ds;
+//	@Reference
+//	ServiceComponentRuntime ds;
 	
 	@Activate
 	void act(BundleContext context) {
@@ -167,23 +160,23 @@ public class ExtraImpl {
 		}
 	}
 	
-	public List<String> ds() {
-		return ds.getComponentDescriptionDTOs().stream().map( d -> d.name ).collect(Collectors.toList());
-	}
-	
-	public List<String> ds( Glob g ) {
-		return ds.getComponentDescriptionDTOs().stream().
-				filter( r -> g.matcher(r.name).matches()  ).
-				map( d -> {
-			StringWriter sw = new StringWriter();
-			Yaml yaml = new Yaml();
-			yaml.dump(d, sw);
-			sw.write("-------------------");
-			Collection<ComponentConfigurationDTO> c = ds.getComponentConfigurationDTOs(d);
-			yaml.dump(c, sw);
-
-			return sw.toString();
-		} ).collect(Collectors.toList());
-	}
+//	public List<String> ds() {
+//		return ds.getComponentDescriptionDTOs().stream().map( d -> d.name ).collect(Collectors.toList());
+//	}
+//	
+//	public List<String> ds( Glob g ) {
+//		return ds.getComponentDescriptionDTOs().stream().
+//				filter( r -> g.matcher(r.name).matches()  ).
+//				map( d -> {
+//			StringWriter sw = new StringWriter();
+//			Yaml yaml = new Yaml();
+//			yaml.dump(d, sw);
+//			sw.write("-------------------");
+//			Collection<ComponentConfigurationDTO> c = ds.getComponentConfigurationDTOs(d);
+//			yaml.dump(c, sw);
+//
+//			return sw.toString();
+//		} ).collect(Collectors.toList());
+//	}
 
 }
