@@ -2,20 +2,11 @@
 # OSGI ENROUTE TRAINS API
 #
 
-Bundle-Version:1.0.0.${tstamp}
+Bundle-Version: 2.0.0.${tstamp}
 Bundle-Description: 				\
 	Contains the API code for the trains.
 
 	
-Export-Package: \
-	osgi.enroute.trains.cloud.api;provide:=true,\
-	osgi.enroute.trains.sensor.api,\
-	osgi.enroute.trains.controller.api,\
-	osgi.enroute.trains.train.api,\
-	osgi.enroute.trains.hardware.api,\
-	osgi.enroute.trains.operator.api,\
-	osgi.enroute.trains.passenger.api,\
-	osgi.enroute.trains.stations.api
 
 
 Require-Capability: \
@@ -23,3 +14,7 @@ Require-Capability: \
 
 -buildpath: \
 	osgi.enroute.base.api;version=1.0
+Export-Package: \
+	osgi.enroute.trains.segment.api,\
+	osgi.enroute.trains.track.api,\
+	osgi.enroute.trains.train.api

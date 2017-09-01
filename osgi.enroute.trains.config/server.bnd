@@ -1,0 +1,6 @@
+
+# 
+# Configuration for the server
+#
+
+-includeresource: {configuration/configuration.json = configuration/track.json}

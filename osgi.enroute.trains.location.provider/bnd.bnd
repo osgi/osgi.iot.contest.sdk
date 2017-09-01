@@ -2,7 +2,7 @@
 # OSGI ENROUTE TRAINS LOCATION PROVIDER
 #
 
-Bundle-Version: 			1.0.0.${tstamp}
+Bundle-Version: 2.0.0.${tstamp}
 Bundle-Description: \
 	Subscribes to raw location info via MQTT, maps it to a segment name and publishes as TrainLocator service.
 	

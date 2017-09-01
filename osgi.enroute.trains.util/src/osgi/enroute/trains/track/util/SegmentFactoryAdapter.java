@@ -1,6 +1,6 @@
 package osgi.enroute.trains.track.util;
 
-import osgi.enroute.trains.cloud.api.Segment;
+import osgi.enroute.trains.track.api.Segment;
 import osgi.enroute.trains.track.util.Tracks.SegmentHandler;
 
 public class SegmentFactoryAdapter<T> implements SegmentFactory<T> {

@@ -133,7 +133,7 @@ public class MQTTEventAdapter implements EventHandler, MqttCallback {
 	            }
 	            
 	            Event event = new Event(topic, eventMap);
-	            ea.sendEvent(event);
+	            ea.postEvent(event);
 	        } catch(Exception e){
 	            e.printStackTrace();
 	        }

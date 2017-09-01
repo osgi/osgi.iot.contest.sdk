@@ -2,7 +2,7 @@
 # OSGI ENROUTE TRAINS UTIL DEFAULTS
 #
 
-Bundle-Version:					1.0.0.${tstamp}
+Bundle-Version: 2.0.0.${tstamp}
 Bundle-Description: 				\
 	A bundle with utilities that can be used to work with the train track etc.
 

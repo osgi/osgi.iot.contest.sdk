@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import osgi.enroute.dto.api.TypeReference;
-import osgi.enroute.trains.cloud.api.Color;
-import osgi.enroute.trains.cloud.api.Observation;
-import osgi.enroute.trains.cloud.api.Segment;
-import osgi.enroute.trains.cloud.api.TrackConfiguration;
+import osgi.enroute.trains.segment.api.Color;
+import osgi.enroute.trains.track.api.Observation;
+import osgi.enroute.trains.track.api.Segment;
+import osgi.enroute.trains.track.api.TrackConfiguration;
 
 /**
  * A utility to parse configuration data and turn it into managed segments. This

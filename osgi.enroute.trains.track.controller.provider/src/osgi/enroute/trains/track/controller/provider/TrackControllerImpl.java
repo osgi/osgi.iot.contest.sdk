@@ -14,16 +14,16 @@ import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import osgi.enroute.trains.cloud.api.Color;
-import osgi.enroute.trains.cloud.api.TrackCommand;
-import osgi.enroute.trains.cloud.api.TrackCommand.Type;
-import osgi.enroute.trains.cloud.api.Segment;
-import osgi.enroute.trains.cloud.api.TrackForSegment;
-import osgi.enroute.trains.controller.api.RFIDSegmentController;
-import osgi.enroute.trains.controller.api.SegmentController;
-import osgi.enroute.trains.controller.api.SignalSegmentController;
-import osgi.enroute.trains.controller.api.SwitchSegmentController;
-import osgi.enroute.trains.controller.api.TrainLocator;
+import osgi.enroute.trains.segment.api.Color;
+import osgi.enroute.trains.segment.api.RFIDSegmentController;
+import osgi.enroute.trains.segment.api.SegmentController;
+import osgi.enroute.trains.segment.api.SignalSegmentController;
+import osgi.enroute.trains.segment.api.SwitchSegmentController;
+import osgi.enroute.trains.segment.api.TrainLocator;
+import osgi.enroute.trains.track.api.Segment;
+import osgi.enroute.trains.track.api.TrackCommand;
+import osgi.enroute.trains.track.api.TrackForSegment;
+import osgi.enroute.trains.track.api.TrackCommand.Type;
 
 /**
  * The TrackController listens for Command events and performs those on the

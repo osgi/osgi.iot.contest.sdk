@@ -10,14 +10,14 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 
-import osgi.enroute.trains.cloud.api.Color;
-import osgi.enroute.trains.cloud.api.Segment;
-import osgi.enroute.trains.cloud.api.Segment.Type;
-import osgi.enroute.trains.cloud.api.TrackInfo;
-import osgi.enroute.trains.controller.api.RFIDSegmentController;
-import osgi.enroute.trains.controller.api.SegmentController;
-import osgi.enroute.trains.controller.api.SignalSegmentController;
-import osgi.enroute.trains.controller.api.SwitchSegmentController;
+import osgi.enroute.trains.segment.api.Color;
+import osgi.enroute.trains.segment.api.RFIDSegmentController;
+import osgi.enroute.trains.segment.api.SegmentController;
+import osgi.enroute.trains.segment.api.SignalSegmentController;
+import osgi.enroute.trains.segment.api.SwitchSegmentController;
+import osgi.enroute.trains.track.api.Segment;
+import osgi.enroute.trains.track.api.TrackManager;
+import osgi.enroute.trains.track.api.Segment.Type;
 
 /**
  * Simple GoGo commands to access SegmentControllers published from (remote)
@@ -39,7 +39,7 @@ public class HardwareCommands {
 	private boolean info = false;
 
 	@Reference
-	void setTrackInfo(TrackInfo ti) {
+	void setTrackInfo(TrackManager ti) {
 		try {
 			id2name = ti.getSegments().values().stream().filter(s -> s.controller >= 0)
 					.collect(Collectors.toMap(s -> s.controller, s -> s.id + ":" + s.type));

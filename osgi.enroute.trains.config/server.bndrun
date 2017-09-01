@@ -1,0 +1,27 @@
+-runrequires: \
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.mqtt.provider)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.manager.track)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.manager.trains)',\
+	osgi.identity;filter:='(osgi.identity=osgi.enroute.trains.config.server)',\
+	osgi.identity;filter:='(&(osgi.identity=org.apache.felix.gogo.runtime)(version>=0.16.2))'
+	
+-runbundles: \
+	org.apache.felix.configadmin;version='[1.8.6,1.8.7)',\
+	org.apache.felix.gogo.runtime;version='[0.16.2,0.16.3)',\
+	org.apache.felix.log;version='[1.0.1,1.0.2)',\
+	org.apache.felix.scr;version='[2.0.0,2.0.1)',\
+	org.eclipse.equinox.event;version='[1.3.100,1.3.101)',\
+	org.eclipse.equinox.metatype;version='[1.4.100,1.4.101)',\
+	org.osgi.service.event;version='[1.3.1,1.3.2)',\
+	org.osgi.service.metatype;version='[1.3.0,1.3.1)',\
+	osgi.enroute.dto.bndlib.provider;version='[1.0.0,1.0.1)',\
+	osgi.enroute.iot.circuit.provider;version='[2.0.1,2.0.2)',\
+	osgi.enroute.logger.simple.provider;version='[1.1.1,1.1.2)',\
+	osgi.enroute.scheduler.simple.provider;version='[1.1.1,1.1.2)',\
+	osgi.enroute.trains.controller.train;version=snapshot,\
+	osgi.promise;version='[6.0.0,6.0.1)',\
+	org.eclipse.paho.client.mqttv3;version='[1.1.0,1.1.1)',\
+	osgi.enroute.trains.mqtt.provider;version=snapshot,\
+	osgi.enroute.trains.config.server;version=snapshot,\
+	osgi.enroute.trains.manager.track;version=snapshot,\
+	osgi.enroute.trains.manager.trains;version=snapshot
