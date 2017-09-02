@@ -9,8 +9,7 @@
   A06      : STRAIGHT        : 1      : -1         : A07
   A07      : STRAIGHT        : 1      : -1         : A08
   A08      : STRAIGHT        : 1      : -1         : A09
-  A09      : STRAIGHT        : 1      : -1         : A09_L
-  A09_L    : LOCATOR         : 1      :  7         : A10
+  A09      : STRAIGHT        : 1      : -1         : A10
   A10      : STRAIGHT        : 1      : -1         : A11
   A11      : STRAIGHT        : 1      : -1         : A12
   A12      : STRAIGHT        : 1      : -1         : A13
@@ -20,8 +19,7 @@
   A15      : CURVED          : 1      : -1         : A16
   A16      : CURVED          : 1      : -1         : A16_S
 
-  A16_S    : SIGNAL          : 0      : 1          : A16_L
-  A16_L    : LOCATOR         : 0      : 1          : X01
+  A16_S    : SIGNAL          : 0      : 1          : X01
   
   X01      : SWITCH          : 1      : -1         : B00, C00
   
@@ -32,8 +30,7 @@
   B04      : STRAIGHT        : 1      : -1         : B05
   B05      : STRAIGHT        : 1      : -1         : B06
   B06      : STRAIGHT        : 1      : -1         : B07
-  B07      : STRAIGHT        : 1      : -1         : B07_L
-  B07_L    : LOCATOR         : 0      :  8         : B08       
+  B07      : STRAIGHT        : 1      : -1         : B08
   B08      : STRAIGHT        : 1      : -1         : B09
   B09      : STRAIGHT        : 1      : -1         : B10
   B10      : STRAIGHT        : 1      : -1         : B11
@@ -50,8 +47,7 @@
   C03      : CURVED          : 1      : -1         : C04
   C04      : CURVED          : 1      : -1         : C05
   C05      : CURVED          : 1      : -1         : C05_S
-  C05_S    : SIGNAL          : 0      :  2         : C05_L
-  C05_L    : LOCATOR         : 0      :  2         : X02
+  C05_S    : SIGNAL          : 0      :  2         : X02
   
   X02      : SWITCH          : 1      : -1         : E00, D00
 
@@ -61,8 +57,7 @@
   D03      : STRAIGHT        : 1      : -1         : D04
   D04      : STRAIGHT        : 1      : -1         : D05
   D05      : STRAIGHT        : 1      : -1         : D06
-  D06      : STRAIGHT        : 1      : -1         : D06_L
-  D06_L    : LOCATOR         : 0      :  4         : D06_S
+  D06      : STRAIGHT        : 1      : -1         : D06_S
   D06_S    : SIGNAL          : 0      :  4         : D07  
   D07      : CURVED          : 1      : -1         : X03!
   
@@ -72,8 +67,7 @@
   E03      : STRAIGHT        : 1      : -1         : E04
   E04      : STRAIGHT        : 1      : -1         : E05
   E05      : STRAIGHT        : 1      : -1         : E06
-  E06      : STRAIGHT        : 1      : -1         : E06_L
-  E06_L    : LOCATOR         : 0      :  3         : E06_S
+  E06      : STRAIGHT        : 1      : -1         : E06_S
   E06_S    : SIGNAL          : 0      :  3         : X03 
   
   X03      : SWITCH          : 1      : -1         : F00
@@ -82,9 +76,8 @@
   F01      : CURVED          : 1      : -1         : F02
   F02      : CURVED          : 1      : -1         : F03
   F03      : CURVED          : 1      : -1         : F04
-  F04      : CURVED          : 1      : -1         : F05_L
-  F05_L    : LOCATOR         : 0      :  6         : F05_S
-  F05_S    : SIGNAL          : 0      :  6         : X04!
+  F04      : CURVED          : 1      : -1         : F04_S
+  F04_S    : SIGNAL          : 0      :  6         : X04!
 
   X04      : SWITCH          : 1      : -1         : A00
 
