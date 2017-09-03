@@ -1,8 +1,0 @@
-{ 
-"0":{"id": "0","firstName": "Mike","lastName": "Francis","company": "Paremus","picture": null}, 
-"1":{"id": "1","firstName": "Tim","lastName": "Verbelen","company": "imec","picture": "pictures/1.jpg"}, 
-"2":{"id": "2","firstName": "Tim","lastName": "Ward","company": "Paremus","picture": null}, 
-"3":{"id": "3","firstName": "Derek","lastName": "Baum","company": "Paremus","picture": "pictures/3.jpg"}, 
-"4":{"id": "4","firstName": "Venelin","lastName": "Andraudov","company": "ProSyst","picture": null}, 
-"5":{"id": "5","firstName": "Walt","lastName": "Bowers","company": "EuroTech","picture": null}, 
-}
