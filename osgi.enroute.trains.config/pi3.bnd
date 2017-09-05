@@ -1,6 +1,10 @@
 
 # 
-# Configuration for the P1 Raspberry PI 
+# Configuration for the P3 Raspberry PI 
 #
 
--includeresource: {configuration/configuration.json = configuration/pi3.json}
+Bundle-Version: 2.0.0
+Require-Capability: osgi.extender;filter:="(osgi.extender=osgi.configurator)"
+
+-includeresource: {OSGI-INF/configurator/configuration.json = configuration/pi3.json}
+

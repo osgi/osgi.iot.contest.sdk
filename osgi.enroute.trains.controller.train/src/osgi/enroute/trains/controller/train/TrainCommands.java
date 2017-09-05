@@ -1,15 +1,21 @@
 package osgi.enroute.trains.controller.train;
 
+import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.util.converter.Converter;
 
 import osgi.enroute.debug.api.Debug;
+import osgi.enroute.mqtt.api.MQTTService;
+import osgi.enroute.trains.track.api.Observation;
+import osgi.enroute.trains.train.api.TrainCommand;
 import osgi.enroute.trains.train.api.TrainController;
 
 /**
@@ -22,26 +28,62 @@ import osgi.enroute.trains.train.api.TrainController;
 }, service=TrainCommands.class)
 public class TrainCommands {
 
-	// TODO also listen for TrainCommand
+	@Reference
+	protected MQTTService mqtt;
 	
+	@Reference
+	protected Converter converter;
+	
+	@Activate
+	void activate(){
+		// listen for SegmentCommands
+		try {
+			mqtt.subscribe(TrainCommand.TOPIC).forEach(msg ->{
+				TrainCommand c = converter.convert(msg.payload().array()).to(TrainCommand.class);
+				switch(c.type){
+				case LIGHT:
+					light(c.train, c.on);
+					
+					break;
+				case MOVE:
+					move(c.train, c.directionAndSpeed);
+					break;
+				}
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}	
 	final Map<String, TrainController> trains = new ConcurrentHashMap<>();
 
 	@Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
 	void addTrain(TrainController t, ServiceReference<?> ref) {
-		String ch = (String) ref.getProperty("channel");
-		trains.put(ch.toLowerCase(), t);
+		String train = (String) ref.getProperty(TrainController.CONTROLLER_TRAIN);
+		trains.put(train, t);
 	}
 
 	void removeTrain(TrainController t) {
 		trains.values().remove(t);
 	}
 
-	public void move(String ch, int directionAndSpeed) {
-		trains.get(ch).move(directionAndSpeed);
+	public void move(String train, int directionAndSpeed) {
+		TrainController t = trains.get(train);
+		if(t != null){
+			t.move(directionAndSpeed);
+			
+			// TODO publish observation?
+		}
+		
 	}
 
-	public void light(String ch, boolean on) {
-		trains.get(ch).light(on);
+	public void light(String train, boolean on) {
+		TrainController t = trains.get(train);
+		if(t != null){
+			t.light(on);
+			
+			// TODO publish observation?
+		}
 	}
 
 	public Map<String, TrainController> trains() {

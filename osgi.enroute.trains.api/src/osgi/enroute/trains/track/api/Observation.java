@@ -22,23 +22,13 @@ public class Observation extends DTO {
 		/**
 		 * Switched changed alternate state
 		 */
-		SWITCH,
-		/**
-		 * Assignment changed
-		 */
-		ASSIGNMENT, 
-		/**
-		 * Assignment reached
-		 */
-		ASSIGNMENT_REACHED
+		SWITCH
 	}
 
 	public Type type;
 	public String segment;
 	public String train;
 	public Color signal;
-	public String assignment;
 	public long time;
-	public long id;
 	public boolean alternate;
 }

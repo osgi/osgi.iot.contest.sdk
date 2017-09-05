@@ -1,14 +1,12 @@
-package osgi.enroute.trains.track.api;
+package osgi.enroute.trains.segment.api;
 
 import org.osgi.dto.DTO;
-
-import osgi.enroute.trains.segment.api.Color;
 
 /**
  * Event class for sending out commands to control signals / switches
  */
-public class TrackCommand extends DTO {
-	public final static String TOPIC = "osgi/trains/track/command";
+public class SegmentCommand extends DTO {
+	public final static String TOPIC = "osgi/trains/command/segment";
 
 	public enum Type {
 		SIGNAL, SWITCH

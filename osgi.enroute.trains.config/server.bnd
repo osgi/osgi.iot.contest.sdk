@@ -3,4 +3,7 @@
 # Configuration for the server
 #
 
--includeresource: {configuration/configuration.json = configuration/track.json}
+Bundle-Version: 2.0.0
+Require-Capability: osgi.extender;filter:="(osgi.extender=osgi.configurator)"
+
+-includeresource: {OSGI-INF/configurator/configuration.json = configuration/server.json}

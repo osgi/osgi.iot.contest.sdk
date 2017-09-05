@@ -1,62 +1,29 @@
-[
-
-	{
-        "service.pid": "train-1",
-        "service.factoryPid": "osgi.enroute.trains.hw.train",
-        "channel":"CH1"
+{
+	"osgi.enroute.trains.controller.train~Train-1":{
+		"controller.channel":"CH1",
+		"controller.train":"White",
 	},
-	{
-        "service.pid": "train-2",
-        "service.factoryPid": "osgi.enroute.trains.hw.train",
-        "channel":"CH2"
+	
+	"osgi.enroute.trains.controller.train~Train-2":{
+		"controller.channel":"CH2",
+		"controller.train":"Red",
 	},
-
-	{
-		"controller.id":1,
-        "service.pid": "signal-1",
-		"service.factoryPid":"osgi.enroute.trains.hw.signal",
+	
+	"osgi.enroute.trains.controller.signal~S01":{
+		"controller.segment":"S01",
 		"green":"GPIO 24",
 		"red":"GPIO 25"
 	},
-	{
-		"controller.id":2,
-        "service.pid": "signal-2",
-		"service.factoryPid":"osgi.enroute.trains.hw.signal",
+	
+	"osgi.enroute.trains.controller.signal~S02":{
+		"controller.segment":"S02",
 		"green":"GPIO 3",
 		"red":"GPIO 21"
 	},
-
-	{
-		"controller.id":11,
-        "service.pid": "switch-1",
-		"service.factoryPid":"osgi.enroute.trains.hw.switch",
+	
+	"osgi.enroute.trains.controller.switch~X01":{
+		"controller.segment":"X01",
 		"fwd":"GPIO 8",
 		"rev":"GPIO 9"
-	},
-	{
-		"controller.id":12,
-        "service.pid": "switch-2",
-		"service.factoryPid":"osgi.enroute.trains.hw.switch",
-		"fwd":"GPIO 7",
-		"rev":"GPIO 2"
-	},
-
-	{
-        "service.pid": "com.paremus.net.encode"
-    },
-    {
-        "service.pid": "com.paremus.dosgi.net",
-        "server.bind.address": "192.168.99.11",
-        "allow.insecure.transports": true
-    },
-    {
-        "service.pid": "com.paremus.dosgi.discovery.gossip",
-        "root.cluster": "IOT_DEMO"
-    },
-    {
-        "service.pid": "com.paremus.gossip",
-        "service.factoryPid": "com.paremus.gossip",
-        "cluster.name": "IOT_DEMO",
-        "initial.peers": "192.168.99.10"
-    }
-]
+	}
+}

@@ -18,7 +18,7 @@ import osgi.enroute.trains.segment.api.Color;
 import osgi.enroute.trains.segment.api.SignalSegmentController;
 
 @Designate(ocd = SignalSegmentImpl.Config.class, factory = true)
-@Component(name = "osgi.enroute.trains.hw.signal", property = "service.exported.interfaces=*",
+@Component(name = "osgi.enroute.trains.controller.signal", property = "service.exported.interfaces=*",
         configurationPolicy = ConfigurationPolicy.REQUIRE)
 public class SignalSegmentImpl implements SignalSegmentController {
     private GpioPinDigitalOutput green;
@@ -31,9 +31,9 @@ public class SignalSegmentImpl implements SignalSegmentController {
 
     @ObjectClassDefinition
     @interface Config {
-        int controller_id();
-
-        String green();
+    	String controller_segment();
+    	
+    	String green();
 
         String red();
     }
@@ -102,12 +102,12 @@ public class SignalSegmentImpl implements SignalSegmentController {
 
     @Override
     public String toString() {
-        return "Signal[green=" + green + ", red=" + red + ", color=" + color + ",cntl=" + config.controller_id()
+        return "Signal[green=" + green + ", red=" + red + ", color=" + color + ",cntl=" + config.controller_segment()
                 + "]";
     }
 
     private void info(String fmt, Object... args) {
-        String ident = String.format("Signal<%d>: ", config.controller_id());
+        String ident = String.format("Signal<%d>: ", config.controller_segment());
         System.out.printf(ident + fmt.replaceAll("\\{}", "%s") + "\n", args);
     }
 

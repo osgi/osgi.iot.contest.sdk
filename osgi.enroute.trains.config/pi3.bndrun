@@ -1,0 +1,8 @@
+-include: pi.bndrun
+	
+-runbundles.pi3: \
+	osgi.enroute.trains.config.pi3;version=snapshot	
+	
+	
+	
+

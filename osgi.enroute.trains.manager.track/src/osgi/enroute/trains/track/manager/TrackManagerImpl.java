@@ -1,49 +1,82 @@
 package osgi.enroute.trains.track.manager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.util.converter.Converter;
 
+import osgi.enroute.dto.api.TypeReference;
+import osgi.enroute.mqtt.api.MQTTService;
 import osgi.enroute.trains.segment.api.Color;
+import osgi.enroute.trains.track.api.Observation;
 import osgi.enroute.trains.track.api.Segment;
+import osgi.enroute.trains.track.api.TrackConfiguration;
 import osgi.enroute.trains.track.api.TrackManager;
+import osgi.enroute.trains.track.manager.Tracks.SignalHandler;
+import osgi.enroute.trains.track.manager.Tracks.SwitchHandler;
 
 /**
  * 
  */
-@Component(immediate = true)
+@Component(immediate = true,
+	name="osgi.enroute.trains.track.manager",
+	configurationPolicy = ConfigurationPolicy.REQUIRE)
 public class TrackManagerImpl implements TrackManager {
+
+	private Tracks tracks;
+	private Map<String, Segment> trains;
+
+	@Reference
+	protected Converter converter;
+	
+	@Reference
+	protected MQTTService mqtt;
+	
+	@Activate
+	public void activate(TrackConfiguration config) throws Exception {
+		tracks = new Tracks(config.segments());
+
+		mqtt.subscribe(Observation.TOPIC).forEach(msg ->{
+			Observation o = converter.convert(msg.payload().array()).to(Observation.class);
+			tracks.event(o);
+		});
+		
+	}
 
 	@Override
 	public Map<String, Segment> getSegments() {
-		// TODO Auto-generated method stub
-		return null;
+		return tracks.getSegments();
 	}
 
 	@Override
 	public List<String> getTrains() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<String>(trains.keySet());
 	}
 
 	@Override
 	public Map<String, Color> getSignals() {
-		// TODO Auto-generated method stub
-		return null;
+		return tracks.filter(new TypeReference<SignalHandler>() {
+		}).collect(Collectors.toMap(sh -> sh.segment.id, sh -> sh.color));
 	}
 
 	@Override
 	public Map<String, Boolean> getSwitches() {
-		// TODO Auto-generated method stub
-		return null;
+		return tracks.filter(new TypeReference<SwitchHandler>() {
+		}).collect(Collectors.toMap(sh -> sh.segment.id, sh -> sh.toAlternate));
 	}
 
 	@Override
 	public boolean requestAccessTo(String train, String fromSegment, String toSegment) {
-		// TODO Auto-generated method stub
+		// TODO
 		return false;
 	}
+	
 	
 	
 //    static Logger logger = LoggerFactory.getLogger(TrackManagerImpl.class);

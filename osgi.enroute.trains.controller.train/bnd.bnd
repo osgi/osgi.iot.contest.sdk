@@ -20,7 +20,10 @@ Conditional-Package: aQute.lib*
 -buildpath: \
 	osgi.enroute.base.api;version=1.0,\
 	osgi.enroute.trains.api;version=latest,\
-	osgi.enroute.iot.pi.provider
+	osgi.enroute.iot.pi.provider,\
+	osgi.enroute.mqtt.provider;version=latest,\
+	org.apache.felix.converter,\
+	pushstream
 		
 -testpath: \
 	osgi.enroute.junit.wrapper;version=4.12

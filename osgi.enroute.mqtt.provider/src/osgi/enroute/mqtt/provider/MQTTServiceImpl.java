@@ -2,6 +2,7 @@ package osgi.enroute.mqtt.provider;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -10,7 +11,6 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
@@ -53,7 +53,7 @@ public class MQTTServiceImpl implements MQTTService, AutoCloseable, MqttCallback
 	
 	@Activate	
 	void activate(MqttConfig config, BundleContext context) throws Exception {
-		String id = context.getProperty(Constants.FRAMEWORK_UUID).toString();
+		String id = UUID.randomUUID().toString();
 		try {
 			mqtt = new MqttClient(config.broker(), id);
 			mqtt.connect();

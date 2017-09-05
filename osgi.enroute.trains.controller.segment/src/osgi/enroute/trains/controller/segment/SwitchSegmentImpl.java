@@ -16,7 +16,7 @@ import com.pi4j.io.gpio.RaspiPin;
 import osgi.enroute.trains.segment.api.SwitchSegmentController;
 
 @Designate(ocd = SwitchSegmentImpl.Config.class, factory = true)
-@Component(name = "osgi.enroute.trains.hw.switch", property = "service.exported.interfaces=*",
+@Component(name = "osgi.enroute.trains.controller.switch", property = "service.exported.interfaces=*",
         configurationPolicy = ConfigurationPolicy.REQUIRE)
 public class SwitchSegmentImpl implements SwitchSegmentController {
 
@@ -32,7 +32,7 @@ public class SwitchSegmentImpl implements SwitchSegmentController {
 
     @ObjectClassDefinition
     @interface Config {
-        int controller_id();
+        String controller_segment();
 
         String fwd();
 
@@ -71,7 +71,7 @@ public class SwitchSegmentImpl implements SwitchSegmentController {
     @Override
     public String toString() {
         return "Switch[alt=" + getSwitch() + ", fwd=" + fwd.toString() + ", rev=" + rev.toString() + ", cntl="
-                + config.controller_id() + "]";
+                + config.controller_segment() + "]";
     }
 
     @Override
@@ -94,7 +94,7 @@ public class SwitchSegmentImpl implements SwitchSegmentController {
     }
 
     private void info(String fmt, Object... args) {
-        String ident = String.format("Switch<%d>: ", config.controller_id());
+        String ident = String.format("Switch<%d>: ", config.controller_segment());
         System.out.printf(ident + fmt.replaceAll("\\{}", "%s") + "\n", args);
     }
 

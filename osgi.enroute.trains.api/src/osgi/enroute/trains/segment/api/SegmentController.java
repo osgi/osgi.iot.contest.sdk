@@ -1,14 +1,9 @@
 package osgi.enroute.trains.segment.api;
 
 /**
- * A controller controls a signal, a switch and an RFID reader.
+ * A controller controls a signal or a switch.
  */
 public interface SegmentController {
-
-	/**
-	 * Service property for identifying this controller
-	 */
-	String CONTROLLER_ID = "controller.id";
 
 	/**
 	 * Service property for identifying this controller, by segment name

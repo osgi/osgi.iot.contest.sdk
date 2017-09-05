@@ -22,7 +22,8 @@ public class TrainControllerImpl extends LegoRC implements TrainController {
 
 	@ObjectClassDefinition
 	@interface Config {
-		Channel channel() default Channel.CH1;
+		String controller_train();
+		Channel controller_channel() default Channel.CH1;
 		int divider() default 100;
 	}
 
@@ -34,7 +35,7 @@ public class TrainControllerImpl extends LegoRC implements TrainController {
 		this.config = config;
 		System.out.println("activate: " + toString());
 		this.setWave(LIRCImpl.getInstance());
-		super.activate(config.channel());
+		super.activate(config.controller_channel());
 		this.divider = config.divider();
 	}
 	
@@ -45,7 +46,7 @@ public class TrainControllerImpl extends LegoRC implements TrainController {
 
 	@Override
 	public String toString() {
-		return "TrainController[channel=" + config.channel() + ", divider=" + config.divider() + "]";
+		return "TrainController[channel=" + config.controller_channel() + ", divider=" + config.divider() + "]";
 	}
 
 	@Override
