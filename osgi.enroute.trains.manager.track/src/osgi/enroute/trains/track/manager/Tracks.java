@@ -295,7 +295,7 @@ public class Tracks {
 		Segment segment = new Segment();
 		segment.id = parts[0];
 		segment.type = Enum.valueOf(Segment.Type.class, parts[1]);
-		segment.tagCode = Integer.parseInt(parts[2]);
+		segment.tag = Integer.parseInt(parts[2]);
 		segment.to = parts[3].split("\\s*,\\s*");
 
 		segment.sequence = n;
@@ -437,7 +437,7 @@ public class Tracks {
 	private String toLine(SegmentHandler handler) {
 		Segment s = handler.segment;
 		try (Formatter formatter = new Formatter();) {
-			formatter.format("%-10s : %-10s : %-6s ", s.id, s.type, s.tagCode);
+			formatter.format("%-10s : %-10s : %-6s ", s.id, s.type, s.tag);
 
 			String nextId = getNextId(handler.next);
 			formatter.format(": %s", nextId);

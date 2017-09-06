@@ -25,7 +25,8 @@ import osgi.enroute.trains.track.api.Observation;
 /**
  * 
  */
-@Component(immediate = true, property = { 
+@Component(immediate = true, property = {
+		Debug.COMMAND_SCOPE + "=trains",
 		Debug.COMMAND_FUNCTION + "=signal", //
 		Debug.COMMAND_FUNCTION + "=swtch", //
 		Debug.COMMAND_FUNCTION + "=signals", //

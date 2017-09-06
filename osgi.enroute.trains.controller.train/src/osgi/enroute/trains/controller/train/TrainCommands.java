@@ -1,6 +1,5 @@
 package osgi.enroute.trains.controller.train;
 
-import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,7 +13,6 @@ import org.osgi.util.converter.Converter;
 
 import osgi.enroute.debug.api.Debug;
 import osgi.enroute.mqtt.api.MQTTService;
-import osgi.enroute.trains.track.api.Observation;
 import osgi.enroute.trains.train.api.TrainCommand;
 import osgi.enroute.trains.train.api.TrainController;
 
@@ -22,6 +20,7 @@ import osgi.enroute.trains.train.api.TrainController;
  * 
  */
 @Component(immediate = true, property = {
+		Debug.COMMAND_SCOPE +"=trains",
 		Debug.COMMAND_FUNCTION + "=trains", //
 		Debug.COMMAND_FUNCTION + "=move", //
 		Debug.COMMAND_FUNCTION + "=light", //

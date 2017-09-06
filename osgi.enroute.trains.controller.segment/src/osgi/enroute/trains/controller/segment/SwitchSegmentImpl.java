@@ -94,7 +94,7 @@ public class SwitchSegmentImpl implements SwitchSegmentController {
     }
 
     private void info(String fmt, Object... args) {
-        String ident = String.format("Switch<%d>: ", config.controller_segment());
+        String ident = String.format("Switch<%s>: ", config.controller_segment());
         System.out.printf(ident + fmt.replaceAll("\\{}", "%s") + "\n", args);
     }
 

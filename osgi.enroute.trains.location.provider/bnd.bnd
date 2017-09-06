@@ -12,8 +12,10 @@ x: edc-client,\
 
 -buildpath: \
 	osgi.enroute.base.api,\
-	org.eclipse.paho.client.mqttv3;version="[1.0.2,2.0.0)",\
-	osgi.enroute.trains.api;version=latest
+	osgi.enroute.trains.api;version=latest,\
+	osgi.enroute.mqtt.provider;version=latest,\
+	pushstream,\
+	org.apache.felix.converter
 	
 -includeresource: \
 	{configuration=configuration}

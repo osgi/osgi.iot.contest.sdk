@@ -1,4 +1,8 @@
 {
+	"osgi.enroute.mqtt": {
+		"broker": "tcp://192.168.99.158:1883"
+	},
+	
 	"osgi.enroute.trains.controller.signal~S05":{
 		"controller.segment":"S05",
 		"green":"GPIO 24",

@@ -48,12 +48,7 @@ public class Segment extends DTO {
 	/**
 	 * Short code for RFID tag attached to this segment, or 0 for none.
 	 */
-	public int tagCode;
-
-	/**
-	 * The associated controller
-	 */
-	public int controller = -1;
+	public int tag;
 
 	/**
 	 * The next segment. Only a switch can have an additional to. The second to

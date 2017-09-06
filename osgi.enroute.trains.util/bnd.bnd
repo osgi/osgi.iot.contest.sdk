@@ -17,4 +17,4 @@ Bundle-Description: 				\
 	osgi.enroute.junit.wrapper;version=4.12, \
 	biz.aQute.bndlib;version=3.0;packages="aQute.lib.*,aQute.libg.*"
 
-Export-Package: osgi.enroute.trains.util
+Export-Package: osgi.enroute.trains.util.converter

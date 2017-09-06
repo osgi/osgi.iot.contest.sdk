@@ -1,13 +1,16 @@
 package osgi.enroute.trains.train.manager;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 
 import osgi.enroute.trains.train.api.TrainsManager;
 
 /**
  * Train manager.
  */
-@Component(immediate = true)
+@Component(immediate = true,
+	name="osgi.enroute.trains.train.manager",
+	configurationPolicy = ConfigurationPolicy.REQUIRE)
 public class TrainsManagerImpl implements TrainsManager{
 
 	@Override

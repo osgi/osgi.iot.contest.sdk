@@ -1,4 +1,4 @@
-package osgi.enroute.trains.util;
+package osgi.enroute.trains.util.converter;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;

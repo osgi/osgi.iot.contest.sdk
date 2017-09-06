@@ -107,7 +107,7 @@ public class SignalSegmentImpl implements SignalSegmentController {
     }
 
     private void info(String fmt, Object... args) {
-        String ident = String.format("Signal<%d>: ", config.controller_segment());
+        String ident = String.format("Signal<%s>: ", config.controller_segment());
         System.out.printf(ident + fmt.replaceAll("\\{}", "%s") + "\n", args);
     }
 
