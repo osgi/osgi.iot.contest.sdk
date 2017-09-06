@@ -22,7 +22,11 @@ public class Observation extends DTO {
 		/**
 		 * Switched changed alternate state
 		 */
-		SWITCH
+		SWITCH,
+		/**
+		 * Blocking a segment
+		 */
+		BLOCKED
 	}
 
 	public Type type;
@@ -31,4 +35,5 @@ public class Observation extends DTO {
 	public Color signal;
 	public long time;
 	public boolean alternate;
+	public boolean blocked;
 }

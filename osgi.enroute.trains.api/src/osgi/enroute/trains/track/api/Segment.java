@@ -11,9 +11,8 @@ import org.osgi.dto.DTO;
 public class Segment extends DTO {
 
 	public enum Type {
-		STRAIGHT, CURVED, SWITCH, SIGNAL, LOCATOR, BLOCK;
+		STRAIGHT, CURVED, SWITCH, SIGNAL, LOCATOR;
 	}
-	
 
 	/**
 	 * Our Identity

@@ -11,6 +11,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -37,6 +38,7 @@ public class Tracks {
 		public Segment segment;
 		public SegmentHandler next;
 		public SegmentHandler prev;
+		public boolean blocked = false;
 
 		public SegmentHandler(Segment segment) {
 			this.segment = segment;
@@ -69,6 +71,10 @@ public class Tracks {
 		
 		public boolean isSignal(){
 			return false;
+		}
+		
+		public boolean isBlocked(){
+			return blocked;
 		}
 
 		public LinkedList<SegmentHandler> findForward(SegmentHandler destination) {
@@ -137,7 +143,13 @@ public class Tracks {
 		 * Events should be handled in subclasses if they have relevant events
 		 */
 		public boolean event(Observation e) {
-			return false;
+			switch(e.type){
+			case BLOCKED:
+				blocked = e.blocked;
+				return true;
+			default:
+				return false;
+			}
 		}
 	}
 
@@ -483,6 +495,10 @@ public class Tracks {
 	public Map<String, Segment> getSegments() {
 		return Collections.unmodifiableMap(segments);
 	}
+	
+	public Segment getSegment(String segment){
+		return segments.get(segment);
+	}
 
 	public <Y extends SegmentHandler> Stream<Y> filter(TypeReference<Y> tref) {
 		ParameterizedType type = (ParameterizedType) tref.getType();
@@ -495,6 +511,26 @@ public class Tracks {
 	public <Y extends SegmentHandler> Y getHandler(Class<Y> clazz, String id) {
 		Y result = clazz.cast(getHandler(id));
 		return result;
+	}
+
+	public Optional<SwitchHandler> getSwitch(String fromTrack, String toTrack) {
+		return filter(new TypeReference<SwitchHandler>() {})
+				.filter(sh -> sh.prev.getTrack().equals(fromTrack)
+						|| (sh.altPrev != null && sh.altPrev.getTrack().equals(fromTrack)))
+				.filter(sh -> sh.next.getTrack().equals(toTrack)
+						|| (sh.altNext != null && sh.altNext.getTrack().equals(toTrack)))
+				.findFirst();
+	}
+
+	public Optional<SignalHandler> getSignal(String fromTrack) {
+		return filter(new TypeReference<SignalHandler>() {})
+				.filter(sh -> sh.getTrack().equals(fromTrack)).findFirst();
+	}
+	
+	public boolean isBlocked(String track){
+		return filter(new TypeReference<SegmentHandler>() {})
+				.filter(sh -> sh.getTrack().equals(track))
+				.filter(sh -> sh.isBlocked()).findFirst().isPresent();
 	}
 
 	public void event(Observation e) {
