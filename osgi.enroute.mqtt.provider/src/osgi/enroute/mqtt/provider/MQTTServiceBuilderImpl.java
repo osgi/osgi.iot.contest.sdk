@@ -4,6 +4,8 @@ import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.Properties;
 
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.osgi.service.component.annotations.Component;
 
 import osgi.enroute.mqtt.api.MQTTService;
@@ -13,70 +15,76 @@ import osgi.enroute.mqtt.api.Qos;
 @Component
 public class MQTTServiceBuilderImpl implements MQTTServiceBuilder {
 
+	private String serverURI;
+	private String clientId;
+	private MqttConnectOptions options = new MqttConnectOptions();
+
 	@Override
-	public MQTTService build() {
-		// TODO Auto-generated method stub
-		return null;
+	public MQTTService build() throws Exception {
+		MqttClient client = new MqttClient(serverURI, clientId);
+		client.connect(options);
+		return new MQTTServiceImpl(client);
 	}
 
 	@Override
 	public MQTTServiceBuilder connect(String serverURI, String clientId) {
-		// TODO Auto-generated method stub
-		return null;
+		this.serverURI = serverURI;
+		this.clientId = clientId;
+		return this;
 	}
 
 	@Override
 	public MQTTServiceBuilder clean() {
-		// TODO Auto-generated method stub
-		return null;
+		options.setCleanSession(true);
+		return this;
 	}
 
 	@Override
 	public MQTTServiceBuilder autoReconnect() {
-		// TODO Auto-generated method stub
-		return null;
+		options.setAutomaticReconnect(true);
+		return this;
 	}
 
 	@Override
 	public MQTTServiceBuilder maxInFlight(int max) {
-		// TODO Auto-generated method stub
-		return null;
+		options.setMaxInflight(max);
+		return this;
 	}
 
 	@Override
 	public MQTTServiceBuilder timeout(Duration timeout) {
-		// TODO Auto-generated method stub
-		return null;
+		options.setConnectionTimeout((int)timeout.getSeconds());
+		return this;
 	}
 
 	@Override
 	public MQTTServiceBuilder keepAlive(Duration keepAlive) {
-		// TODO Auto-generated method stub
-		return null;
+		options.setKeepAliveInterval((int)keepAlive.getSeconds());
+		return this;
 	}
 
 	@Override
 	public MQTTServiceBuilder username(String username) {
-		// TODO Auto-generated method stub
-		return null;
+		options.setUserName(username);
+		return this;
 	}
 
 	@Override
 	public MQTTServiceBuilder password(String password) {
-		// TODO Auto-generated method stub
-		return null;
+		options.setPassword(password.toCharArray());
+		return this;
 	}
 
 	@Override
 	public MQTTServiceBuilder ssl(Properties props) {
-		// TODO Auto-generated method stub
-		return null;
+		options.setSSLProperties(props);
+		return this;
 	}
 
 	@Override
 	public MQTTServiceBuilder lastWill(String topic, ByteBuffer data, Qos qos, boolean retained) {
-		// TODO Auto-generated method stub
-		return null;
+		options.setWill(topic, data.array(), qos.ordinal(), retained);
+		return this;
 	}
 
 }

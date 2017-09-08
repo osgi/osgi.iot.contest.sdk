@@ -1,7 +1,9 @@
 package osgi.enroute.mqtt.provider;
 
 import java.nio.ByteBuffer;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -77,14 +79,14 @@ public class MQTTServiceImpl implements MQTTService, AutoCloseable, MqttCallback
 	@Override
 	public PushStream<MQTTMessage> subscribe(String topic, Qos qos) throws Exception {
 		try {
-			// TODO topic might be filter?!
 			mqtt.subscribe(topic, qos.ordinal());
-			SimplePushEventSource<MQTTMessage> source = subscriptions.get(topic);
+			String filter = topic.replaceAll("\\*", "#"); // replace MQTT # sign with * for filters
+			SimplePushEventSource<MQTTMessage> source = subscriptions.get(filter);
 			if(source == null){
-				source = provider.buildSimpleEventSource(MQTTMessage.class).create();
-				subscriptions.put(topic, source);
+				source = provider.buildSimpleEventSource(MQTTMessage.class).build();
+				subscriptions.put(filter, source);
 			}
-			return provider.buildStream(source).create();
+			return provider.createStream(source);
 		} catch(MqttException e){
 			throw new Exception(e.getMessage(), e);
 		}
@@ -97,6 +99,7 @@ public class MQTTServiceImpl implements MQTTService, AutoCloseable, MqttCallback
 
 	@Override
 	public void publish(String topic, ByteBuffer data, Qos qos) throws Exception {
+		//System.out.println("Publish msg "+topic+" "+new String(data.array()));
 		mqtt.publish(topic, data.array(), qos.ordinal(), false);
 	}
 
@@ -114,7 +117,8 @@ public class MQTTServiceImpl implements MQTTService, AutoCloseable, MqttCallback
 	
 	@Override
 	public void connectionLost(Throwable ex) {
-		// TODO log?
+		System.err.println("Connection lost?!");
+		ex.printStackTrace();
 	}
 
 	@Override
@@ -125,19 +129,26 @@ public class MQTTServiceImpl implements MQTTService, AutoCloseable, MqttCallback
 
 	@Override
 	public void messageArrived(String topic, MqttMessage message) throws Exception {
-		// TODO match topic filters
-		SimplePushEventSource<MQTTMessage> source = subscriptions.get(topic);
-		if(source != null){
+		//System.out.println("Msg arrived "+topic+" "+new String(message.getPayload()));	
+		Iterator<Entry<String, SimplePushEventSource<MQTTMessage>>> it = subscriptions.entrySet().iterator();
+		while(it.hasNext()){
+			Entry<String, SimplePushEventSource<MQTTMessage>> e = it.next();
+			if(!e.getKey().matches(topic)){
+				continue;
+			}
+			SimplePushEventSource<MQTTMessage> source = e.getValue();
 			if(!source.isConnected()){
 				source.close();
-				subscriptions.remove(topic);
-				return;
+				it.remove();
+			} else {
+				try {
+					MQTTMessage msg = new MQTTMessageImpl(topic, ByteBuffer.wrap(message.getPayload()));
+					source.publish(msg);
+				} catch(Exception ex){
+					ex.printStackTrace();
+				}
 			}
-			
-			MQTTMessage msg = new MQTTMessageImpl(topic, ByteBuffer.wrap(message.getPayload()));
-			source.publish(msg);
 		}
-		
 	}
 
 }

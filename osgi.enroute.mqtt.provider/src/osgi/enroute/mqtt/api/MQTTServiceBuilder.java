@@ -7,7 +7,7 @@ import java.util.Properties;
 public interface MQTTServiceBuilder {
 	
 	// create the actual MQTTService
-	public MQTTService build();
+	public MQTTService build() throws Exception;
 
 	// connect to a broker
 	public MQTTServiceBuilder connect(String serverURI, String clientId);
