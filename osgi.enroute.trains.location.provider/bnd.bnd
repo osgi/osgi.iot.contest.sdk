@@ -14,8 +14,9 @@ x: edc-client,\
 	osgi.enroute.base.api,\
 	osgi.enroute.trains.api;version=latest,\
 	osgi.enroute.mqtt.provider;version=latest,\
-	pushstream,\
-	org.apache.felix.converter
+	org.apache.felix.converter,\
+	org.osgi.util.pushstream,\
+	osgi.enroute.trains.util;version=latest
 	
 -includeresource: \
 	{configuration=configuration}

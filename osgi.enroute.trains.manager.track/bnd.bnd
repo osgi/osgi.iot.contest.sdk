@@ -19,9 +19,9 @@ Conditional-Package: aQute.lib*
 	biz.aQute.bndlib,\
 	osgi.enroute.trains.api;version=latest,\
 	osgi.enroute.mqtt.provider;version=latest,\
-	pushstream,\
 	org.apache.felix.converter,\
-	osgi.enroute.trains.util;version=latest
+	osgi.enroute.trains.util;version=latest,\
+	org.osgi.util.pushstream
 
 -testpath: \
 	osgi.enroute.junit.wrapper

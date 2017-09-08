@@ -10,7 +10,10 @@ Private-Package: osgi.enroute.trains.train.manager
 	
 -buildpath: \
 	osgi.enroute.base.api;version=1.0,\
-	osgi.enroute.trains.api;version=latest
+	osgi.enroute.trains.api;version=latest,\
+	osgi.enroute.mqtt.provider;version=latest,\
+	org.apache.felix.converter,\
+	org.osgi.util.pushstream
 	
 
 -testpath: \

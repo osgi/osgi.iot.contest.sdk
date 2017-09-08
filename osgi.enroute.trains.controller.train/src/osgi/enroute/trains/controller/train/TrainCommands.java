@@ -67,6 +67,7 @@ public class TrainCommands {
 	}
 
 	public void move(String train, int directionAndSpeed) {
+		System.out.println("Move "+train+" at "+directionAndSpeed+" %");
 		TrainController t = trains.get(train);
 		if(t != null){
 			t.move(directionAndSpeed);

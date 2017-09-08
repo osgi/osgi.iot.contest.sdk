@@ -3,6 +3,7 @@ package osgi.enroute.trains.track.manager;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,6 +25,7 @@ import osgi.enroute.trains.track.api.Observation.Type;
 import osgi.enroute.trains.track.api.Segment;
 import osgi.enroute.trains.track.api.TrackConfiguration;
 import osgi.enroute.trains.track.api.TrackManager;
+import osgi.enroute.trains.track.manager.Tracks.SegmentHandler;
 import osgi.enroute.trains.track.manager.Tracks.SignalHandler;
 import osgi.enroute.trains.track.manager.Tracks.SwitchHandler;
 
@@ -83,16 +85,21 @@ public class TrackManagerImpl implements TrackManager {
 				}
 
 				releaseOtherTracks(o.train, track);
-
 			} else {
 
 				// update track state
 				tracks.event(o);
 			}
+			
 		});
 
 	}
 
+	@Override
+	public Segment getSegment(String segment) {
+		return tracks.getSegment(segment);
+	}
+	
 	@Override
 	public Map<String, Segment> getSegments() {
 		return tracks.getSegments();
@@ -122,8 +129,6 @@ public class TrackManagerImpl implements TrackManager {
 
 		while (!granted && System.currentTimeMillis() - start < TIMEOUT) {
 			synchronized (access) {
-				lastAccess.remove(train);
-
 				if (!tracks.isBlocked(toTrack) && (access.get(toTrack) == null || access.get(toTrack).equals(train))) {
 					// assign track to this train
 					access.put(toTrack, train);
@@ -153,6 +158,9 @@ public class TrackManagerImpl implements TrackManager {
 							granted = true;
 						}
 					}
+
+					// release previous access
+					lastAccess.remove(train);
 				}
 
 				// if not granted, wait until timeout
@@ -171,6 +179,18 @@ public class TrackManagerImpl implements TrackManager {
 		return granted;
 	}
 	
+	public List<Segment> planRoute(String fromSegment, String toSegment) {
+		// plan the route
+		SegmentHandler src = tracks.getHandler(fromSegment);
+		SegmentHandler dest = tracks.getHandler(toSegment);
+		LinkedList<SegmentHandler> route = src.findForward(dest);
+
+		return route.stream()
+				.filter(sh -> !(sh instanceof SwitchHandler)) // exclude switch/signals
+				.filter(sh -> !(sh instanceof SignalHandler)) // from routes
+				.map(sh -> sh.segment).collect(Collectors.toList());
+	}
+
 	private void releaseOtherTracks(String train, String track) {
 		synchronized (access) {
 			String lastTrack = lastAccess.get(train);

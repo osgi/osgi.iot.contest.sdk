@@ -12,6 +12,13 @@ import osgi.enroute.trains.segment.api.Color;
 public interface TrackManager {
 
 	/**
+	 * Get segment information by id
+	 * @param segment
+	 * @return
+	 */
+	Segment getSegment(String segment);
+	
+	/**
 	 * Get the general configuration
 	 * 
 	 * @return a map where the key is the segment name and the segment contains
@@ -54,4 +61,15 @@ public interface TrackManager {
 	 *         minute.
 	 */
 	boolean requestAccessTo(String train, String fromSegment, String toSegment);
+	
+	/**
+	 * Give a route of segments from a segment to a segment.
+	 * 
+	 * @param fromSegment 
+	 * 				the segment to start from
+	 * @param toSegment 
+	 * 				the segment to reach
+	 * @return a list of segments to follow, or null if no route exists.
+	 */
+	List<Segment> planRoute(String fromSegment, String toSegment);
 }

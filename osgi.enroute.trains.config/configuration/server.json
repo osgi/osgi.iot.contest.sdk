@@ -5,12 +5,11 @@
 	        
 	"osgi.enroute.trains.train.manager~Train-1": {
 		"name": "White",
-		"TrainController.target" : "(channel=CH1)"
+		"osgi.command.scope":"white"
 	},
 	        
 	"osgi.enroute.trains.train.manager~Train-2": {
-		"name": "Red",
-		"TrainController.target" : "(channel=CH2)"
+		"name": "Red"	
 	},
 	        
 	"osgi.enroute.trains.track.manager": {
@@ -82,7 +81,7 @@
 	            "F03        : CURVED     : 70     : F04",
 	            "F04        : CURVED     : 72     : F05",
 	            "F05        : CURVED     : 74     : F06",
-	            "F06        : CURVED     : 67     : F07",
+	            "F06        : CURVED     : 49     : F07",
 	            "F07        : CURVED     : 47     : F08",
 	            "F08        : CURVED     : 45     : F09",
 	            "F09        : CURVED     : 43     : S06",
