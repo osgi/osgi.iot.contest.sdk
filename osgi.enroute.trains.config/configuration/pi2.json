@@ -3,6 +3,16 @@
 		"broker": "tcp://192.168.99.158:1883"
 	},
 	
+	"osgi.enroute.trains.controller.train~Train-1":{
+		"controller.channel":"CH1",
+		"controller.train":"White"
+	},
+	
+	"osgi.enroute.trains.controller.train~Train-2":{
+		"controller.channel":"CH2",
+		"controller.train":"Red"
+	},
+	
 	"osgi.enroute.trains.controller.signal~S03":{
 		"controller.segment":"S03",
 		"green":"GPIO 24",
