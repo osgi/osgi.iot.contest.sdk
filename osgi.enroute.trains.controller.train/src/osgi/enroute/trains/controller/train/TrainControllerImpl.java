@@ -30,6 +30,9 @@ public class TrainControllerImpl extends LegoRC implements TrainController {
 	private double divider;
 	private Config config;
 
+	private volatile boolean running = false;
+	private Double speed = 0.0;
+
 	@Activate
 	void start(Config config) throws Exception {
 		this.config = config;
@@ -37,11 +40,30 @@ public class TrainControllerImpl extends LegoRC implements TrainController {
 		this.setWave(LIRCImpl.getInstance());
 		super.activate(config.controller_channel());
 		this.divider = config.divider();
+		
+		// continuously repeat signal in case of missing sendouts
+		Thread t = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				running = true;
+				while(running){
+					try {
+						A(speed);
+						Thread.sleep(1000);
+					} catch(Exception e){
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+		t.start();
 	}
 	
 	@Deactivate
 	void stop() {
 		System.out.println("deactivate: " + toString());
+		running = false;
 	}
 
 	@Override
@@ -52,7 +74,7 @@ public class TrainControllerImpl extends LegoRC implements TrainController {
 	@Override
 	public void move(int directionAndSpeed) {
 		try {
-			Double speed = directionAndSpeed / divider;
+			speed = directionAndSpeed / divider;
 			A(speed);
 		} catch (Exception e) {
 			e.printStackTrace();
