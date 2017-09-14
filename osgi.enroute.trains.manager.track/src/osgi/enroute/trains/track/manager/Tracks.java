@@ -1,6 +1,5 @@
 package osgi.enroute.trains.track.manager;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -313,6 +312,10 @@ public class Tracks {
 		segment.sequence = n;
 
 		segment.track = segment.id.substring(0, 1);
+		if(segment.type == Segment.Type.SIGNAL){
+			// signal belongs to same track of next segment
+			segment.track = segment.to[0].substring(0, 1);
+		}
 		return segment;
 	}
 
@@ -501,8 +504,7 @@ public class Tracks {
 	}
 
 	public <Y extends SegmentHandler> Stream<Y> filter(TypeReference<Y> tref) {
-		ParameterizedType type = (ParameterizedType) tref.getType();
-		Class<?> clazz = (Class<?>) type.getRawType();
+		Class<?> clazz = (Class<?>) tref.getType();
 		@SuppressWarnings("unchecked")
 		Stream<Y> map = handlers.values().stream().filter(h -> clazz.isInstance(h)).map(h -> (Y) clazz.cast(h));
 		return map;

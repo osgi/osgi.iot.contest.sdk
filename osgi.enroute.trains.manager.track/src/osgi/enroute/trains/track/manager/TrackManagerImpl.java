@@ -61,6 +61,8 @@ public class TrackManagerImpl implements TrackManager {
 	public void activate(TrackConfiguration config) throws Exception {
 		tracks = new Tracks(config.segments());
 
+		tracks.getSegments().entrySet().stream().filter(e -> e.getValue().type == Segment.Type.SIGNAL).forEach(e -> setSignal(e.getKey(), Color.RED));
+		
 		mqtt.subscribe(Observation.TOPIC).forEach(msg -> {
 			Observation o = converter.convert(msg.payload().array()).to(Observation.class);
 			if (o.type == Type.LOCATED) {
@@ -124,6 +126,7 @@ public class TrackManagerImpl implements TrackManager {
 
 	@Override
 	public boolean requestAccessTo(String train, String fromTrack, String toTrack) {
+		System.out.println("Access request from "+train+" "+fromTrack+"->"+toTrack);
 		long start = System.currentTimeMillis();
 		boolean granted = false;
 
@@ -148,15 +151,17 @@ public class TrackManagerImpl implements TrackManager {
 						if (shouldSwitch(switchHandler, fromTrack, toTrack)) {
 							doSwitch(switchHandler.segment.id, !switchHandler.toAlternate);
 							sleep(3000);
-						} else {
-							// set green signal
-							if (!greenSignal(tracks.getSignal(fromTrack))) {
-								sleep(1000);
-							}
-
-							// now grant the access
-							granted = true;
+							// TODO should we wait for switched observation here?!
+						}							
+						
+						// set green signal
+						if (!greenSignal(tracks.getSignal(fromTrack))) {
+							sleep(1000);
+							// TODO should we wait for green signal observation here?!
 						}
+
+						// now grant the access
+						granted = true;
 					}
 
 					// release previous access
