@@ -75,6 +75,7 @@ public class TrainManagerImpl implements TrainManager{
 		
 		mqtt.subscribe(Assignment.TOPIC)
 			.map(msg -> converter.convert(msg.payload().array()).to(Assignment.class))
+			.filter(a -> a.type == Assignment.Type.ASSIGN)
 			.filter(a -> a.train.equals(config.name()))
 			.forEach(a -> {
 				// new assignment for this train
@@ -116,6 +117,10 @@ public class TrainManagerImpl implements TrainManager{
 			}
 		} else {
 			System.out.println("Train located at "+o.segment);
+			if(o.segment == null){
+				// invalid located event!?
+				return;
+			}
 			System.out.println("Observation interval: "+(System.currentTimeMillis() - interval));
 			interval = System.currentTimeMillis();
 			// update the route 
@@ -192,7 +197,6 @@ public class TrainManagerImpl implements TrainManager{
 				System.out.println("Train "+config.name()+" did not get access to "+toTrack+", aborting assignment?");
 				assignmentAborted();
 			}
-			
       }
 		
 	}
@@ -223,6 +227,7 @@ public class TrainManagerImpl implements TrainManager{
 	}
 	
 	private void assignmentReached(){
+		System.out.println("Train "+config.name()+" reached assignment!");
 		stop();
 		
 		Assignment a = new Assignment();
