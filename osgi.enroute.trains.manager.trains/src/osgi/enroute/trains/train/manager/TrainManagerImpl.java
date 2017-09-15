@@ -90,9 +90,6 @@ public class TrainManagerImpl implements TrainManager{
 				// new observation of this train
 				observation(o);
 			});
-		
-		// start moving the train to get a first observation
-		move();
 	}
 	
 	@Override
@@ -183,7 +180,7 @@ public class TrainManagerImpl implements TrainManager{
 		
 		// check whether we have to request access to a track
 		String fromTrack = remainingRoute.get(0).track;
-		String toTrack = remainingRoute.get(Math.min(3, remainingRoute.size()-1)).track;
+		String toTrack = remainingRoute.get(Math.min(4, remainingRoute.size()-1)).track;
 		
 		if (!fromTrack.equals(toTrack)) {
 			stop();

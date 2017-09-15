@@ -32,9 +32,13 @@ public class TrainLocationProvider {
 	private volatile boolean running = false;
 	
 	private Map<String, Integer> codeToTag;
+	private Map<Integer, String> tagToCode;
+	
 	private Map<Integer, String> tagToSegment;
+	private Map<String, Integer> segmentToTag;
 	
 	private int lastTag = 0;
+	private String lastSegment = null;
 	
 	@Reference
 	protected Converter converter;
@@ -71,19 +75,41 @@ public class TrainLocationProvider {
 
 						while(running){
 							r.read(buffer);
+							//System.out.println(new String(buffer));
 							String code = new String(buffer, 5, 5);
 							Integer tag = codeToTag.get(code);
 							if(tag == null){
-								System.out.println("Unknown code: "+code);
-								continue;
+								// Check whether this relates to the next segment?
+								if(lastSegment == null)
+									continue;
+								
+								Segment last = trackManager.getSegment(lastSegment);
+								for(String to : last.to){
+									Integer t = segmentToTag.get(to);
+									if(t == null)
+										continue;
+									
+									String c = tagToCode.get(t);
+									if(c == null)
+										continue;
+											
+									int distance = distance(c, code);
+									// System.out.println("Excpected "+c+", got "+code+", distance "+distance);
+									if(distance <= 1){
+										// We probably have a match
+										// System.out.println(code+" matches "+c+", probably "+to);
+										tag = t;
+										continue;
+									}
+								}
 							}
 							
 							String segment = tagToSegment.get(tag);
 							if(segment == null){
-								System.out.println("Unknown tag: "+tag);
+								continue;
 							}
 							
-							if(lastTag != tag){
+							if(!segment.equals(lastSegment)){
 								// send out observation
 								try {
 									Observation o = new Observation();
@@ -99,6 +125,7 @@ public class TrainLocationProvider {
 								
 							}
 							
+							lastSegment = segment;
 							lastTag = tag;
 						}
 					} catch(Exception e){
@@ -107,7 +134,7 @@ public class TrainLocationProvider {
 				}
 			});
 			reader.start();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
@@ -132,7 +159,12 @@ public class TrainLocationProvider {
 				.filter( s -> s.tag != 0)
 				.collect(Collectors.toMap(s -> s.tag, s -> s.id));
 		
+		segmentToTag = segments.values().stream()
+				.filter( s -> s.tag != 0)
+				.collect(Collectors.toMap(s -> s.id, s -> s.tag));
+		
 		codeToTag = new HashMap<String, Integer>();
+		tagToCode = new HashMap<Integer, String>();
 		for(String line : config.code2tag()){
 			String[] split = line.split(":");
 			int tag = Integer.parseInt(split[0]);
@@ -140,6 +172,17 @@ public class TrainLocationProvider {
 			// only keep last 5 characters
 			code = code.substring(5);
 			codeToTag.put(code, tag);
+			tagToCode.put(tag, code);
 		}
+	}
+	
+	private int distance(String s1, String s2){
+		int distance = 0;
+		for(int i=0;i<s1.length();i++){
+			if(s2.length()<=i || s2.charAt(i) != s1.charAt(i))
+				distance++;
+		}
+		distance += (s2.length() - s1.length());
+		return distance;
 	}
 }
