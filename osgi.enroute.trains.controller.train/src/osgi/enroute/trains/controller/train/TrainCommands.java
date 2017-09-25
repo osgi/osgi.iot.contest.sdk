@@ -1,5 +1,6 @@
 package osgi.enroute.trains.controller.train;
 
+import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,8 +14,10 @@ import org.osgi.util.converter.Converter;
 
 import osgi.enroute.debug.api.Debug;
 import osgi.enroute.mqtt.api.MQTTService;
+import osgi.enroute.trains.track.api.TrackObservation;
 import osgi.enroute.trains.train.api.TrainCommand;
 import osgi.enroute.trains.train.api.TrainController;
+import osgi.enroute.trains.train.api.TrainObservation;
 
 /**
  * 
@@ -72,7 +75,15 @@ public class TrainCommands {
 		if(t != null){
 			t.move(directionAndSpeed);
 			
-			// TODO publish observation?
+			try {
+				TrainObservation o = new TrainObservation();
+				o.time = System.currentTimeMillis();
+				o.type = directionAndSpeed == 0 ? TrainObservation.Type.STOPPED : TrainObservation.Type.MOVING;
+				o.directionAndSpeed = directionAndSpeed;
+				mqtt.publish(TrainObservation.TOPIC, ByteBuffer.wrap( converter.convert(o).to(byte[].class)));
+			} catch(Exception e){
+				e.printStackTrace();
+			}
 		}
 		
 	}
@@ -82,7 +93,15 @@ public class TrainCommands {
 		if(t != null){
 			t.light(on);
 			
-			// TODO publish observation?
+			try {
+				TrainObservation o = new TrainObservation();
+				o.time = System.currentTimeMillis();
+				o.type = TrainObservation.Type.LIGHT;
+				o.on = on;
+				mqtt.publish(TrainObservation.TOPIC, ByteBuffer.wrap( converter.convert(o).to(byte[].class)));
+			} catch(Exception e){
+				e.printStackTrace();
+			}
 		}
 	}
 

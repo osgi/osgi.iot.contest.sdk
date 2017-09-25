@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 
 import osgi.enroute.dto.api.TypeReference;
 import osgi.enroute.trains.segment.api.Color;
-import osgi.enroute.trains.track.api.Observation;
+import osgi.enroute.trains.track.api.TrackObservation;
 import osgi.enroute.trains.track.api.Segment;
 import osgi.enroute.trains.track.api.TrackConfiguration;
 
@@ -141,7 +141,7 @@ public class Tracks {
 		/**
 		 * Events should be handled in subclasses if they have relevant events
 		 */
-		public boolean event(Observation e) {
+		public boolean event(TrackObservation e) {
 			switch(e.type){
 			case BLOCKED:
 				blocked = e.blocked;
@@ -228,7 +228,7 @@ public class Tracks {
 			this.toAlternate = alternate;
 		}
 
-		public boolean event(Observation e) {
+		public boolean event(TrackObservation e) {
 			switch (e.type) {
 			case SWITCH:
 				setToAlternate(e.alternate);
@@ -247,7 +247,7 @@ public class Tracks {
 			super(segment);
 		}
 		
-		public boolean event(Observation e) {
+		public boolean event(TrackObservation e) {
 			switch (e.type) {
 			case SIGNAL:
 				setSignal(e.signal);
@@ -535,7 +535,7 @@ public class Tracks {
 				.filter(sh -> sh.isBlocked()).findFirst().isPresent();
 	}
 
-	public void event(Observation e) {
+	public void event(TrackObservation e) {
 		if (e.segment != null) {
 			SegmentHandler sh = getHandler(e.segment);
 			if (sh == null)

@@ -17,7 +17,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.util.converter.Converter;
 
 import osgi.enroute.mqtt.api.MQTTService;
-import osgi.enroute.trains.track.api.Observation;
+import osgi.enroute.trains.track.api.TrackObservation;
 import osgi.enroute.trains.track.api.Segment;
 import osgi.enroute.trains.track.api.TrackManager;
 
@@ -112,12 +112,12 @@ public class TrainLocationProvider {
 							if(!segment.equals(lastSegment)){
 								// send out observation
 								try {
-									Observation o = new Observation();
+									TrackObservation o = new TrackObservation();
 									o.time = System.currentTimeMillis();
-									o.type = Observation.Type.LOCATED;
+									o.type = TrackObservation.Type.LOCATED;
 									o.segment = segment;
 									o.train = config.train();
-									mqtt.publish(Observation.TOPIC, ByteBuffer.wrap( converter.convert(o).to(byte[].class)));
+									mqtt.publish(TrackObservation.TOPIC, ByteBuffer.wrap( converter.convert(o).to(byte[].class)));
 								} catch(Exception e){
 									System.err.println("Failed to publish observation");
 									e.printStackTrace();

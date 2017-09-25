@@ -20,8 +20,8 @@ import osgi.enroute.mqtt.api.MQTTService;
 import osgi.enroute.scheduler.api.Scheduler;
 import osgi.enroute.trains.segment.api.Color;
 import osgi.enroute.trains.segment.api.SegmentCommand;
-import osgi.enroute.trains.track.api.Observation;
-import osgi.enroute.trains.track.api.Observation.Type;
+import osgi.enroute.trains.track.api.TrackObservation;
+import osgi.enroute.trains.track.api.TrackObservation.Type;
 import osgi.enroute.trains.track.api.Segment;
 import osgi.enroute.trains.track.api.TrackConfiguration;
 import osgi.enroute.trains.track.api.TrackManager;
@@ -63,8 +63,8 @@ public class TrackManagerImpl implements TrackManager {
 
 		tracks.getSegments().entrySet().stream().filter(e -> e.getValue().type == Segment.Type.SIGNAL).forEach(e -> setSignal(e.getKey(), Color.RED));
 		
-		mqtt.subscribe(Observation.TOPIC).forEach(msg -> {
-			Observation o = converter.convert(msg.payload().array()).to(Observation.class);
+		mqtt.subscribe(TrackObservation.TOPIC).forEach(msg -> {
+			TrackObservation o = converter.convert(msg.payload().array()).to(TrackObservation.class);
 			if (o.type == Type.LOCATED) {
 				// update train observation
 				lastLocation.put(o.train, o.segment);

@@ -7,8 +7,8 @@ import osgi.enroute.trains.segment.api.Color;
 /**
  * Event class for sending out information about what's happening
  */
-public class Observation extends DTO {
-	public final static String TOPIC = "osgi/trains/observation";
+public class TrackObservation extends DTO {
+	public final static String TOPIC = "osgi/trains/observation/track";
 
 	public enum Type {
 		/**

@@ -20,7 +20,7 @@ import osgi.enroute.trains.segment.api.SegmentCommand;
 import osgi.enroute.trains.segment.api.SegmentController;
 import osgi.enroute.trains.segment.api.SignalSegmentController;
 import osgi.enroute.trains.segment.api.SwitchSegmentController;
-import osgi.enroute.trains.track.api.Observation;
+import osgi.enroute.trains.track.api.TrackObservation;
 
 /**
  * 
@@ -96,12 +96,12 @@ public class SegmentCommands {
 			c.signal(color);
 		
 			try {
-				Observation o = new Observation();
+				TrackObservation o = new TrackObservation();
 				o.time = System.currentTimeMillis();
-				o.type = Observation.Type.SIGNAL;
+				o.type = TrackObservation.Type.SIGNAL;
 				o.segment = segment;
 				o.signal = color;
-				mqtt.publish(Observation.TOPIC, ByteBuffer.wrap( converter.convert(o).to(byte[].class)));
+				mqtt.publish(TrackObservation.TOPIC, ByteBuffer.wrap( converter.convert(o).to(byte[].class)));
 				
 			} catch(Exception e){
 				System.err.println("Failed to publish observation");
@@ -124,12 +124,12 @@ public class SegmentCommands {
 			c.swtch(alt);
 
 			try {
-				Observation o = new Observation();
+				TrackObservation o = new TrackObservation();
 				o.time = System.currentTimeMillis();
-				o.type = Observation.Type.SWITCH;
+				o.type = TrackObservation.Type.SWITCH;
 				o.segment = segment;
 				o.alternate = alt;
-				mqtt.publish(Observation.TOPIC, ByteBuffer.wrap( converter.convert(o).to(byte[].class)));
+				mqtt.publish(TrackObservation.TOPIC, ByteBuffer.wrap( converter.convert(o).to(byte[].class)));
 				
 			} catch(Exception e){
 				System.err.println("Failed to publish observation");

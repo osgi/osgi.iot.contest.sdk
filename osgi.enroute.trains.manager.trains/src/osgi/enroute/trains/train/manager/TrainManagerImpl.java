@@ -14,7 +14,7 @@ import org.osgi.util.converter.Converter;
 import osgi.enroute.debug.api.Debug;
 import osgi.enroute.mqtt.api.MQTTService;
 import osgi.enroute.scheduler.api.Scheduler;
-import osgi.enroute.trains.track.api.Observation;
+import osgi.enroute.trains.track.api.TrackObservation;
 import osgi.enroute.trains.track.api.Segment;
 import osgi.enroute.trains.track.api.TrackManager;
 import osgi.enroute.trains.train.api.Assignment;
@@ -39,7 +39,7 @@ public class TrainManagerImpl implements TrainManager{
 	private long interval = -1;
 	
 	// last observation of this train
-	private Observation lastObservation = null;
+	private TrackObservation lastObservation = null;
 
 	// segment we think we are on
 	private String currentSegment = null;
@@ -82,9 +82,9 @@ public class TrainManagerImpl implements TrainManager{
 				assign(a.segment);
 			});
 		
-		mqtt.subscribe(Observation.TOPIC)
-			.map(msg -> converter.convert(msg.payload().array()).to(Observation.class))
-			.filter(o -> o.type == Observation.Type.LOCATED)
+		mqtt.subscribe(TrackObservation.TOPIC)
+			.map(msg -> converter.convert(msg.payload().array()).to(TrackObservation.class))
+			.filter(o -> o.type == TrackObservation.Type.LOCATED)
 			.filter(o -> o.train.equals(config.name()))
 			.forEach(o -> {
 				// new observation of this train
@@ -101,7 +101,7 @@ public class TrainManagerImpl implements TrainManager{
 		}
 	}
 	
-	private void observation(Observation o){
+	private void observation(TrackObservation o){
 		if(lastObservation == null){
 			// first observation, now we know where we are at
 			currentSegment = o.segment;
