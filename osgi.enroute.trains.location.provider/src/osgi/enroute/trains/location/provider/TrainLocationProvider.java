@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -17,9 +16,9 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.util.converter.Converter;
 
 import osgi.enroute.mqtt.api.MQTTService;
-import osgi.enroute.trains.track.api.TrackObservation;
 import osgi.enroute.trains.track.api.Segment;
 import osgi.enroute.trains.track.api.TrackManager;
+import osgi.enroute.trains.track.api.TrackObservation;
 
 @Component(
         immediate = true,
@@ -30,9 +29,6 @@ public class TrainLocationProvider {
 	private LocationProviderConfig config;
 	private Thread reader;
 	private volatile boolean running = false;
-	
-	private Map<String, Integer> codeToTag;
-	private Map<Integer, String> tagToCode;
 	
 	private Map<Integer, String> tagToSegment;
 	private Map<String, Integer> segmentToTag;
@@ -49,6 +45,8 @@ public class TrainLocationProvider {
 	@Reference
 	protected TrackManager trackManager;
 	
+	@Reference
+	protected Code2Tag code2Tag;
 	
 	@Activate
 	void activate(LocationProviderConfig config){
@@ -61,7 +59,6 @@ public class TrainLocationProvider {
 		buildCodeMap();
 		
 		// try to set up rfcomm port by issuing Linux command...
-		// TODO check for root?
 		try {
 			Runtime.getRuntime().exec("rfcomm bind "+config.rfcomm()+" "+config.mac()+" "+config.channel());
 			
@@ -77,7 +74,7 @@ public class TrainLocationProvider {
 							r.read(buffer);
 							//System.out.println(new String(buffer));
 							String code = new String(buffer, 5, 5);
-							Integer tag = codeToTag.get(code);
+							Integer tag = code2Tag.getTag(code);
 							if(tag == null){
 								// Check whether this relates to the next segment?
 								if(lastSegment == null)
@@ -89,7 +86,7 @@ public class TrainLocationProvider {
 									if(t == null)
 										continue;
 									
-									String c = tagToCode.get(t);
+									String c = code2Tag.getCode(t);
 									if(c == null)
 										continue;
 											
@@ -162,18 +159,6 @@ public class TrainLocationProvider {
 		segmentToTag = segments.values().stream()
 				.filter( s -> s.tag != 0)
 				.collect(Collectors.toMap(s -> s.id, s -> s.tag));
-		
-		codeToTag = new HashMap<String, Integer>();
-		tagToCode = new HashMap<Integer, String>();
-		for(String line : config.code2tag()){
-			String[] split = line.split(":");
-			int tag = Integer.parseInt(split[0]);
-			String code = split[1];
-			// only keep last 5 characters
-			code = code.substring(5);
-			codeToTag.put(code, tag);
-			tagToCode.put(tag, code);
-		}
 	}
 	
 	private int distance(String s1, String s2){

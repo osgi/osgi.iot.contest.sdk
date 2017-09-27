@@ -29,11 +29,4 @@ public @interface LocationProviderConfig {
 	 */
 	String rfcomm() default "/dev/rfcomm0";
 	
-	/**
-	 * short code to RFID tag uuid
-	 * 
-	 * {@code code:tag}
-	 */
-	String[] code2tag();
-	
 }
