@@ -14,5 +14,10 @@ public interface TrainManager {
 	 *            the id of the requested segment
 	 */
 	void assign(String toSegment);
+	
+	/**
+	 * Stop the train
+	 */
+	void stop();
 
 }

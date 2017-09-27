@@ -30,13 +30,16 @@ import osgi.enroute.trains.train.api.TrainManager;
 	configurationPolicy = ConfigurationPolicy.REQUIRE,
 	property = {
 			Debug.COMMAND_FUNCTION + "=assign", //
+			Debug.COMMAND_FUNCTION + "=stop"
 	})
-public class TrainManagerImpl implements TrainManager{
+public class TrainManagerImpl implements TrainManager {
 
 	private Config config;
 	
 	// estimated avg time interval between segments
 	private long interval = -1;
+	
+	private int speed = 40;
 	
 	// last observation of this train
 	private TrackObservation lastObservation = null;
@@ -46,6 +49,9 @@ public class TrainManagerImpl implements TrainManager{
 	
 	// current target
 	private String currentAssignment = null;
+	
+	// current access
+	private String currentAccess = null;
 	
 	// current route
 	private List<Segment> currentRoute = null;
@@ -65,8 +71,6 @@ public class TrainManagerImpl implements TrainManager{
 	@ObjectClassDefinition
 	@interface Config {
 		String name();
-
-		int speed() default 50;
 	}
 	
 	@Activate
@@ -101,6 +105,13 @@ public class TrainManagerImpl implements TrainManager{
 		}
 	}
 	
+	@Override
+	public void stop(){
+		// clear assignment and stop
+		currentAssignment = null;
+		halt();
+	}
+	
 	private void observation(TrackObservation o){
 		if(lastObservation == null){
 			// first observation, now we know where we are at
@@ -108,7 +119,7 @@ public class TrainManagerImpl implements TrainManager{
 			
 			if(currentAssignment == null){
 				// no assignment, just stop
-				stop();
+				halt();
 			} else {
 				startRoute();
 			}
@@ -131,21 +142,15 @@ public class TrainManagerImpl implements TrainManager{
 	private void startRoute(){
 		System.out.println("Plan route "+currentSegment+"->"+currentAssignment);
 		currentRoute = trackManager.planRoute(currentSegment, currentAssignment);
-		System.out.println("Start route "+currentRoute);
+		// System.out.println("Start route "+currentRoute);
 		if(currentRoute == null){
 			// no route existing? abort
 			assignmentAborted();
 		}
-		move();	
+		updateRoute(currentSegment);
 	}
 	
 	private void updateRoute(String segment){
-		// we are now at segment
-		if(currentSegment.equals(segment)){
-			// nothing to be done?
-			return;
-		}
-		
 		this.currentSegment = segment;
 		
 		// if segment is the assignment, we are done
@@ -166,7 +171,7 @@ public class TrainManagerImpl implements TrainManager{
 		if(index >= currentRoute.size()){
 			// we are no longer on the route?! stop and plan again...
 			System.out.println("Train got off the route?! Stop and reschedule...");
-			stop();
+			halt();
 			startRoute();
 			return;
 		}
@@ -176,26 +181,26 @@ public class TrainManagerImpl implements TrainManager{
 		for(int i=index;i<currentRoute.size();i++){
 			remainingRoute.add(currentRoute.get(i));
 		}
-		System.out.println("Route remaining: "+remainingRoute);
+		//System.out.println("Route remaining: "+remainingRoute);
 		
 		// check whether we have to request access to a track
 		String fromTrack = remainingRoute.get(0).track;
 		String toTrack = remainingRoute.get(Math.min(4, remainingRoute.size()-1)).track;
 		
-		if (!fromTrack.equals(toTrack)) {
-			stop();
+		if (!fromTrack.equals(toTrack) && !toTrack.equals(currentAccess)) {
+			halt();
 			// ok to block here?
 			System.out.println("Train "+config.name()+" requests access from "+fromTrack+" to "+toTrack);
 			boolean granted = trackManager.requestAccessTo(config.name(), fromTrack, toTrack);
 			
 			if(granted){
+				currentAccess = toTrack;
 				move();
 			} else {
 				System.out.println("Train "+config.name()+" did not get access to "+toTrack+", aborting assignment?");
 				assignmentAborted();
 			}
-      }
-		
+		}
 	}
 	
 
@@ -203,11 +208,11 @@ public class TrainManagerImpl implements TrainManager{
 		TrainCommand c = new TrainCommand();
 		c.type = Type.MOVE;
 		c.train = config.name();
-		c.directionAndSpeed = config.speed();
+		c.directionAndSpeed = speed;
 		command(c);
 	}
 	
-	private void stop(){
+	private void halt(){
 		TrainCommand c = new TrainCommand();
 		c.type = Type.MOVE;
 		c.train = config.name();
@@ -225,7 +230,7 @@ public class TrainManagerImpl implements TrainManager{
 	
 	private void assignmentReached(){
 		System.out.println("Train "+config.name()+" reached assignment!");
-		stop();
+		halt();
 		
 		Assignment a = new Assignment();
 		a.type = Assignment.Type.REACHED;
@@ -243,7 +248,7 @@ public class TrainManagerImpl implements TrainManager{
 	}
 	
 	private void assignmentAborted(){
-		stop();
+		halt();
 		
 		Assignment a = new Assignment();
 		a.type = Assignment.Type.ABORTED;
