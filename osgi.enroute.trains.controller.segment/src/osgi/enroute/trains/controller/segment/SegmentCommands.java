@@ -50,12 +50,11 @@ public class SegmentCommands {
 				case SIGNAL:
 					System.out.println("Set signal "+c.segment+" to "+c.signal);
 					signal(c.segment, c.signal);
-					
 					break;
 				case SWITCH:
 					System.out.println("Set switch "+c.segment+" to "+c.alternate);
 					swtch(c.segment, c.alternate);
-				break;
+					break;
 				}
 			});
 		} catch (Exception e) {

@@ -44,10 +44,11 @@ public class TrainCommands {
 				TrainCommand c = converter.convert(msg.payload().array()).to(TrainCommand.class);
 				switch(c.type){
 				case LIGHT:
+					System.out.println("Turn light of train "+c.train+" "+(c.on ? "on" : "off"));
 					light(c.train, c.on);
-					
 					break;
 				case MOVE:
+					System.out.println("Move "+c.train+" at "+c.directionAndSpeed+" %");
 					move(c.train, c.directionAndSpeed);
 					break;
 				}
@@ -70,11 +71,9 @@ public class TrainCommands {
 	}
 
 	public void move(String train, int directionAndSpeed) {
-		System.out.println("Move "+train+" at "+directionAndSpeed+" %");
 		TrainController t = trains.get(train);
 		if(t != null){
 			t.move(directionAndSpeed);
-			
 			try {
 				TrainObservation o = new TrainObservation();
 				o.time = System.currentTimeMillis();
