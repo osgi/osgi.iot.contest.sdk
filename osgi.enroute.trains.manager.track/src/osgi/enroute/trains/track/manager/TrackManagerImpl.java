@@ -20,14 +20,15 @@ import osgi.enroute.mqtt.api.MQTTService;
 import osgi.enroute.scheduler.api.Scheduler;
 import osgi.enroute.trains.segment.api.Color;
 import osgi.enroute.trains.segment.api.SegmentCommand;
-import osgi.enroute.trains.track.api.TrackObservation;
-import osgi.enroute.trains.track.api.TrackObservation.Type;
 import osgi.enroute.trains.track.api.Segment;
 import osgi.enroute.trains.track.api.TrackConfiguration;
 import osgi.enroute.trains.track.api.TrackManager;
+import osgi.enroute.trains.track.api.TrackObservation;
+import osgi.enroute.trains.track.api.TrackObservation.Type;
 import osgi.enroute.trains.track.manager.Tracks.SegmentHandler;
 import osgi.enroute.trains.track.manager.Tracks.SignalHandler;
 import osgi.enroute.trains.track.manager.Tracks.SwitchHandler;
+import osgi.enroute.trains.train.api.TrainCommand;
 
 /**
  * 
@@ -81,18 +82,18 @@ public class TrackManagerImpl implements TrackManager {
 					if (trainForTrack == null) {
 						System.out.println("Initial access for train "+o.train+" to track "+track);
 						access.put(track, o.train);
+						lastAccess.put(o.train, track);
 					} else if (!trainForTrack.equals(o.train)) {
 						System.err.println("Train "+o.train+" doesn't have access to track "+track);
+						stopTrain(o.train);
 					}
 				}
 
 				releaseOtherTracks(o.train, track);
 			} else {
-
 				// update track state
 				tracks.event(o);
 			}
-			
 		});
 
 	}
@@ -132,42 +133,52 @@ public class TrackManagerImpl implements TrackManager {
 
 		while (!granted && System.currentTimeMillis() - start < TIMEOUT) {
 			synchronized (access) {
-				if (!tracks.isBlocked(toTrack) && (access.get(toTrack) == null || access.get(toTrack).equals(train))) {
-					// assign track to this train
-					access.put(toTrack, train);
-					lastAccess.put(train, toTrack);
-
-					// check if switch is ok
-					Optional<SwitchHandler> optSwitch = tracks.getSwitch(fromTrack, toTrack);
-					if (!optSwitch.isPresent()) {
-						// in case no switch, just set signal - if present -
-						// green
-						System.out.println("No switch between " + fromTrack + " and " + toTrack);
-						greenSignal(tracks.getSignal(fromTrack));
+				if(tracks.isBlocked(toTrack)){
+					// blocked, decline access
+					granted = false;
+				} else {
+					String currentAllocation = access.get(toTrack);
+					if(train.equals(currentAllocation)){
+						// train already has access
 						granted = true;
+					} else if(currentAllocation != null){
+						// other train currently has access, we have to wait
+						granted = false;
 					} else {
-						// set switch in correct position
-						SwitchHandler switchHandler = optSwitch.get();
-						if (shouldSwitch(switchHandler, fromTrack, toTrack)) {
-							doSwitch(switchHandler.segment.id, !switchHandler.toAlternate);
-							sleep(3000);
-							// TODO should we wait for switched observation here?!
-						}							
-						
-						// set green signal
-						if (!greenSignal(tracks.getSignal(fromTrack))) {
-							sleep(1000);
-							// TODO should we wait for green signal observation here?!
+						// no other train currently has access, assign track to this train and set signals/switches 
+						// assign track to this train
+						access.put(toTrack, train);
+						lastAccess.put(train, toTrack);
+
+						// check if switch is ok
+						Optional<SwitchHandler> optSwitch = tracks.getSwitch(fromTrack, toTrack);
+						if (!optSwitch.isPresent()) {
+							// in case no switch, just set signal - if present -
+							// green
+							System.out.println("No switch between " + fromTrack + " and " + toTrack);
+							greenSignal(tracks.getSignal(fromTrack));
+							granted = true;
+						} else {
+							// set switch in correct position
+							SwitchHandler switchHandler = optSwitch.get();
+							if (shouldSwitch(switchHandler, fromTrack, toTrack)) {
+								doSwitch(switchHandler.segment.id, !switchHandler.toAlternate);
+								sleep(3000);
+								// TODO should we wait for switched observation here?!
+							}							
+							
+							// set green signal
+							if (!greenSignal(tracks.getSignal(fromTrack))) {
+								sleep(1000);
+								// TODO should we wait for green signal observation here?!
+							}
+
+							// now grant the access
+							granted = true;
 						}
-
-						// now grant the access
-						granted = true;
 					}
-
-					// release previous access
-					lastAccess.remove(train);
 				}
-
+				
 				// if not granted, wait until timeout
 				if (!granted) {
 					try {
@@ -278,6 +289,19 @@ public class TrackManagerImpl implements TrackManager {
 	private void command(SegmentCommand c){
 		try {
 			mqtt.publish(SegmentCommand.TOPIC,  ByteBuffer.wrap( converter.convert(c).to(byte[].class)));
+		} catch(Exception e){
+			System.out.println("Failed publishing command");
+		}
+	}
+	
+	private void stopTrain(String train) {
+		TrainCommand c = new TrainCommand();
+		c.type = TrainCommand.Type.MOVE;
+		c.train = train;
+		c.directionAndSpeed = 0;
+		
+		try {
+			mqtt.publish(TrainCommand.TOPIC,  ByteBuffer.wrap( converter.convert(c).to(byte[].class)));
 		} catch(Exception e){
 			System.out.println("Failed publishing command");
 		}
