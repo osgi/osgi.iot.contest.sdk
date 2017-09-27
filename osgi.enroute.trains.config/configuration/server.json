@@ -1,6 +1,6 @@
 {
 	"osgi.enroute.mqtt": {
-		"broker": "tcp://127.0.0.1:1883"
+		"broker": "tcp://192.168.99.150:1883"
 	},
 	        
 	"osgi.enroute.trains.train.manager~Train-1": {
@@ -9,7 +9,8 @@
 	},
 	        
 	"osgi.enroute.trains.train.manager~Train-2": {
-		"name": "Red"	
+		"name": "Red",
+		"osgi.command.scope":"red"	
 	},
 	        
 	"osgi.enroute.trains.track.manager": {
@@ -91,7 +92,7 @@
 		]
 	},
 	
-	"osgi.enroute.trains.location.provider": {
+	"osgi.enroute.trains.location.provider~Train-1": {
 		"train":"White",
 		"mac": "20:15:07:24:37:31",
 		"channel": 1,
@@ -184,5 +185,101 @@
 			"90:010E9CDB89",
 			"92:010E9CC0B6"
 		]
+	},
+	
+	"osgi.enroute.trains.location.provider~Train-2": {
+		"train":"Red",
+		"mac": "20:15:09:08:35:80",
+		"channel": 1,
+		"rfcomm":"/dev/rfcomm1",
+		"code2tag" : [
+			"1:010E9CD250",
+			"2:010E9EF905",
+			"3:010E9CD8F6",
+			"4:010E9EF8F9",
+			"5:010E9CD69F",
+			"6:010E9ECAB7",
+			"7:010E9CE805",
+			"8:010E9CD61D",
+			"9:ambiguous - not used",
+			"10:010E9ED6C1",
+			"11:010E9CCC3C",
+			"12:010E9CDB1D",
+			"13:010E9CDDDD",
+			"14:010E9ECE7D",
+			"15:010E9ED6BE",
+			"16:010E9CDAC1",
+			"17:010E9D0409",
+			"18:010E9CDF1A",
+			"19:010E9CE1E1",
+			"20:010E9CD0C1",
+			"21:010E9CD2A0",
+			"22:010E9CDF0E",
+			"23:010E9ECEAF",
+			"24:010E9CBDB9",
+			"25:010E9CDDA0",
+			"26:010E9ED95D",
+			"27:010E9CC909",
+			"28:010E9CD29B",
+			"29:010E9ED969",
+			"30:010E9CE218",
+			"31:010E9ED0B4",
+			"32:010E9D045C",
+			"33:010E9D049C",
+			"34:010E9CD0DA",
+			"35:010E9CE13E",
+			"36:010E9CE117",
+			"37:010E9CBDC4",
+			"38:010E9ED786",
+			"39:010E9CDDC2",
+			"40:010E9CE1FE",
+			"41:010E9ED6C8",
+			"42:010E9CC8C8",
+			"43:010E9CC8A4",
+			"44:010E9CF1FE",
+			"45:010E9CE7D3",
+			"46:010E9ECE79",
+			"47:010E9ED888",
+			"48:010E9CDE3D",
+			"49:010E9ED8A8",
+			"50:010E9CE826",
+			"51:010E9D04C3",
+			"52:010E9CDB4E",
+			"53:010E9CD8B9",
+			"54:010E9D03E4",
+			"55:010E9CDE59",
+			"56:010E9CF04D",
+			"57:010E9ED942",
+			"58:010E9CE1EE",
+			"59:010E9CDD67",
+			"60:010E9CEA63",
+			"61:010E9CE005",
+			"62:010E9CDFF7",
+			"63:010E9CE7F7",
+			"64:010E9CE115",
+			"65:010E9D0F7B",
+			"66:010E9CBDCC",
+			"67:010E9CD262",
+			"68:010E9CC8AA",
+			"69:010E9CE82C",
+			"70:010E9CD3DC",
+			"71:010E9CD201",
+			"72:010E9CDB36",
+			"73:010E9EF8ED",
+			"74:010E9CE800",
+			"75:010E9CD1E8",
+			"76:010E9CE1EB",
+			"77:010E9ED7A3",
+			"78:010E9CD8A9",
+			"79:010E9CC545",
+			"80:010E9CD204",
+			"82:010E9CDDE3",
+			"84:010E9CC501",
+			"86:010E9CE7DB",
+			"88:010E9D04A6",
+			"90:010E9CDB89",
+			"92:010E9CC0B6"
+		]
 	}
+	
 }
