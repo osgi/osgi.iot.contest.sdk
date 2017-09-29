@@ -13,10 +13,9 @@ import org.osgi.util.converter.Converter;
 
 import osgi.enroute.debug.api.Debug;
 import osgi.enroute.mqtt.api.MQTTService;
-import osgi.enroute.scheduler.api.Scheduler;
-import osgi.enroute.trains.track.api.TrackObservation;
 import osgi.enroute.trains.track.api.Segment;
 import osgi.enroute.trains.track.api.TrackManager;
+import osgi.enroute.trains.track.api.TrackObservation;
 import osgi.enroute.trains.train.api.Assignment;
 import osgi.enroute.trains.train.api.TrainCommand;
 import osgi.enroute.trains.train.api.TrainCommand.Type;
@@ -57,9 +56,6 @@ public class TrainManagerImpl implements TrainManager {
 	private List<Segment> currentRoute = null;
 	
 	@Reference
-	private Scheduler scheduler;
-
-	@Reference
 	private Converter converter;
 
 	@Reference
@@ -83,6 +79,7 @@ public class TrainManagerImpl implements TrainManager {
 			.filter(a -> a.train.equals(config.name()))
 			.forEach(a -> {
 				// new assignment for this train
+				System.out.println("New assignment for "+a.train);
 				assign(a.segment);
 			});
 		
@@ -151,6 +148,7 @@ public class TrainManagerImpl implements TrainManager {
 	}
 	
 	private void updateRoute(String segment){
+		System.out.println("Update route "+segment);
 		this.currentSegment = segment;
 		
 		// if segment is the assignment, we are done
@@ -200,6 +198,8 @@ public class TrainManagerImpl implements TrainManager {
 				System.out.println("Train "+config.name()+" did not get access to "+toTrack+", aborting assignment?");
 				assignmentAborted();
 			}
+		} else {
+			move();
 		}
 	}
 	
