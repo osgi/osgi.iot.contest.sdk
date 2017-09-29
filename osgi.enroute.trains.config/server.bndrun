@@ -21,6 +21,7 @@
 	osgi.enroute.trains.manager.track;version=snapshot,\
 	osgi.enroute.trains.manager.trains;version=snapshot,\
 	osgi.enroute.trains.location.provider;version=snapshot,\
+	osgi.enroute.trains.demo;version=snapshot,\
 	osgi.enroute.trains.config.server;version=snapshot		
 	
 	

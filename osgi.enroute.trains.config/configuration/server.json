@@ -12,6 +12,17 @@
 		"name": "Red",
 		"osgi.command.scope":"red"	
 	},
+	
+	"osgi.enroute.trains.demo":{
+		"trains" : ["White","Red"],
+		"stations" : [
+			"Station 1:A07",
+			"Station 2:B04",
+			"Station 3:C05",
+			"Station 4:E04",
+			"Station 5:F05"
+		]
+	},
 	        
 	"osgi.enroute.trains.track.manager": {
 		"name": "demo",
