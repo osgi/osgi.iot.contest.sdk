@@ -1,0 +1,57 @@
+	
+-runbundles.robot: \
+	org.apache.felix.http.api;version='[3.0.0,4.0)',\
+	org.apache.felix.http.jetty;version='[3.1.0,4.0)',\
+	org.apache.felix.http.servlet-api;version='[1.1.2,1.2)',\
+	org.apache.felix.gogo.runtime;version='[0.16.2,0.16.3)',\
+	org.apache.felix.gogo.command;version='[0.14.0,0.14.1)',\
+	org.apache.felix.gogo.shell;version='[0.10.0,0.10.1)',\
+	osgi.promise;version='[6.0.0,6.0.1)',\
+	org.osgi.util.promise;version='[1.1.0,1.2.0)',\
+	org.osgi.util.function;version='[1.1.0,1.2.0)',\
+	org.osgi.util.pushstream;version='[1.0.0,1.1.0)',\
+	org.apache.felix.converter;version='[0.1.0,0.1.1)',\
+	org.apache.felix.configadmin;version='[1.9.0,1.10.0)',\
+	org.apache.felix.configurator;version='[0.0.1,0.1.0)',\
+	org.apache.felix.log;version='[1.0.1,1.0.2)',\
+	org.apache.felix.scr;version='[2.0.0,2.0.1)',\
+	org.osgi.service.event;version='[1.3.0,1.4.0)',\
+	com.google.guava;version='[12.0,13.0)',\
+	org.jboss.netty;version='[3.5,4)',\
+	org.apache.commons.logging;version='[1.1,2)',\
+	org.apache.commons.net;version='[2.0,3)',\
+	org.apache.commons.httpclient;version='[3.1,4)',\
+	org.apache.commons.codec;version='[1.3,2.0)',\
+	org.apache.commons.io;version='[1.4,2.0)',\
+	org.apache.commons.lang;version='[2.6,3)',\
+	org.apache.commons.pool;version='[1.6,2)',\
+	ws-commons-util;version='[1.0.1,1.0.2)',\
+	org.ros.rosjava_core.apache_xmlrpc_common;version='[0.2.1,0.2.2)',\
+	org.ros.rosjava_core.apache_xmlrpc_client;version='[0.2.1,0.2.2)',\
+	org.ros.rosjava_core.apache_xmlrpc_server;version='[0.2.1,0.2.2)',\
+	org.ros.rosjava;version='[0.2.2,0.2.3)',\
+	org.ros.rosjava.message_generation;version='[0.2.1,0.2.2)',\
+	org.ros.rosjava_messages.rosgraph_msgs;version='[1.11.1,1.12)',\
+	org.ros.rosjava_messages.std_msgs;version='[0.5.9,0.6)',\
+	org.ros.rosjava_messages.geometry_msgs;version='[1.11.7,1.11.8)',\
+	org.ros.rosjava_messages.sensor_msgs;version='[1.11.7,1.11.8)',\
+	org.ros.rosjava_messages.brics_actuator;version='[0.7,0.8)',\
+	be.iminds.iot.ros.core;version='[0.3.0,0.4.0)',\
+	be.iminds.iot.ros.configurator;version='[0.3.0,0.4.0)',\
+	be.iminds.iot.ros.youbot;version='[0.2.0,0.3.0)',\
+	be.iminds.iot.ros.range;version='[0.2.0,0.3.0)',\
+	be.iminds.iot.sensor.range.ros;version='[0.3.0,0.4.0)',\
+	be.iminds.iot.robot.youbot.ros;version='[0.3.0,0.4.0)',\
+	be.iminds.iot.keyboard.servlet;version='[0.2.0,0.3.0)',\
+	be.iminds.iot.robot.input.keyboard;version='[0.3.0,0.4.0)',\
+	org.eclipse.equinox.coordinator;version='[1.3.100,1.3.101)',\
+	org.eclipse.paho.client.mqttv3;version='[1.1.0,1.1.1)',\
+	com.springsource.org.json;version='[1.0.0,1.0.1)',\
+	osgi.enroute.mqtt.provider;version=snapshot,\
+	osgi.enroute.trains.util;version=snapshot,\
+	osgi.enroute.trains.robot.provider;version=snapshot,\
+	osgi.enroute.trains.config.robot;version=snapshot		
+	
+		
+	
+

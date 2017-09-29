@@ -17,4 +17,5 @@ Require-Capability: \
 Export-Package: \
 	osgi.enroute.trains.segment.api,\
 	osgi.enroute.trains.track.api,\
-	osgi.enroute.trains.train.api
+	osgi.enroute.trains.train.api,\
+	osgi.enroute.trains.robot.api
