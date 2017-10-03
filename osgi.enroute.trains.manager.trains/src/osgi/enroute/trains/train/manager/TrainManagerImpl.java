@@ -40,9 +40,6 @@ public class TrainManagerImpl implements TrainManager {
 	
 	private int speed = 40;
 	
-	// last observation of this train
-	private TrackObservation lastObservation = null;
-
 	// segment we think we are on
 	private String currentSegment = null;
 	
@@ -98,7 +95,7 @@ public class TrainManagerImpl implements TrainManager {
 		System.out.println("New assignment "+toSegment+" for "+config.name());
 		currentAssignment = toSegment;
 		if(currentSegment != null){
-			startRoute();
+			updateRoute();
 		}
 	}
 	
@@ -110,76 +107,38 @@ public class TrainManagerImpl implements TrainManager {
 	}
 	
 	private void observation(TrackObservation o){
-		if(lastObservation == null){
-			// first observation, now we know where we are at
-			currentSegment = o.segment;
-			
-			if(currentAssignment == null){
-				// no assignment, just stop
-				halt();
-			} else {
-				startRoute();
-			}
+		System.out.println("Train located at "+o.segment);
+		if(o.segment == null){
+			// invalid located event!?
+			return;
+		}
+		System.out.println("Observation interval: "+(System.currentTimeMillis() - interval));
+		interval = System.currentTimeMillis();
+		
+		currentSegment = o.segment;
+		
+		if(currentAssignment == null){
+			// no assignment, just stop
+			halt();
 		} else {
-			System.out.println("Train located at "+o.segment);
-			if(o.segment == null){
-				// invalid located event!?
-				return;
-			}
-			System.out.println("Observation interval: "+(System.currentTimeMillis() - interval));
-			interval = System.currentTimeMillis();
-			// update the route 
-			if(currentRoute != null)
-				updateRoute(o.segment);
+			updateRoute();
 		}
-		
-		lastObservation = o;
 	}
 	
-	private void startRoute(){
-		System.out.println("Plan route "+currentSegment+"->"+currentAssignment);
-		currentRoute = trackManager.planRoute(currentSegment, currentAssignment);
-		// System.out.println("Start route "+currentRoute);
-		if(currentRoute == null){
-			// no route existing? abort
-			assignmentAborted();
-		}
-		updateRoute(currentSegment);
-	}
-	
-	private void updateRoute(String segment){
-		System.out.println("Update route "+segment);
-		this.currentSegment = segment;
-		
+	private void updateRoute(){
 		// if segment is the assignment, we are done
-		if(segment.equals(currentAssignment)){
+		if(currentSegment.equals(currentAssignment)){
 			assignmentReached();
 			return;
 		}
 
-		// check where we are at the route
-		int index = 0;
-		for(Segment s : currentRoute){
-			if(s.id.equals(currentSegment)){
-				break;
-			}
-			index++;
-		}
-		
-		if(index >= currentRoute.size()){
-			// we are no longer on the route?! stop and plan again...
-			System.out.println("Train got off the route?! Stop and reschedule...");
-			halt();
-			startRoute();
-			return;
-		}
-		
-		// update the remaining route
-		List<Segment> remainingRoute = new ArrayList<>();
-		for(int i=index;i<currentRoute.size();i++){
-			remainingRoute.add(currentRoute.get(i));
-		}
+		// calculate the remaining route
+		List<Segment> remainingRoute = trackManager.planRoute(currentSegment, currentAssignment, config.name());
 		//System.out.println("Route remaining: "+remainingRoute);
+		if(remainingRoute == null){
+			// no route existing? abort
+			assignmentAborted();
+		}
 		
 		// check whether we have to request access to a track
 		String fromTrack = remainingRoute.get(0).track;

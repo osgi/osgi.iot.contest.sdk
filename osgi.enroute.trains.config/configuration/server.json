@@ -14,13 +14,12 @@
 	},
 	
 	"osgi.enroute.trains.demo":{
-		"trains" : ["White","Red"],
+		"trains" : ["White:true","Red:false"],
 		"stations" : [
-			"Station 1:A07",
-			"Station 2:B04",
-			"Station 3:C05",
-			"Station 4:E04",
-			"Station 5:F05"
+			"Station 1:B04:REGULAR",
+			"Station 2:C05:REGULAR",
+			"Station 3:E04:CARGO",
+			"Station 4:F05:REGULAR"
 		]
 	},
 	        

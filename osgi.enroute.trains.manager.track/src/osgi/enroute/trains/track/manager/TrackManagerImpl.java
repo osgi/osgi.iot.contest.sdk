@@ -195,11 +195,11 @@ public class TrackManagerImpl implements TrackManager {
 		return granted;
 	}
 	
-	public List<Segment> planRoute(String fromSegment, String toSegment) {
+	public List<Segment> planRoute(String fromSegment, String toSegment, String train) {
 		// plan the route
 		SegmentHandler src = tracks.getHandler(fromSegment);
 		SegmentHandler dest = tracks.getHandler(toSegment);
-		LinkedList<SegmentHandler> route = src.findForward(dest);
+		LinkedList<SegmentHandler> route = src.findForward(dest, train);
 
 		return route.stream()
 				.filter(sh -> !(sh instanceof SwitchHandler)) // exclude switch/signals
@@ -223,7 +223,7 @@ public class TrackManagerImpl implements TrackManager {
 		}
 	}
 
-	// set the signal to green for 10 seconds
+	// set the signal to green for 5 seconds
 	private boolean greenSignal(Optional<SignalHandler> optSignal) {
 		boolean alreadyGreen = false;
 
@@ -231,8 +231,8 @@ public class TrackManagerImpl implements TrackManager {
 			SignalHandler signal = optSignal.get();
 			alreadyGreen = (signal.color.equals(Color.GREEN));
 			setSignal(signal.segment.id, Color.GREEN);
-			scheduler.after(() -> setSignal(signal.segment.id, Color.YELLOW), 10000);
-			scheduler.after(() -> setSignal(signal.segment.id, Color.RED), 15000);
+			scheduler.after(() -> setSignal(signal.segment.id, Color.YELLOW), 5000);
+			scheduler.after(() -> setSignal(signal.segment.id, Color.RED), 10000);
 		}
 
 		return alreadyGreen;

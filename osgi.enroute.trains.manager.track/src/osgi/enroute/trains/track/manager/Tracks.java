@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 import osgi.enroute.dto.api.TypeReference;
 import osgi.enroute.trains.segment.api.Color;
 import osgi.enroute.trains.track.api.TrackObservation;
+import osgi.enroute.trains.track.api.TrackObservation.Type;
 import osgi.enroute.trains.track.api.Segment;
 import osgi.enroute.trains.track.api.TrackConfiguration;
 
@@ -38,7 +39,8 @@ public class Tracks {
 		public SegmentHandler next;
 		public SegmentHandler prev;
 		public boolean blocked = false;
-
+		public String occupiedBy = null;
+		
 		public SegmentHandler(Segment segment) {
 			this.segment = segment;
 		}
@@ -76,24 +78,50 @@ public class Tracks {
 			return blocked;
 		}
 
-		public LinkedList<SegmentHandler> findForward(SegmentHandler destination) {
+		public boolean isOccupied(){
+			return occupiedBy != null;
+		}
+		
+		public LinkedList<SegmentHandler> findForward(SegmentHandler destination, String train) {
 			LinkedList<SegmentHandler> route = new LinkedList<>();
-			if (find(route, destination, true))
+			if (find(route, destination, train, true, false)){
 				return new LinkedList<SegmentHandler>(route);
-			else
-				return null;
+			} else {
+				 // in case no route found, try ignoring current train occupations...
+				route = new LinkedList<>();
+				if (find(route, destination, train, true, true))
+					return new LinkedList<SegmentHandler>(route);
+				else
+					return null;
+			}
 		}
 
-		public LinkedList<SegmentHandler> findBackward(SegmentHandler destination) {
+		public LinkedList<SegmentHandler> findBackward(SegmentHandler destination, String train) {
 			LinkedList<SegmentHandler> route = new LinkedList<>();
-			if (find(route, destination, false))
+			if (find(route, destination, train, false, false)){
 				return new LinkedList<SegmentHandler>(route);
-			else
-				return null;
+			} else {
+				 // in case no route found, try ignoring current train occupations...
+				route = new LinkedList<>();
+				if (find(route, destination, train, false, true))
+					return new LinkedList<SegmentHandler>(route);
+				else
+					return null;
+			}
 		}
 
-		boolean find(List<SegmentHandler> route, SegmentHandler destination, boolean forward) {
+		boolean find(List<SegmentHandler> route, SegmentHandler destination, String train, boolean forward, boolean ignoreOccupied) {
 			if (route.contains(this)){
+				return false;
+			}
+			
+			// cannot traverse blocked segment
+			if(this.blocked){
+				return false;
+			}
+			
+			// cannot traverse segment occupied by other train
+			if(!ignoreOccupied && occupiedBy!=null && !occupiedBy.equals(train)){
 				return false;
 			}
 
@@ -106,12 +134,12 @@ public class Tracks {
 			Collection<SegmentHandler> choices = move(forward);
 
 			if (choices.size() == 1) {
-				return choices.iterator().next().find(route, destination, forward);
+				return choices.iterator().next().find(route, destination, train, forward, ignoreOccupied);
 			}
 
 			int marker = route.size();
 			for (SegmentHandler choice : choices) {
-				if (choice.find(route, destination, forward))
+				if (choice.find(route, destination, train, forward, ignoreOccupied))
 					return true;
 					
 
@@ -145,6 +173,9 @@ public class Tracks {
 			switch(e.type){
 			case BLOCKED:
 				blocked = e.blocked;
+				return true;
+			case LOCATED:
+				occupiedBy = e.train;
 				return true;
 			default:
 				return false;
@@ -536,6 +567,13 @@ public class Tracks {
 	}
 
 	public void event(TrackObservation e) {
+		if(e.type == Type.LOCATED){
+			// clear previous occupation
+			handlers.values().stream()
+				.filter(sh -> e.train.equals(sh.occupiedBy))
+				.forEach(sh -> sh.occupiedBy = null);
+		}
+		
 		if (e.segment != null) {
 			SegmentHandler sh = getHandler(e.segment);
 			if (sh == null)

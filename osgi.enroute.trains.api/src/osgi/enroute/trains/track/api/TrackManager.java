@@ -69,7 +69,9 @@ public interface TrackManager {
 	 * 				the segment to start from
 	 * @param toSegment 
 	 * 				the segment to reach
+	 * @param train
+	 * 				the train for which to calculate the route
 	 * @return a list of segments to follow, or null if no route exists.
 	 */
-	List<Segment> planRoute(String fromSegment, String toSegment);
+	List<Segment> planRoute(String fromSegment, String toSegment, String train);
 }
