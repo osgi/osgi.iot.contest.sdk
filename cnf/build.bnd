@@ -8,3 +8,8 @@ Bundle-Copyright: 			OSGi Alliance All Rights Reserved ${tstamp;YYYY}
 	aQute.bnd.deployer.repository.FixedIndexedRepo; \
 	        name		=       Paremus RSA; \
 	        locations	=       http://repository.paremus.com/gossip/index.xml
+
+-plugin.imec.robot = \
+	aQute.bnd.deployer.repository.FixedIndexedRepo; \
+	        name		=       imec Robot; \
+	        locations	=       http://aiolos.intec.ugent.be/repositories/be.iminds.iot.robot/index.xml
