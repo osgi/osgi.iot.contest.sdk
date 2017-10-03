@@ -1,7 +1,6 @@
 package osgi.enroute.trains.train.manager;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.osgi.service.component.annotations.Activate;
@@ -107,12 +106,11 @@ public class TrainManagerImpl implements TrainManager {
 	}
 	
 	private void observation(TrackObservation o){
-		System.out.println("Train located at "+o.segment);
+		System.out.println("Train "+config.name()+" located at "+o.segment+" ( after "+(System.currentTimeMillis() - interval)+" ms)");
 		if(o.segment == null){
 			// invalid located event!?
 			return;
 		}
-		System.out.println("Observation interval: "+(System.currentTimeMillis() - interval));
 		interval = System.currentTimeMillis();
 		
 		currentSegment = o.segment;
