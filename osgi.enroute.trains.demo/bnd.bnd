@@ -28,4 +28,6 @@ Private-Package: osgi.enroute.trains.demo
 -runbundles: \
 	${error;Resolve first}
 
-Export-Package: osgi.enroute.trains.train.api
+Export-Package: \
+	osgi.enroute.trains.train.api,\
+	osgi.enroute.trains.robot.api
