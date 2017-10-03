@@ -24,6 +24,7 @@ import osgi.enroute.trains.robot.api.RobotCommand;
 import osgi.enroute.trains.robot.api.RobotObservation;
 import osgi.enroute.trains.train.api.Assignment;
 import osgi.enroute.trains.train.api.Assignment.Type;
+import osgi.enroute.trains.train.api.TrainCommand;
 
 /**
  * Train demo.
@@ -34,7 +35,9 @@ import osgi.enroute.trains.train.api.Assignment.Type;
 	property = {
 			Debug.COMMAND_SCOPE +"=trains",
 			Debug.COMMAND_FUNCTION + "=station",
-			Debug.COMMAND_FUNCTION + "=container"},
+			Debug.COMMAND_FUNCTION + "=container",
+			Debug.COMMAND_FUNCTION + "=stop",
+			Debug.COMMAND_FUNCTION + "=resume"},
 	service=TrainsDemo.class)
 public class TrainsDemo {
 
@@ -147,7 +150,7 @@ public class TrainsDemo {
 		
 		mqtt.subscribe(RobotObservation.TOPIC)
 			.map(msg -> converter.convert(msg.payload().array()).to(RobotObservation.class))
-			.forEach(a -> {
+			.forEach(o -> {
 
 				// check which train is in cargo station
 				Optional<Station> station = stations.values().stream()
@@ -158,6 +161,16 @@ public class TrainsDemo {
 					String train = station.get().train;
 					
 					if(train != null){
+						// update loaded state
+						switch(o.type){
+						case LOADED:
+							trains.put(train, o.succes);
+							break;
+						case UNLOADED:
+							trains.put(train, !o.succes);
+							break;
+						}
+						
 						// reschedule
 						scheduleRandomStation(train);	
 					}
@@ -195,6 +208,23 @@ public class TrainsDemo {
 		}
 	}
 	
+	public void stop(){
+		TrainCommand c = new TrainCommand();
+		c.type = TrainCommand.Type.MOVE;
+		c.directionAndSpeed = 0;
+		
+		try {
+			mqtt.publish(TrainCommand.TOPIC,  ByteBuffer.wrap( converter.convert(c).to(byte[].class)));
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void resume(){
+		for(String train : trains.keySet()){
+			scheduleRandomStation(train);
+		}
+	}
 	
 	private void scheduleRandomStation(String train){
 		final String station = stationList.get(random.nextInt(stationList.size()));
