@@ -1,8 +1,4 @@
-# OSGI ENROUTE TRAINS UTIL
+# Trains utilities
 
-${Bundle-Description}
-
-## Example
-
-## References
+Contains a converter to convert Train DTOs to/from MQTT byte[] payload.
 
