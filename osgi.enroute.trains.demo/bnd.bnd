@@ -30,4 +30,5 @@ Private-Package: osgi.enroute.trains.demo
 
 Export-Package: \
 	osgi.enroute.trains.train.api,\
-	osgi.enroute.trains.robot.api
+	osgi.enroute.trains.robot.api,\
+	osgi.enroute.trains.demo.api

@@ -3,7 +3,7 @@ package osgi.enroute.trains.demo;
 public class Station {
 
 	public enum Type {
-		CARGO, REGULAR
+		CARGO, PARKING, REGULAR
 	}
 	
 	public String name;

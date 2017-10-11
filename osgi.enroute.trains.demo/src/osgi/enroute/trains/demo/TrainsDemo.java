@@ -1,7 +1,6 @@
 package osgi.enroute.trains.demo;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +9,7 @@ import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -20,11 +20,12 @@ import org.osgi.util.converter.Converter;
 
 import osgi.enroute.debug.api.Debug;
 import osgi.enroute.mqtt.api.MQTTService;
+import osgi.enroute.trains.demo.api.DemoCommand;
+import osgi.enroute.trains.demo.api.DemoObservation;
 import osgi.enroute.trains.robot.api.RobotCommand;
 import osgi.enroute.trains.robot.api.RobotObservation;
 import osgi.enroute.trains.train.api.Assignment;
 import osgi.enroute.trains.train.api.Assignment.Type;
-import osgi.enroute.trains.train.api.TrainCommand;
 
 /**
  * Train demo.
@@ -37,16 +38,17 @@ import osgi.enroute.trains.train.api.TrainCommand;
 			Debug.COMMAND_FUNCTION + "=station",
 			Debug.COMMAND_FUNCTION + "=container",
 			Debug.COMMAND_FUNCTION + "=stop",
-			Debug.COMMAND_FUNCTION + "=resume"},
+			Debug.COMMAND_FUNCTION + "=start",
+			Debug.COMMAND_FUNCTION + "=emergency"},
 	service=TrainsDemo.class)
 public class TrainsDemo {
 
 	private Random random = new Random();
 	
-	private Map<String, Boolean> trains = new HashMap<>();
+	private volatile boolean emergency = false; 
+	private volatile boolean robotHasContainer = false;
 	
-	// separate list of station names to facilitate random station selection
-	private List<String> stationList = new ArrayList<>();
+	private Map<String, Train> trains = new HashMap<>();
 	private Map<String, Station> stations = new HashMap<>();
 
 	private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
@@ -80,27 +82,33 @@ public class TrainsDemo {
 			station.name = split[0].trim();
 			station.segment = split[1].trim();
 			station.type = Station.Type.valueOf(split[2].trim());
-			
-			stationList.add(station.name);
 			stations.put(station.name, station);
 		}
 		
-		for(String s : config.trains()){
-			String[] split = s.split(":");
-			String train = split[0].trim();
-			boolean loaded = Boolean.parseBoolean(split[1].trim());
-			trains.put(train, loaded);
+		for(String train : config.trains()){
+			Train t = new Train();
+			t.name = train;
+			t.assignment = null;
+			t.state = Train.State.RUNNING;
+			trains.put(train, t);
 			scheduleRandomStation(train);
 		}
 		
 		mqtt.subscribe(Assignment.TOPIC)
 			.map(msg -> converter.convert(msg.payload().array()).to(Assignment.class))
 			.forEach(a -> {
+				Train train = trains.get(a.train);
+				if(train == null){
+					System.err.println("Invalid train? "+a.train);
+					return;
+				}
+				
 				switch(a.type){
 				case REACHED:
 				{
 					// train reached assignment 
-					String train = a.train;
+					train.assignment = null;
+
 					Optional<Station> station = stations.values().stream()
 						.filter(s -> s.segment.equals(a.segment))
 						.findFirst();
@@ -108,25 +116,25 @@ public class TrainsDemo {
 					if(station.isPresent()){
 						System.out.println("Train "+a.train+" reached station "+station.get().name);
 						
-						station.get().train = train;
+						station.get().train = train.name;
 						
-						event("Train "+a.train+" reached station "+station.get().name);
-						
+						message("Train "+a.train+" reached station "+station.get().name);
+
 						if(station.get().type == Station.Type.CARGO){
-							if(trains.get(a.train)){
-								// this train is loaded?
-								event("Unloading container from "+a.train);
-								container(false);
-							} else {
-								event("Loading container onto "+a.train);
-								container(true);
-							}
+							scheduler.schedule(() -> container(), 3, TimeUnit.SECONDS);
+						} else if(train.state == Train.State.STOPPING){
+							// we reached the parking station, so stop now
+							// TODO send out stopped event
+							System.out.println("Train "+train.name+" stopped!");
+							stopped(train.name, station.get().name);
+							
+							train.state = Train.State.STOPPED;
 						} else {
-							scheduleRandomStation(train);
+							scheduleRandomStation(train.name);
 						}
 					} else {
 						// reschedule when assigned to custom segment?
-						scheduleRandomStation(train);
+						scheduleRandomStation(train.name);
 					}
 					
 					
@@ -134,14 +142,24 @@ public class TrainsDemo {
 				}
 				case ASSIGN:
 				{	
+					train.assignment = a.segment;
+					
 					Optional<Station> station = stations.values().stream()
 						.filter(s -> a.train.equals(s.train))
 						.findFirst();	
 					
 					if(station.isPresent()){
-						event("Train "+a.train+" leaving station "+station.get().name);
+						message("Train "+a.train+" leaving station "+station.get().name);
 						station.get().train = null;
 					}
+					break;
+				}
+				case ABORTED:
+				{
+					train.assignment = null;
+					
+					// re-assign?
+					scheduleRandomStation(train.name);
 					break;
 				}
 			}
@@ -158,26 +176,41 @@ public class TrainsDemo {
 						.findFirst();
 				
 				if(station.isPresent()){
-					String train = station.get().train;
+					Train train = trains.get(station.get().train);
 					
 					if(train != null){
 						// update loaded state
 						switch(o.type){
 						case LOADED:
-							trains.put(train, o.succes);
+							robotHasContainer = !o.succes;
 							break;
 						case UNLOADED:
-							trains.put(train, !o.succes);
+							robotHasContainer = o.succes;
 							break;
 						}
 						
-						// reschedule
-						scheduleRandomStation(train);	
+						// leave the station after one second
+						scheduleRandomStation(train.name, 1);	
 					}
 				}
 		});
 		
 		
+		mqtt.subscribe(DemoCommand.TOPIC)
+			.map(msg -> converter.convert(msg.payload().array()).to(DemoCommand.class))
+			.forEach(c -> {
+				switch(c.type){
+				case START:
+					start(c.train);
+					break;
+				case STOP:
+					stop(c.train);
+					break;
+				case EMERGENCY:
+					emergency(c.emergency);
+					break;
+				}
+			});
 	}
 	
 	// send a train to a station
@@ -197,9 +230,10 @@ public class TrainsDemo {
 	
 	
 	// load/unload container
-	public void container(boolean load){
+	public void container(){
 		RobotCommand c = new RobotCommand();
-		c.type = load ? RobotCommand.Type.LOAD : RobotCommand.Type.UNLOAD;
+		// if robot has container, try to load it on train - will fail if train is already loaded?
+		c.type = robotHasContainer ? RobotCommand.Type.LOAD : RobotCommand.Type.UNLOAD;
 		
 		try {
 			mqtt.publish(RobotCommand.TOPIC,  ByteBuffer.wrap( converter.convert(c).to(byte[].class)));
@@ -208,55 +242,193 @@ public class TrainsDemo {
 		}
 	}
 	
-	public void stop(){
-		TrainCommand c = new TrainCommand();
-		c.type = TrainCommand.Type.MOVE;
-		c.directionAndSpeed = 0;
+	public void stop(String train){
+		Train t = trains.get(train);
+		if(t == null){
+			return;
+		}
+		
+		// cancel any running schedules
+		if(t.schedule != null){
+			t.schedule.cancel(false);
+		}
+		
+		// send the train to a "parking" station
+		Optional<Station> parkingStation = stations.values().stream()
+			.filter(station -> station.type == Station.Type.PARKING) // only parking stations
+			.filter(station -> station.train == null || station.train.equals(t.name)) // ignore stations that currently have train parked
+			.filter(station -> trains.values().stream().filter(tt -> !tt.name.equals(t.name)).filter(tt -> station.segment.equals(tt.assignment)).count() == 0) // filter stations that are assigned to other trains
+			.findFirst();
+		
+		if(!parkingStation.isPresent()){
+			System.err.println("No parking station available?!");
+			System.err.println("Stations");
+			for(Station station : stations.values()){
+				System.err.println("* "+station.name+" "+station.type+" "+station.train);
+			}
+			System.err.println("Trains");
+			for(Train tt : trains.values()){
+				System.err.println("* "+tt.name+" "+tt.assignment);
+			}
+			return;
+		}
+		
+		if(t.name.equals(parkingStation.get().train)){
+			// train is already at parking station!
+			t.state = Train.State.STOPPED;
+			
+			System.out.println("Train "+t.name+" stopped at station "+parkingStation.get().name);
+			stopped(t.name, parkingStation.get().name);
+		} else {
+			t.state = Train.State.STOPPING;
+			station(train, parkingStation.get().name);
+
+			System.out.println("Train "+t.name+" stopping!");
+			message("Train "+t.name+" stopping");
+		}
+
+	}
+	
+	public void emergency(boolean emergency){
+		this.emergency = emergency;
+		
+		if(emergency){
+			// stop everything
+			for(Train t : trains.values()){
+				
+				if(t.schedule != null){
+					t.schedule.cancel(false);
+				}
+				
+				Assignment a = new Assignment();
+				a.type = Assignment.Type.ABORT;
+				a.train = t.name;
+				
+				try {
+					mqtt.publish(Assignment.TOPIC,  ByteBuffer.wrap( converter.convert(a).to(byte[].class)));
+				} catch(Exception e){
+					System.out.println("Failed publishing command");
+				}		
+			}
+			resetRobot();
+			message("EMERGENCY! EMERGENCY!");
+			
+		} else {
+			// start trains again
+			for(Train t : trains.values()){
+				scheduleRandomStation(t.name, 0);
+			}
+		}
+	}
+
+	public void resetRobot(){
+		RobotCommand c = new RobotCommand();
+		c.type = RobotCommand.Type.RESET;
+		robotHasContainer = false;
 		
 		try {
-			mqtt.publish(TrainCommand.TOPIC,  ByteBuffer.wrap( converter.convert(c).to(byte[].class)));
+			mqtt.publish(RobotCommand.TOPIC,  ByteBuffer.wrap( converter.convert(c).to(byte[].class)));
 		} catch(Exception e){
-			e.printStackTrace();
+			System.out.println("Failed publishing command");
 		}
 	}
 	
-	public void resume(){
-		for(String train : trains.keySet()){
-			scheduleRandomStation(train);
+	
+	public void start(String train){
+		Train t = trains.get(train);
+		if(t == null){
+			return;
 		}
+		
+		System.out.println("Train "+t.name+" started!");
+		started(t.name);
+		
+		scheduleRandomStation(train, 0);
 	}
 	
 	private void scheduleRandomStation(String train){
-		final String station = stationList.get(random.nextInt(stationList.size()));
-		int seconds = random.nextInt(20);
-		System.out.println("Send "+train+" to "+station+" in "+seconds+" s.");
-		scheduler.schedule(()-> station(train, station), seconds, TimeUnit.SECONDS);
+		int delay = random.nextInt(10);
+		scheduleRandomStation(train, delay);
+	}
+
+	private void scheduleRandomStation(String train, int delay){
+		if(emergency){
+			return;
+		}
+		
+		Train t = trains.get(train);
+		if(t == null){
+			return;
+		}
+		
+		// cancel any previous schedules
+		if(t.schedule != null){
+			t.schedule.cancel(false);
+		}
+		
+		// filter out stations that currently have a train
+		List<Station> stationList = stations.values().stream()
+				.filter(station -> station.train == null)
+		//		.filter(station -> trains.values().stream().filter(tt -> station.segment.equals(tt.assignment)).count() == 0)
+				.collect(Collectors.toList());
+		
+		System.out.println("Potential stations: ");
+		stationList.stream().forEach(s -> System.out.println("* "+s.name+" "+s.type));
+		
+		Station assignment;
+		Optional<Station> cargo = stationList.stream().filter(station -> station.type == Station.Type.CARGO).findFirst(); 
+		if(cargo.isPresent()){
+			System.out.println("Send "+train+" to cargo station");
+			assignment = cargo.get();
+		} else {
+			assignment = stationList.get(random.nextInt(stationList.size()));
+		}
+		
+		final String station = assignment.name;
+
+		System.out.println("Send "+train+" to "+station+" in "+delay+" s.");
+		t.schedule = scheduler.schedule(()-> station(train, station), delay, TimeUnit.SECONDS);
 	}
 	
-	
-	public void event(String message){
-		DemoEvent event = new DemoEvent();
-		event.time = System.currentTimeMillis();
-		event.message = message;
-		
+	public void started(String train){
+		DemoObservation o = new DemoObservation();
+		o.time = System.currentTimeMillis();
+		o.type = DemoObservation.Type.TRAIN_STARTED;
+		o.train = train;
+		o.message = "Train "+train+" started";
+
 		try {
-			mqtt.publish(DemoEvent.TOPIC,  ByteBuffer.wrap( converter.convert(event).to(byte[].class)));
+			mqtt.publish(DemoObservation.TOPIC,  ByteBuffer.wrap( converter.convert(o).to(byte[].class)));
 		} catch(Exception e){
 			e.printStackTrace();
 		}
 	}
 	
-	//
+	public void stopped(String train, String station){
+		DemoObservation o = new DemoObservation();
+		o.time = System.currentTimeMillis();
+		o.type = DemoObservation.Type.TRAIN_STOPPED;
+		o.train = train;
+		o.message = "Train "+train+" stopped at station "+station;
+
+		try {
+			mqtt.publish(DemoObservation.TOPIC,  ByteBuffer.wrap( converter.convert(o).to(byte[].class)));
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+	}
 	
-	// Demo actions
-	// - for each train: command to go to station vs random loop
-	// - trigger the robot (only when train in station?!)
 	
-	// Events to send out
-	// - train arriving in station
-	// - train departing station
-	// - load/unload events
-	
-	// Other scenarios
-	// - send train to servicing station
+	public void message(String message){
+		DemoObservation o = new DemoObservation();
+		o.time = System.currentTimeMillis();
+		o.message = message;
+		o.type = DemoObservation.Type.MESSAGE;
+		
+		try {
+			mqtt.publish(DemoObservation.TOPIC,  ByteBuffer.wrap( converter.convert(o).to(byte[].class)));
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+	}
 }
