@@ -9,7 +9,7 @@ public class RobotCommand extends DTO {
 	public final static String TOPIC = "osgi/trains/command/robot";
 
 	public enum Type {
-		LOAD, UNLOAD
+		LOAD, UNLOAD, RESET
 	}
 
 	public Type type;

@@ -46,6 +46,10 @@ public class RobotCommands {
 					System.out.println("Unload container from the train");
 					unload();
 					break;
+				case RESET:
+					System.out.println("Reset robot arm");
+					robot.reset();
+					break;
 				}
 			});
 		} catch (Exception e) {

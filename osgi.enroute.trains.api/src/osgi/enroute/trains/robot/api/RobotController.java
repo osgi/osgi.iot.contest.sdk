@@ -6,4 +6,7 @@ public interface RobotController {
 	
 	public boolean unload();
 	
+	public void reset();
+	
+	public void stop();
 }
