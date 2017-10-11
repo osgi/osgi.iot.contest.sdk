@@ -78,6 +78,7 @@ public class TrainCommands {
 				TrainObservation o = new TrainObservation();
 				o.time = System.currentTimeMillis();
 				o.type = directionAndSpeed == 0 ? TrainObservation.Type.STOPPED : TrainObservation.Type.MOVING;
+				o.train = train;
 				o.directionAndSpeed = directionAndSpeed;
 				mqtt.publish(TrainObservation.TOPIC, ByteBuffer.wrap( converter.convert(o).to(byte[].class)));
 			} catch(Exception e){
@@ -96,6 +97,7 @@ public class TrainCommands {
 				TrainObservation o = new TrainObservation();
 				o.time = System.currentTimeMillis();
 				o.type = TrainObservation.Type.LIGHT;
+				o.train = train;
 				o.on = on;
 				mqtt.publish(TrainObservation.TOPIC, ByteBuffer.wrap( converter.convert(o).to(byte[].class)));
 			} catch(Exception e){
