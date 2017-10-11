@@ -14,11 +14,16 @@ public class Assignment extends DTO {
 		 */
 		ASSIGN, 
 		/**
+		 * Abort current assignment
+		 */
+		ABORT,
+		/**
 		 * Notify of assignment reached
 		 */
 		REACHED,
 		/**
 		 * Notify of assignment aborted, e.g. could not find route or get access
+		 * or someone aborted an assignment
 		 */
 		ABORTED
 	}

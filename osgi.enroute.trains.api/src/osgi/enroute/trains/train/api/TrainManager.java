@@ -15,9 +15,21 @@ public interface TrainManager {
 	 */
 	void assign(String toSegment);
 	
+	
 	/**
-	 * Stop the train
+	 * Abort the current assignment.
 	 */
-	void stop();
+	void abort();
 
+	
+	/**
+	 * Get the (max) speed of the train
+	 */
+	int speed();
+	
+	/**
+	 * Set a new (max) speed of the train
+	 * @param speed
+	 */
+	void speed(int speed);
 }
