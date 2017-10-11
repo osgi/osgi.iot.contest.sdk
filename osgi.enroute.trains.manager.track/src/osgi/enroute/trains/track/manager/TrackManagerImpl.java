@@ -36,7 +36,7 @@ import osgi.enroute.trains.train.api.TrainCommand;
 @Component(immediate = true, name = "osgi.enroute.trains.track.manager", configurationPolicy = ConfigurationPolicy.REQUIRE)
 public class TrackManagerImpl implements TrackManager {
 
-	private static final int TIMEOUT = 60000;
+	private static final int TIMEOUT = 20000;
 
 	private Tracks tracks;
 
@@ -63,6 +63,7 @@ public class TrackManagerImpl implements TrackManager {
 		tracks = new Tracks(config.segments());
 
 		tracks.getSegments().entrySet().stream().filter(e -> e.getValue().type == Segment.Type.SIGNAL).forEach(e -> setSignal(e.getKey(), Color.RED));
+		tracks.getSegments().entrySet().stream().filter(e -> e.getValue().type == Segment.Type.SWITCH).forEach(e -> doSwitch(e.getKey(), false));
 		
 		mqtt.subscribe(TrackObservation.TOPIC).forEach(msg -> {
 			TrackObservation o = converter.convert(msg.payload().array()).to(TrackObservation.class);
@@ -247,11 +248,11 @@ public class TrackManagerImpl implements TrackManager {
 			// check if previous is fromTrack
 			if (sh.prev.getTrack().equals(fromTrack)) {
 				// if so, then alternate should be false
-				if (sh.toAlternate) {
+				if (!sh.toAlternate) {
 					switchOK = false;
 				}
 				// else alternate should be true
-			} else if (!sh.toAlternate) {
+			} else if (sh.toAlternate) {
 				switchOK = false;
 			}
 		} else {
