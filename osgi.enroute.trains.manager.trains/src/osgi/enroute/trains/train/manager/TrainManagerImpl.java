@@ -28,7 +28,8 @@ import osgi.enroute.trains.train.api.TrainManager;
 	configurationPolicy = ConfigurationPolicy.REQUIRE,
 	property = {
 			Debug.COMMAND_FUNCTION + "=assign", //
-			Debug.COMMAND_FUNCTION + "=stop"
+			Debug.COMMAND_FUNCTION + "=stop",
+			Debug.COMMAND_FUNCTION + "=speed"
 	})
 public class TrainManagerImpl implements TrainManager {
 
@@ -47,9 +48,6 @@ public class TrainManagerImpl implements TrainManager {
 	
 	// current access
 	private String currentAccess = null;
-	
-	// current route
-	private List<Segment> currentRoute = null;
 	
 	@Reference
 	private Converter converter;
@@ -71,12 +69,19 @@ public class TrainManagerImpl implements TrainManager {
 		
 		mqtt.subscribe(Assignment.TOPIC)
 			.map(msg -> converter.convert(msg.payload().array()).to(Assignment.class))
-			.filter(a -> a.type == Assignment.Type.ASSIGN)
 			.filter(a -> a.train.equals(config.name()))
 			.forEach(a -> {
-				// new assignment for this train
-				System.out.println("New assignment for "+a.train);
-				assign(a.segment);
+				switch(a.type){
+				case ASSIGN:
+					// new assignment for this train
+					System.out.println("New assignment for "+a.train);
+					assign(a.segment);
+					break;
+				case ABORT:
+					System.out.println("Abort assignment for "+a.train);
+					assignmentAborted();
+					break;
+				}
 			});
 		
 		mqtt.subscribe(TrackObservation.TOPIC)
@@ -99,14 +104,23 @@ public class TrainManagerImpl implements TrainManager {
 	}
 	
 	@Override
-	public void stop(){
-		// clear assignment and stop
-		currentAssignment = null;
-		halt();
+	public void abort(){
+		assignmentAborted();
+	}
+	
+	@Override
+	public void speed(int speed){
+		this.speed = speed;
+	}
+	
+	@Override
+	public int speed(){
+		return this.speed;
 	}
 	
 	private void observation(TrackObservation o){
-		System.out.println("Train "+config.name()+" located at "+o.segment+" ( after "+(System.currentTimeMillis() - interval)+" ms)");
+		long timeSinceLastObservation = (System.currentTimeMillis() - interval);
+		System.out.println("Train "+config.name()+" located at "+o.segment+" ( after "+timeSinceLastObservation+" ms)");
 		if(o.segment == null){
 			// invalid located event!?
 			return;
@@ -140,7 +154,7 @@ public class TrainManagerImpl implements TrainManager {
 		
 		// check whether we have to request access to a track
 		String fromTrack = remainingRoute.get(0).track;
-		String toTrack = remainingRoute.get(Math.min(4, remainingRoute.size()-1)).track;
+		String toTrack = remainingRoute.get(Math.min(5, remainingRoute.size()-1)).track;
 		
 		if (!fromTrack.equals(toTrack) && !toTrack.equals(currentAccess)) {
 			halt();
@@ -149,19 +163,21 @@ public class TrainManagerImpl implements TrainManager {
 			boolean granted = trackManager.requestAccessTo(config.name(), fromTrack, toTrack);
 			
 			if(granted){
-				currentAccess = toTrack;
-				move();
+				if(currentAssignment != null){
+					currentAccess = toTrack;
+					move(speed);
+				}
 			} else {
 				System.out.println("Train "+config.name()+" did not get access to "+toTrack+", aborting assignment?");
 				assignmentAborted();
 			}
 		} else {
-			move();
+			move(speed);
 		}
 	}
 	
 
-	private void move(){
+	private void move(int speed){
 		TrainCommand c = new TrainCommand();
 		c.type = Type.MOVE;
 		c.train = config.name();
@@ -186,8 +202,8 @@ public class TrainManagerImpl implements TrainManager {
 	}
 	
 	private void assignmentReached(){
-		System.out.println("Train "+config.name()+" reached assignment!");
 		halt();
+		System.out.println("Train "+config.name()+" reached assignment!");
 		
 		Assignment a = new Assignment();
 		a.type = Assignment.Type.REACHED;
@@ -201,12 +217,11 @@ public class TrainManagerImpl implements TrainManager {
 		}
 		
 		currentAssignment = null;
-		currentRoute = null;
 	}
 	
 	private void assignmentAborted(){
 		halt();
-		
+
 		Assignment a = new Assignment();
 		a.type = Assignment.Type.ABORTED;
 		a.segment = currentAssignment;
@@ -219,7 +234,5 @@ public class TrainManagerImpl implements TrainManager {
 		}
 		
 		currentAssignment = null;
-		currentRoute = null;
 	}
-
 }
