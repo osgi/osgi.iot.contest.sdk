@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.osgi.framework.BundleContext;
@@ -58,7 +59,9 @@ public class MQTTServiceImpl implements MQTTService, AutoCloseable, MqttCallback
 		String id = UUID.randomUUID().toString();
 		try {
 			mqtt = new MqttClient(config.broker(), id);
-			mqtt.connect();
+			MqttConnectOptions options = new MqttConnectOptions();
+			options.setAutomaticReconnect(true);
+			mqtt.connect(options);
 			mqtt.setCallback(this);
 		} catch(Exception e){
 			System.err.println("Error connecting to MQTT broker "+config.broker());
@@ -117,8 +120,7 @@ public class MQTTServiceImpl implements MQTTService, AutoCloseable, MqttCallback
 	
 	@Override
 	public void connectionLost(Throwable ex) {
-		System.err.println("Connection lost?!");
-		ex.printStackTrace();
+		System.err.println("Connection to the MQTT broker lost?!");
 	}
 
 	@Override
