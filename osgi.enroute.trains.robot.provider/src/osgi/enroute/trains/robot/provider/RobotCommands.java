@@ -61,7 +61,7 @@ public class RobotCommands {
 	public void load(){
 		RobotObservation o = new RobotObservation();
 		o.type = RobotObservation.Type.LOADED;
-		o.succes = robot.load();
+		o.success = robot.load();
 		o.time = System.currentTimeMillis();
 		observation(o);
 	}
@@ -69,7 +69,7 @@ public class RobotCommands {
 	public void unload(){
 		RobotObservation o = new RobotObservation();
 		o.type = RobotObservation.Type.UNLOADED;
-		o.succes = robot.unload();
+		o.success = robot.unload();
 		o.time = System.currentTimeMillis();
 		observation(o);
 	}

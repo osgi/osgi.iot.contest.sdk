@@ -20,6 +20,6 @@ public class RobotObservation extends DTO {
 	}
 
 	public Type type;
-	public boolean succes;
+	public boolean success;
 	public long time;
 }
