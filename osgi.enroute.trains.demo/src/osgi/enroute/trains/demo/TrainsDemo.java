@@ -36,6 +36,8 @@ import osgi.enroute.trains.train.api.Assignment.Type;
 	property = {
 			Debug.COMMAND_SCOPE +"=trains",
 			Debug.COMMAND_FUNCTION + "=station",
+			Debug.COMMAND_FUNCTION + "=robot",
+			Debug.COMMAND_FUNCTION + "=robotHasContainer",
 			Debug.COMMAND_FUNCTION + "=container",
 			Debug.COMMAND_FUNCTION + "=stop",
 			Debug.COMMAND_FUNCTION + "=start",
@@ -45,7 +47,9 @@ public class TrainsDemo {
 
 	private Random random = new Random();
 	
-	private volatile boolean emergency = false; 
+	private volatile boolean emergency = false;
+	
+	private boolean robot = true;
 	private volatile boolean robotHasContainer = false;
 	
 	private Map<String, Train> trains = new HashMap<>();
@@ -120,7 +124,7 @@ public class TrainsDemo {
 						
 						message("Train "+a.train+" reached station "+station.get().name);
 
-						if(station.get().type == Station.Type.CARGO){
+						if(station.get().type == Station.Type.CARGO && robot){
 							scheduler.schedule(() -> container(), 3, TimeUnit.SECONDS);
 						} else if(train.state == Train.State.STOPPING){
 							// we reached the parking station, so stop now
@@ -182,10 +186,10 @@ public class TrainsDemo {
 						// update loaded state
 						switch(o.type){
 						case LOADED:
-							robotHasContainer = !o.succes;
+							robotHasContainer = !o.success;
 							break;
 						case UNLOADED:
-							robotHasContainer = o.succes;
+							robotHasContainer = o.success;
 							break;
 						}
 						
@@ -212,6 +216,22 @@ public class TrainsDemo {
 				}
 			});
 	}
+
+	public boolean robot(){
+		return robot;
+	}
+	
+	public void robot(boolean r){
+		this.robot = r;
+	}
+	
+	public boolean robotHasContainer(){
+		return robotHasContainer;
+	}
+	
+	public void robotHasContainer(boolean c){
+		this.robotHasContainer  = c;
+	}
 	
 	// send a train to a station
 	public void station(String train, String station){
@@ -227,7 +247,6 @@ public class TrainsDemo {
 			e.printStackTrace();
 		}
 	}
-	
 	
 	// load/unload container
 	public void container(){
