@@ -120,7 +120,7 @@ public class TrainManagerImpl implements TrainManager {
 	
 	private void observation(TrackObservation o){
 		long timeSinceLastObservation = (System.currentTimeMillis() - interval);
-		System.out.println("Train "+config.name()+" located at "+o.segment+" ( after "+timeSinceLastObservation+" ms)");
+		//System.out.println("Train "+config.name()+" located at "+o.segment+" ( after "+timeSinceLastObservation+" ms)");
 		if(o.segment == null){
 			// invalid located event!?
 			return;
@@ -165,14 +165,18 @@ public class TrainManagerImpl implements TrainManager {
 			if(granted){
 				if(currentAssignment != null){
 					currentAccess = toTrack;
-					move(speed);
+					move(speed+10);
 				}
 			} else {
 				System.out.println("Train "+config.name()+" did not get access to "+toTrack+", aborting assignment?");
 				assignmentAborted();
 			}
 		} else {
-			move(speed);
+			if(remainingRoute.size() > 9 && remainingRoute.get(9).track.equals(currentAccess)){
+				move(speed+10);
+			} else {
+				move(speed);
+			}
 		}
 	}
 	
