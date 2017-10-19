@@ -25,6 +25,7 @@ import osgi.enroute.trains.demo.api.DemoObservation;
 import osgi.enroute.trains.robot.api.RobotCommand;
 import osgi.enroute.trains.robot.api.RobotObservation;
 import osgi.enroute.trains.train.api.Assignment;
+import osgi.enroute.trains.train.api.TrainCommand;
 import osgi.enroute.trains.train.api.Assignment.Type;
 
 /**
@@ -41,6 +42,7 @@ import osgi.enroute.trains.train.api.Assignment.Type;
 			Debug.COMMAND_FUNCTION + "=container",
 			Debug.COMMAND_FUNCTION + "=stop",
 			Debug.COMMAND_FUNCTION + "=start",
+			Debug.COMMAND_FUNCTION + "=blink",
 			Debug.COMMAND_FUNCTION + "=emergency"},
 	service=TrainsDemo.class)
 public class TrainsDemo {
@@ -48,6 +50,7 @@ public class TrainsDemo {
 	private Random random = new Random();
 	
 	private volatile boolean emergency = false;
+	private volatile boolean blink = true;
 	
 	private boolean robot = true;
 	private volatile boolean robotHasContainer = false;
@@ -330,6 +333,7 @@ public class TrainsDemo {
 				}		
 			}
 			resetRobot();
+			blink();
 			message("EMERGENCY! EMERGENCY!");
 			
 		} else {
@@ -340,6 +344,26 @@ public class TrainsDemo {
 		}
 	}
 
+	public void blink(){
+		for(Train train : trains.values()){
+			TrainCommand c = new TrainCommand();
+			c.type = TrainCommand.Type.LIGHT;
+			c.on = blink;
+			c.train = train.name;
+			
+			try {
+				mqtt.publish(TrainCommand.TOPIC,  ByteBuffer.wrap( converter.convert(c).to(byte[].class)));
+			} catch(Exception e){
+				System.out.println("Failed publishing command");
+			}
+		}
+		
+		if(emergency || blink){
+			blink = !blink;
+			scheduler.schedule(()->blink(), 1, TimeUnit.SECONDS);
+		}
+	}
+	
 	public void resetRobot(){
 		RobotCommand c = new RobotCommand();
 		c.type = RobotCommand.Type.RESET;
