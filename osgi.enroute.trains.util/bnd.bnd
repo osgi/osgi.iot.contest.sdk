@@ -11,7 +11,9 @@ Bundle-Description: 				\
 	osgi.enroute.base.api;version=1.0,\
 	osgi.enroute.mqtt.provider;version=latest,\
 	org.apache.felix.converter,\
-	com.springsource.org.json
+	com.springsource.org.json,\
+	osgi.enroute.trains.api;version=latest,\
+	osgi.enroute.trains.demo;version=latest
 
 -testpath: \
 	osgi.enroute.junit.wrapper;version=4.12, \

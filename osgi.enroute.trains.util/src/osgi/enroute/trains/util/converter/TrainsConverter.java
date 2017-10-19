@@ -15,6 +15,7 @@ import org.osgi.util.converter.Converter;
 import org.osgi.util.converter.ConverterBuilder;
 import org.osgi.util.converter.ConverterFunction;
 import org.osgi.util.converter.Converters;
+import org.osgi.util.converter.TypeReference;
 
 @Component(immediate=true)
 public class TrainsConverter {
@@ -35,9 +36,11 @@ public class TrainsConverter {
 			@Override
 			public Object apply(Object obj, Type targetType) throws Exception {
 				if(targetType.equals(byte[].class)){
-					// convert to byte array using toString representation and get the bytes
+					// convert to byte array using json string representation and get the bytes
 					// works for DTOs (should we check whether obj is DTO?)
-					return obj.toString().getBytes();
+					Map<String,String> m = converter.convert(obj).to(new TypeReference<Map<String, String>>(){});
+					JSONObject json = new JSONObject(m);
+					return json.toString().getBytes();
 				} else {
 					return ConverterFunction.CANNOT_HANDLE;
 				}
