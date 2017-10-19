@@ -20,9 +20,11 @@ import osgi.enroute.trains.robot.api.RobotController;
 		Debug.COMMAND_FUNCTION + "=open",
 		Debug.COMMAND_FUNCTION + "=reset",
 		Debug.COMMAND_FUNCTION + "=stop",
-		Debug.COMMAND_FUNCTION + "=y",
 		Debug.COMMAND_FUNCTION + "=h",
 		Debug.COMMAND_FUNCTION + "=xoffset",
+		Debug.COMMAND_FUNCTION + "=yloadoffset",
+		Debug.COMMAND_FUNCTION + "=yunloadoffset",
+		Debug.COMMAND_FUNCTION + "=yfixed",
 		Debug.COMMAND_FUNCTION + "=aoffset"
 }, service={RobotProvider.class,RobotController.class})
 public class RobotProvider implements RobotController {
@@ -42,21 +44,40 @@ public class RobotProvider implements RobotController {
 	private float y_grip = 0.3f;
 	private float a_grip = 1.57f;
 	private float h_grip = 0.088f;
-	private float x_offset = 0.13f;
-	private float a_offset = 0.0f;
-	
+	private float x_load_offset = -0.13f;
+	private float y_fixed = -1f;
+	private float y_load_offset = 0.17f;
+	private float y_unload_offset = 0.18f;
+	private float a_offset = -0.17f;
+
 
 	public void stop(){
 		base.stop();
 		arm.stop();
 	}
 	
-	public float y(){
-		return y_grip;
+	public float yloadoffset(){
+		return y_load_offset;
 	}
 	
-	public void y(float y){
-		this.y_grip = y;
+	public void yloadoffset(float y){
+		this.y_load_offset = y;
+	}
+	
+	public float yunloadoffset(){
+		return y_unload_offset;
+	}
+	
+	public void yunloadoffset(float y){
+		this.y_unload_offset = y;
+	}
+
+	public float yfixed(){
+		return y_fixed;
+	}
+	
+	public void yfixed(float y){
+		this.y_fixed = y;
 	}
 	
 	public float h(){
@@ -68,11 +89,11 @@ public class RobotProvider implements RobotController {
 	}
 	
 	public float xoffset(){
-		return x_offset;
+		return x_load_offset;
 	}
 	
 	public void xoffset(float o){
-		this.x_offset = o;
+		this.x_load_offset = o;
 	}
 
 	public float aoffset(){
@@ -113,8 +134,6 @@ public class RobotProvider implements RobotController {
 		}
 		
 		System.out.println("Load container on the train");
-		
-		// TODO check if there is a train to load the container on?
 		
 		try {
 			Promise<Arm> toWaitFor = put().then(p -> open());
@@ -246,8 +265,9 @@ public class RobotProvider implements RobotController {
 			System.out.println("Train start "+s1 + " " +x[s1]
 					+" - Train end "+e1+ " "+ x[e1]);
 			
-			x_grip = x[e1] - x_offset;
-			//y_grip  = 0.185f + y[e1];
+			x_grip = x[e1+3] + x_load_offset;
+			
+			y_grip  = y_fixed > 0 ? y_fixed : y_load_offset + y[e1+3];
 			a_grip = 1.57f - (float)Math.tan(x_grip/y_grip) + a_offset;
 			
 			System.out.println("Pose "+x_grip+" "+y_grip);
@@ -266,7 +286,7 @@ public class RobotProvider implements RobotController {
 					+" - Container end "+e2+ " "+ x[e2]);
 			
 			x_grip = (x[s2]+x[e2])/2;
-			//y_grip = 0.185f + y[(s2+e2)/2];
+			y_grip =  y_fixed > 0 ? y_fixed : y_unload_offset + y[(s2+e2)/2];
 			a_grip = 1.57f - (float)Math.tan(x_grip/y_grip) + a_offset;
 			
 			System.out.println("Pose "+x_grip+" "+y_grip);
